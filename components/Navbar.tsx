@@ -162,7 +162,9 @@ function Navbar() {
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         console.error('Image failed to load:', user.photo);
-                        console.error('Attempted path:', user.photo.startsWith('/') ? user.photo : `/${user.photo}`);
+                        if (user.photo) {
+                          console.error('Attempted path:', user.photo.startsWith('/') ? user.photo : `/${user.photo}`);
+                        }
                         setPhotoError(true);
                       }}
                       onLoad={() => {

@@ -264,7 +264,6 @@ export default function HomeAuthCard() {
             style={{ backgroundColor: '#16A34A' }}
             onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#15803D')}
             onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#16A34A')}
-            disabled={loading}
           >
             {loading ? 'Submitting...' : 'Submit'}
           </button>
@@ -323,7 +322,6 @@ export default function HomeAuthCard() {
             style={{ backgroundColor: '#16A34A' }}
             onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#15803D')}
             onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#16A34A')}
-            disabled={loading}
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>

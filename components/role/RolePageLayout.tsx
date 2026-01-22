@@ -54,16 +54,18 @@ export default function RolePageLayout({
     silver: 'text-slate-600 dark:text-slate-400',
     gold: 'text-amber-600 dark:text-yellow-400',
     platinum: 'text-purple-600 dark:text-purple-400',
-  };
+  } as const;
+
+  const roleKey = role as 'silver' | 'gold' | 'platinum';
 
   return (
     <ProtectedRoute>
       <div className="w-full min-h-screen pt-24 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <RoleHeader role={role as 'silver' | 'gold' | 'platinum'} userName={user.name || user.email} />
+          <RoleHeader role={roleKey} userName={user.name || user.email} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <AccountInfoCard user={user} roleColor={roleColors[role]} />
+            <AccountInfoCard user={user} roleColor={roleColors[roleKey]} />
             <BenefitsCard benefits={benefits} />
           </div>
 

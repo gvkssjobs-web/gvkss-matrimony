@@ -205,6 +205,7 @@ export default function RoleFilterBar({
                 value={minAge || sliderMin}
                 onChange={(e) => handleMinInputChange(e.target.value)}
                 onBlur={(e) => {
+                  e.target.style.borderColor = '#22C55E';
                   const val = e.target.value;
                   if (val === '') {
                     setSliderMin(18);
@@ -231,7 +232,6 @@ export default function RoleFilterBar({
                 className='w-24 px-4 py-3 rounded-xl border-2 bg-white text-sm font-medium focus:outline-none focus:ring-2 transition-all duration-300'
                 style={{ borderColor: '#22C55E', color: '#111827' }}
                 onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-                onBlur={(e) => e.target.style.borderColor = '#22C55E'}
                 onMouseEnter={(e) => e.currentTarget.style.borderColor = '#16A34A'}
                 onMouseLeave={(e) => e.currentTarget.style.borderColor = '#22C55E'}
               />
@@ -241,6 +241,7 @@ export default function RoleFilterBar({
                 value={maxAge || sliderMax}
                 onChange={(e) => handleMaxInputChange(e.target.value)}
                 onBlur={(e) => {
+                  e.target.style.borderColor = '#22C55E';
                   const val = e.target.value;
                   if (val === '') {
                     setSliderMax(50);
@@ -267,7 +268,6 @@ export default function RoleFilterBar({
                 className='w-24 px-4 py-3 rounded-xl border-2 bg-white text-sm font-medium focus:outline-none focus:ring-2 transition-all duration-300'
                 style={{ borderColor: '#22C55E', color: '#111827' }}
                 onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-                onBlur={(e) => e.target.style.borderColor = '#22C55E'}
                 onMouseEnter={(e) => e.currentTarget.style.borderColor = '#16A34A'}
                 onMouseLeave={(e) => e.currentTarget.style.borderColor = '#22C55E'}
               />
