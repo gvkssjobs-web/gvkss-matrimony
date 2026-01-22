@@ -37,9 +37,27 @@ export default function UserCard({ user }: UserCardProps) {
       <div className="relative h-72 overflow-hidden">
         {user.photo ? (
           <img
-            src={user.photo.startsWith('/') ? user.photo : `/${user.photo}`}
+            src={
+              user.photo.startsWith('http://') || user.photo.startsWith('https://')
+                ? user.photo  // Use full URL directly for Vercel Blob
+                : user.photo.startsWith('/')
+                  ? user.photo  // Use relative path if it starts with /
+                  : `/${user.photo}`  // Prepend / for relative paths
+            }
             alt={user.name || user.email}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              // Fallback to placeholder if image fails to load
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+              const parent = target.parentElement;
+              if (parent && !parent.querySelector('.photo-placeholder')) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'photo-placeholder w-full h-full bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-300 flex items-center justify-center';
+                placeholder.innerHTML = `<div class="text-7xl font-bold text-zinc-400">${user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}</div>`;
+                parent.appendChild(placeholder);
+              }
+            }}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-300 flex items-center justify-center">

@@ -95,7 +95,13 @@ export default function UsersDisplay() {
                 <div className="relative h-72 overflow-hidden">
                   {user.photo ? (
                     <img
-                      src={user.photo.startsWith('/') ? user.photo : `/${user.photo}`}
+                      src={
+                        user.photo.startsWith('http://') || user.photo.startsWith('https://')
+                          ? user.photo  // Use full URL directly for Vercel Blob
+                          : user.photo.startsWith('/')
+                            ? user.photo  // Use relative path if it starts with /
+                            : `/${user.photo}`  // Prepend / for relative paths
+                      }
                       alt={user.name || user.email}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     />

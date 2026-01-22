@@ -157,13 +157,19 @@ function Navbar() {
                 >
                   {user.photo && !photoError ? (
                     <img
-                      src={user.photo.startsWith('/') ? user.photo : `/${user.photo}`}
+                      src={
+                        user.photo.startsWith('http://') || user.photo.startsWith('https://')
+                          ? user.photo  // Use full URL directly for Vercel Blob
+                          : user.photo.startsWith('/')
+                            ? user.photo  // Use relative path if it starts with /
+                            : `/${user.photo}`  // Prepend / for relative paths
+                      }
                       alt={user.name || user.email}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         console.error('Image failed to load:', user.photo);
                         if (user.photo) {
-                          console.error('Attempted path:', user.photo.startsWith('/') ? user.photo : `/${user.photo}`);
+                          console.error('Attempted path:', user.photo);
                         }
                         setPhotoError(true);
                       }}
@@ -182,7 +188,13 @@ function Navbar() {
                       <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white font-semibold">
                         {user.photo && !photoError ? (
                           <img
-                            src={user.photo.startsWith('/') ? user.photo : `/${user.photo}`}
+                            src={
+                              user.photo.startsWith('http://') || user.photo.startsWith('https://')
+                                ? user.photo  // Use full URL directly for Vercel Blob
+                                : user.photo.startsWith('/')
+                                  ? user.photo  // Use relative path if it starts with /
+                                  : `/${user.photo}`  // Prepend / for relative paths
+                            }
                             alt={user.name || user.email}
                             className="w-full h-full object-cover rounded-full"
                             onError={() => setPhotoError(true)}
