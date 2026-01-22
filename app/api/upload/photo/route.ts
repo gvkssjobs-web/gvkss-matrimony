@@ -30,6 +30,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if BLOB_READ_WRITE_TOKEN is set
+    const token = process.env.BLOB_READ_WRITE_TOKEN;
+    if (!token) {
+      console.error('BLOB_READ_WRITE_TOKEN is not set');
+      return NextResponse.json(
+        { 
+          error: 'Blob storage not configured. Please set BLOB_READ_WRITE_TOKEN environment variable.',
+          details: 'Visit Vercel dashboard > Storage > Create Blob store to get your token'
+        },
+        { status: 500 }
+      );
+    }
+
     // Generate unique filename
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
@@ -40,6 +53,7 @@ export async function POST(request: NextRequest) {
     const blob = await put(filename, file, {
       access: 'public',
       contentType: file.type,
+      token: token,
     });
 
     return NextResponse.json(
@@ -52,8 +66,25 @@ export async function POST(request: NextRequest) {
     );
   } catch (error: any) {
     console.error('Photo upload error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to upload photo';
+    if (error.message?.includes('token')) {
+      errorMessage = 'Blob storage token is invalid or missing';
+    } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
+      errorMessage = 'Network error while uploading photo';
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to upload photo', details: error.message },
+      { 
+        error: errorMessage, 
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      },
       { status: 500 }
     );
   }
