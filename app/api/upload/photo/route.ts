@@ -56,10 +56,19 @@ export async function POST(request: NextRequest) {
       token: token,
     });
 
+    // Ensure the URL is properly formatted (remove any double slashes or malformed URLs)
+    let photoUrl = blob.url;
+    if (photoUrl && !photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
+      // If somehow the URL is malformed, try to fix it
+      if (photoUrl.startsWith('http:/') || photoUrl.startsWith('https:/')) {
+        photoUrl = photoUrl.replace('http:/', 'http://').replace('https:/', 'https://');
+      }
+    }
+
     return NextResponse.json(
       { 
         success: true,
-        path: blob.url,
+        path: photoUrl,
         filename: filename
       },
       { status: 200 }

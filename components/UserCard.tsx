@@ -37,13 +37,31 @@ export default function UserCard({ user }: UserCardProps) {
       <div className="relative h-72 overflow-hidden">
         {user.photo ? (
           <img
-            src={
-              user.photo.startsWith('http://') || user.photo.startsWith('https://')
-                ? user.photo  // Use full URL directly for Vercel Blob
-                : user.photo.startsWith('/')
-                  ? user.photo  // Use relative path if it starts with /
-                  : `/${user.photo}`  // Prepend / for relative paths
-            }
+            src={(() => {
+              // Normalize the photo URL
+              let photoUrl = user.photo.trim();
+              
+              // Fix malformed URLs (https:/ instead of https://)
+              if (photoUrl.startsWith('https:/') && !photoUrl.startsWith('https://')) {
+                photoUrl = photoUrl.replace('https:/', 'https://');
+              }
+              if (photoUrl.startsWith('http:/') && !photoUrl.startsWith('http://')) {
+                photoUrl = photoUrl.replace('http:/', 'http://');
+              }
+              
+              // Handle full URLs
+              if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
+                return photoUrl;
+              }
+              
+              // Handle relative paths
+              if (photoUrl.startsWith('/')) {
+                return photoUrl;
+              }
+              
+              // Default: prepend / for relative paths
+              return `/${photoUrl}`;
+            })()}
             alt={user.name || user.email}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
