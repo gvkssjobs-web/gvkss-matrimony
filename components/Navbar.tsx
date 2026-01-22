@@ -114,7 +114,7 @@ function Navbar() {
 
   return (
     <>
-      <nav id="theme-navbar" className='fixed w-full z-10 top-0 transition-all duration-200 border-b' style={{ backgroundColor: '#FFFFFF', borderColor: '#DCFCE7' }}>
+      <nav id="theme-navbar" className='fixed w-full z-10 top-0 transition-all duration-200 border-b' style={{ backgroundColor: 'rgba(255,255,255,.78)', backdropFilter: 'blur(10px)', borderColor: 'var(--border)' }}>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
           <div className='flex justify-between items-center gap-4'>
             {/* Logo */}
@@ -262,14 +262,14 @@ function Navbar() {
                   value={loginData.email}
                   onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                   required
-                  className="px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 bg-white text-sm w-40 transition-all duration-200 shadow-sm placeholder:text-[#9CA3AF]"
-                  style={{ borderColor: '#22C55E', color: '#111827', borderWidth: '2px' }}
+                  className="px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 bg-white text-sm w-40 transition-all duration-200 shadow-sm"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)', borderWidth: '2px' }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#16A34A';
+                    e.target.style.borderColor = 'var(--primary)';
                     e.target.style.borderWidth = '2px';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#22C55E';
+                    e.target.style.borderColor = 'var(--border)';
                     e.target.style.borderWidth = '2px';
                   }}
                 />
@@ -279,14 +279,14 @@ function Navbar() {
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                   required
-                  className="px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 bg-white text-sm w-32 transition-all duration-200 shadow-sm placeholder:text-[#9CA3AF]"
-                  style={{ borderColor: '#22C55E', color: '#111827', borderWidth: '2px' }}
+                  className="px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 bg-white text-sm w-32 transition-all duration-200 shadow-sm"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)', borderWidth: '2px' }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = '#16A34A';
+                    e.target.style.borderColor = 'var(--primary)';
                     e.target.style.borderWidth = '2px';
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = '#22C55E';
+                    e.target.style.borderColor = 'var(--border)';
                     e.target.style.borderWidth = '2px';
                   }}
                 />
@@ -297,9 +297,12 @@ function Navbar() {
                   type="submit"
                   disabled={loginLoading}
                   className='px-4 py-2 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed'
-                  style={{ backgroundColor: '#16A34A' }}
-                  onMouseEnter={(e) => !loginLoading && (e.currentTarget.style.backgroundColor = '#15803D')}
-                  onMouseLeave={(e) => !loginLoading && (e.currentTarget.style.backgroundColor = '#16A34A')}
+                  style={{ 
+                    background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
+                    boxShadow: '0 12px 22px rgba(233,75,106,.22)'
+                  }}
+                  onMouseEnter={(e) => !loginLoading && (e.currentTarget.style.transform = 'translateY(-1px)')}
+                  onMouseLeave={(e) => !loginLoading && (e.currentTarget.style.transform = 'translateY(0)')}
                 >
                   {loginLoading ? '...' : 'Login'}
                 </button>
@@ -307,11 +310,6 @@ function Navbar() {
             )}
             </div>
           </div>
-        </div>
-        {/* Decorative Horizontal Line - Yellow and Red (at bottom of nav) */}
-        <div className="w-full">
-          <div className="h-1 bg-yellow-500"></div>
-          <div className="h-0.5 bg-green-600"></div>
         </div>
       </nav>
     </>

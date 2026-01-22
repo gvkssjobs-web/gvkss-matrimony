@@ -101,9 +101,9 @@ export default function HomeAuthCard() {
   };
 
   return (
-    <div className="w-full max-w-lg rounded-3xl shadow-2xl p-8 border" style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', borderColor: '#DCFCE7', boxShadow: 'rgba(0, 0, 0, 0.12)' }}>
+    <div className="w-full max-w-lg rounded-3xl shadow-2xl p-8 border" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', boxShadow: 'var(--shadow)' }}>
       {/* Tab Buttons */}
-      <div className="flex mb-8 rounded-xl p-1 border" style={{ backgroundColor: '#F3F4F6', borderColor: '#E5E7EB' }}>
+      <div className="flex mb-8 rounded-xl p-1 border" style={{ backgroundColor: 'rgba(233,75,106,.08)', borderColor: 'var(--border)' }}>
         <button
           onClick={() => {
             setActiveTab('register');
@@ -111,9 +111,13 @@ export default function HomeAuthCard() {
           }}
           className={`flex-1 py-3 px-4 rounded-lg font-bold text-sm uppercase transition-all duration-200 ${
             activeTab === 'register'
-              ? 'bg-green-600 text-white shadow-md'
-              : 'bg-zinc-600 text-white'
+              ? 'text-white shadow-md'
+              : 'text-white'
           }`}
+          style={activeTab === 'register' ? { 
+            background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
+            boxShadow: '0 12px 22px rgba(233,75,106,.22)'
+          } : { backgroundColor: 'rgba(233,75,106,.3)' }}
         >
           Register
         </button>
@@ -127,7 +131,10 @@ export default function HomeAuthCard() {
               ? 'text-white shadow-md'
               : 'text-white'
           }`}
-          style={activeTab === 'signin' ? { backgroundColor: '#16A34A' } : { backgroundColor: '#4B5563' }}
+          style={activeTab === 'signin' ? { 
+            background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
+            boxShadow: '0 12px 22px rgba(233,75,106,.22)'
+          } : { backgroundColor: 'rgba(233,75,106,.3)' }}
         >
           Sign In
         </button>
@@ -135,7 +142,7 @@ export default function HomeAuthCard() {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-6 p-3 rounded-lg text-sm" style={{ backgroundColor: '#ECFDF5', borderColor: '#DCFCE7', color: '#16A34A', border: '1px solid' }}>
+        <div className="mb-6 p-3 rounded-lg text-sm" style={{ backgroundColor: 'var(--secondary)', borderColor: 'var(--primary)', color: 'var(--primary)', border: '1px solid' }}>
           {error}
         </div>
       )}
@@ -150,10 +157,10 @@ export default function HomeAuthCard() {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors placeholder:text-[#9CA3AF]"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             />
           </div>
 
@@ -162,9 +169,9 @@ export default function HomeAuthCard() {
               value={formData.phoneCode}
               onChange={(e) => setFormData({ ...formData, phoneCode: e.target.value })}
               className="w-24 px-3 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             >
               <option value="+91">+91</option>
               <option value="+1">+1</option>
@@ -188,9 +195,9 @@ export default function HomeAuthCard() {
               onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
               required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             >
               <option value="">Select Gender</option>
               <option value="male">Male</option>
@@ -206,10 +213,10 @@ export default function HomeAuthCard() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors placeholder:text-[#9CA3AF]"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             />
           </div>
 
@@ -220,10 +227,10 @@ export default function HomeAuthCard() {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors placeholder:text-[#9CA3AF]"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             />
           </div>
 
@@ -234,10 +241,10 @@ export default function HomeAuthCard() {
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors placeholder:text-[#9CA3AF]"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             />
           </div>
 
@@ -247,9 +254,9 @@ export default function HomeAuthCard() {
               onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
               required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             >
               <option value="silver">Silver Plan</option>
               <option value="gold">Gold Plan</option>
@@ -261,9 +268,12 @@ export default function HomeAuthCard() {
             type="submit"
             disabled={loading}
             className="w-full py-4 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: '#16A34A' }}
-            onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#15803D')}
-            onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#16A34A')}
+            style={{ 
+              background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
+              boxShadow: '0 12px 22px rgba(233,75,106,.22)'
+            }}
+            onMouseEnter={(e) => !loading && (e.currentTarget.style.transform = 'translateY(-1px)')}
+            onMouseLeave={(e) => !loading && (e.currentTarget.style.transform = 'translateY(0)')}
           >
             {loading ? 'Submitting...' : 'Submit'}
           </button>
@@ -280,10 +290,10 @@ export default function HomeAuthCard() {
               value={loginData.email}
               onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
               required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors placeholder:text-[#9CA3AF]"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             />
           </div>
 
@@ -294,23 +304,23 @@ export default function HomeAuthCard() {
               value={loginData.password}
               onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
               required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors placeholder:text-[#9CA3AF]"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             />
           </div>
 
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm" style={{ color: '#374151' }}>
+            <label className="flex items-center gap-2 text-sm" style={{ color: 'var(--text)' }}>
               <input
                 type="checkbox"
                 className="w-4 h-4 rounded focus:ring-2"
-                style={{ borderColor: '#22C55E', accentColor: '#16A34A' }}
+                style={{ borderColor: 'var(--border)', accentColor: 'var(--primary)' }}
               />
               <span>Keep me logged in</span>
             </label>
-            <Link href="#" className="text-sm hover:underline transition-colors" style={{ color: '#16A34A' }} onMouseEnter={(e) => e.currentTarget.style.color = '#15803D'} onMouseLeave={(e) => e.currentTarget.style.color = '#16A34A'}>
+            <Link href="#" className="text-sm hover:underline transition-colors" style={{ color: 'var(--primary)' }} onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'} onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
               Forgot Password?
             </Link>
           </div>
@@ -319,9 +329,12 @@ export default function HomeAuthCard() {
             type="submit"
             disabled={loading}
             className="w-full py-4 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: '#16A34A' }}
-            onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#15803D')}
-            onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#16A34A')}
+            style={{ 
+              background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
+              boxShadow: '0 12px 22px rgba(233,75,106,.22)'
+            }}
+            onMouseEnter={(e) => !loading && (e.currentTarget.style.transform = 'translateY(-1px)')}
+            onMouseLeave={(e) => !loading && (e.currentTarget.style.transform = 'translateY(0)')}
           >
             {loading ? 'Signing In...' : 'Sign In'}
           </button>

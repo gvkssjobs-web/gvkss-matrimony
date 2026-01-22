@@ -25,6 +25,10 @@ export async function initDatabase() {
           profession VARCHAR(255),
           age INTEGER,
           gender VARCHAR(20),
+          education VARCHAR(255),
+          city VARCHAR(255),
+          dob DATE,
+          partner_preference TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -138,6 +142,66 @@ export async function initDatabase() {
           ALTER TABLE users ADD COLUMN gender VARCHAR(20);
         `);
         console.log('Gender column added successfully');
+      }
+
+      // Check and add education column if it doesn't exist
+      const educationColumnExists = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_name = 'users' AND column_name = 'education'
+        );
+      `);
+
+      if (!educationColumnExists.rows[0].exists) {
+        await client.query(`
+          ALTER TABLE users ADD COLUMN education VARCHAR(255);
+        `);
+        console.log('Education column added successfully');
+      }
+
+      // Check and add city column if it doesn't exist
+      const cityColumnExists = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_name = 'users' AND column_name = 'city'
+        );
+      `);
+
+      if (!cityColumnExists.rows[0].exists) {
+        await client.query(`
+          ALTER TABLE users ADD COLUMN city VARCHAR(255);
+        `);
+        console.log('City column added successfully');
+      }
+
+      // Check and add dob column if it doesn't exist
+      const dobColumnExists = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_name = 'users' AND column_name = 'dob'
+        );
+      `);
+
+      if (!dobColumnExists.rows[0].exists) {
+        await client.query(`
+          ALTER TABLE users ADD COLUMN dob DATE;
+        `);
+        console.log('DOB column added successfully');
+      }
+
+      // Check and add partner_preference column if it doesn't exist
+      const partnerPreferenceColumnExists = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_name = 'users' AND column_name = 'partner_preference'
+        );
+      `);
+
+      if (!partnerPreferenceColumnExists.rows[0].exists) {
+        await client.query(`
+          ALTER TABLE users ADD COLUMN partner_preference TEXT;
+        `);
+        console.log('Partner preference column added successfully');
       }
     }
     

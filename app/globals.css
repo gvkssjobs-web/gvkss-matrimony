@@ -1,11 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --navbar-bg: #ffffff;
-  --navbar-text: #3f3f46;
-  --navbar-border: #e4e4e7;
+  /* OPTION 1: Soft Rose & Cream */
+  --primary: #E94B6A;
+  --primary-2: #ff8aa2;
+  --secondary: #FFF1F4;
+  --accent: #F7C873;
+  --bg: #FAFAFA;
+  --card: #FFFFFF;
+  --text: #2E2E2E;
+  --muted: #6b6b6b;
+  --border: #EDEDED;
+  --shadow: 0 12px 30px rgba(0,0,0,.08);
+  --radius: 18px;
+  --max: 1100px;
+
+  /* Legacy variables for compatibility */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --navbar-bg: rgba(255,255,255,.78);
+  --navbar-text: var(--text);
+  --navbar-border: var(--border);
 }
 
 @theme inline {
@@ -20,9 +35,12 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  background-color: var(--background);
-  color: var(--foreground);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(900px 380px at 12% 0%, rgba(233,75,106,.12), transparent 60%),
+    radial-gradient(900px 420px at 88% 10%, rgba(247,200,115,.16), transparent 60%),
+    var(--bg);
+  color: var(--text);
   transition: background-color 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

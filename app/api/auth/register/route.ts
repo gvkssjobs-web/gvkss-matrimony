@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name, role, photo, phoneNumber, profession, age, gender } = await request.json();
+    const { email, password, name, role, photo, phoneNumber, profession, age, gender, education, city, dob, partnerPreference } = await request.json();
 
     // Validation
     if (!email || !password) {
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
 
       // Insert new user with all fields
       const result = await client.query(
-        'INSERT INTO users (email, password, name, role, photo, phone_number, profession, age, gender) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id, email, name, role, photo, phone_number, profession, age, gender',
+        'INSERT INTO users (email, password, name, role, photo, phone_number, profession, age, gender, education, city, dob, partner_preference) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id, email, name, role, photo, phone_number, profession, age, gender, education, city, dob, partner_preference',
         [
           email, 
           hashedPassword, 
@@ -75,7 +75,11 @@ export async function POST(request: NextRequest) {
           phoneNumber || null,
           profession || null,
           ageValue,
-          gender || null
+          gender || null,
+          education || null,
+          city || null,
+          dob || null,
+          partnerPreference || null
         ]
       );
 
@@ -92,6 +96,10 @@ export async function POST(request: NextRequest) {
             profession: result.rows[0].profession,
             age: result.rows[0].age,
             gender: result.rows[0].gender,
+            education: result.rows[0].education,
+            city: result.rows[0].city,
+            dob: result.rows[0].dob,
+            partnerPreference: result.rows[0].partner_preference,
           },
         },
         { status: 201 }
