@@ -92,14 +92,20 @@ export default function RegisterPage() {
 
         if (!uploadResponse.ok) {
           const uploadError = await uploadResponse.json();
-          setError(uploadError.error || 'Failed to upload photo');
-          setLoading(false);
-          setUploadingPhoto(false);
-          return;
+          // If S3 is not configured, we can still proceed - photo will be stored in DB during registration
+          if (uploadError.error?.includes('AWS S3 storage not configured')) {
+            console.warn('S3 not configured, photo will be stored in database during registration');
+            photoPath = null; // Will be handled during registration
+          } else {
+            setError(uploadError.error || 'Failed to upload photo');
+            setLoading(false);
+            setUploadingPhoto(false);
+            return;
+          }
+        } else {
+          const uploadData = await uploadResponse.json();
+          photoPath = uploadData.s3Url || uploadData.path || null;
         }
-
-        const uploadData = await uploadResponse.json();
-        photoPath = uploadData.path;
         setUploadingPhoto(false);
       }
 
@@ -144,17 +150,25 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // If photo was uploaded, update the user's photo blob in database
+        // If photo was provided but not uploaded yet, upload it now with userId
         if (formData.photo && data.user?.id) {
           try {
             const updatePhotoFormData = new FormData();
             updatePhotoFormData.append('photo', formData.photo);
             updatePhotoFormData.append('userId', data.user.id.toString());
             
-            await fetch('/api/upload/photo', {
+            const photoUploadResponse = await fetch('/api/upload/photo', {
               method: 'POST',
               body: updatePhotoFormData,
             });
+            
+            if (!photoUploadResponse.ok) {
+              const photoError = await photoUploadResponse.json();
+              // If S3 is not configured, that's okay - photo blob will be stored during registration
+              if (!photoError.error?.includes('AWS S3 storage not configured')) {
+                console.error('Failed to update photo blob:', photoError);
+              }
+            }
           } catch (err) {
             console.error('Failed to update photo blob:', err);
             // Non-critical error, continue with registration

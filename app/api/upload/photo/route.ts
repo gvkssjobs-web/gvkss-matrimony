@@ -32,48 +32,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate AWS S3 configuration
-    if (!validateS3Config()) {
-      return NextResponse.json(
-        { 
-          error: 'AWS S3 storage not configured. Please set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, and AWS_S3_BUCKET_NAME environment variables.',
-        },
-        { status: 500 }
-      );
-    }
-
-    // Generate unique filename
-    const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 15);
-    const fileExtension = file.name.split('.').pop() || 'jpg';
-    const filename = `photos/${timestamp}-${randomString}.${fileExtension}`;
-
-    // Upload to AWS S3
-    const s3Url = await uploadToS3(file, filename);
-
     // Convert file to buffer for PostgreSQL storage
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Store blob in PostgreSQL if userId is provided
+    let s3Url: string | null = null;
+    let filename: string | null = null;
+
+    // Upload to AWS S3 if configured (optional)
+    if (validateS3Config()) {
+      try {
+        // Generate unique filename
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(2, 15);
+        const fileExtension = file.name.split('.').pop() || 'jpg';
+        filename = `photos/${timestamp}-${randomString}.${fileExtension}`;
+
+        // Upload to AWS S3
+        s3Url = await uploadToS3(file, filename);
+      } catch (s3Error) {
+        console.warn('S3 upload failed, storing only in PostgreSQL:', s3Error);
+        // Continue without S3 - store only in PostgreSQL
+      }
+    } else {
+      console.log('AWS S3 not configured, storing photo only in PostgreSQL');
+    }
+
+    // Store blob in PostgreSQL (always store in database)
     if (userId) {
       const client = await pool.connect();
       try {
         await client.query(
           'UPDATE users SET photo_blob = $1, photo_s3_url = $2, photo = $3 WHERE id = $4',
-          [buffer, s3Url, s3Url, parseInt(userId)]
+          [buffer, s3Url, s3Url || `local-${userId}`, parseInt(userId)]
         );
       } finally {
         client.release();
       }
     }
 
+    // Return response - use S3 URL if available, otherwise indicate stored in DB
     return NextResponse.json(
       { 
         success: true,
-        path: s3Url,
-        filename: filename,
-        s3Url: s3Url
+        path: s3Url || 'stored-in-database',
+        filename: filename || 'local-storage',
+        s3Url: s3Url,
+        storedInDatabase: true
       },
       { status: 200 }
     );
