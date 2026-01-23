@@ -10,8 +10,6 @@ interface User {
   role: string;
   photo: string | null;
   phone_number: string | null;
-  profession: string | null;
-  age: number | null;
   gender: string | null;
   created_at: string;
 }
@@ -73,12 +71,10 @@ export default function RoleUsersDisplay({ roles, currentUserId, searchQuery = '
     filteredUsers = filteredUsers.filter(user => {
       const name = (user.name || '').toLowerCase();
       const email = (user.email || '').toLowerCase();
-      const profession = (user.profession || '').toLowerCase();
       const phone = (user.phone_number || '').toLowerCase();
       
       return name.includes(query) || 
              email.includes(query) || 
-             profession.includes(query) ||
              phone.includes(query);
     });
   }
@@ -97,24 +93,7 @@ export default function RoleUsersDisplay({ roles, currentUserId, searchQuery = '
       );
     }
 
-    // Age range filter
-    if (filters.minAge) {
-      const minAge = parseInt(filters.minAge);
-      if (!isNaN(minAge)) {
-        filteredUsers = filteredUsers.filter(user => 
-          user.age !== null && user.age >= minAge
-        );
-      }
-    }
-
-    if (filters.maxAge) {
-      const maxAge = parseInt(filters.maxAge);
-      if (!isNaN(maxAge)) {
-        filteredUsers = filteredUsers.filter(user => 
-          user.age !== null && user.age <= maxAge
-        );
-      }
-    }
+    // Note: Age filtering removed as age column was removed (can be calculated from dob if needed)
   }
 
   if (filteredUsers.length === 0) {

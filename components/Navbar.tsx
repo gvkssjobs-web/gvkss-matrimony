@@ -451,6 +451,18 @@ function Navbar() {
                 >
                   {loginLoading ? '...' : 'Login'}
                 </button>
+                <Link
+                  href="/register"
+                  className='px-4 py-2 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl'
+                  style={{ 
+                    background: 'linear-gradient(135deg, #16A34A, #22C55E)',
+                    boxShadow: '0 12px 22px rgba(34,197,94,.22)'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  Register
+                </Link>
               </form>
             )}
             </div>

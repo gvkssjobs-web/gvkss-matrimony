@@ -106,7 +106,7 @@ export default function RoleFilterBar({
           <form onSubmit={handleSearch} className='relative w-full group'>
             <input
               type="text"
-              placeholder="Search users by name, email, profession..."
+              placeholder="Search users by name, email, phone..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className='w-full px-5 py-3 pl-12 pr-12 rounded-lg bg-white border transition-all duration-300 placeholder:text-[#9CA3AF]'

@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     try {
       // Fetch brides (gender = 'female' or 'Female' or 'F')
       const bridesResult = await client.query(
-        `SELECT id, name, role, photo, photo_s3_url, phone_number, profession, age, gender, created_at 
+        `SELECT id, name, role, photo, photo_s3_url, phone_number, gender, created_at 
          FROM users 
          WHERE role != 'admin' 
          AND (LOWER(gender) = 'female' OR LOWER(gender) = 'f' OR LOWER(gender) = 'bride')
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
       // Fetch grooms (gender = 'male' or 'Male' or 'M')
       const groomsResult = await client.query(
-        `SELECT id, name, role, photo, photo_s3_url, phone_number, profession, age, gender, created_at 
+        `SELECT id, name, role, photo, photo_s3_url, phone_number, gender, created_at 
          FROM users 
          WHERE role != 'admin' 
          AND (LOWER(gender) = 'male' OR LOWER(gender) = 'm' OR LOWER(gender) = 'groom')

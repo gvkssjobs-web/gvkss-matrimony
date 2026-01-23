@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       const placeholders = roleArray.map((_, i) => `$${i + 1}`).join(', ');
       
       const result = await client.query(
-        `SELECT id, email, name, role, photo, phone_number, profession, age, gender, created_at 
+        `SELECT id, email, name, role, photo, phone_number, gender, created_at 
          FROM users 
          WHERE role IN (${placeholders})
          ORDER BY created_at DESC`,

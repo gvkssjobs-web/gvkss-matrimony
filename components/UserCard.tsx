@@ -7,8 +7,6 @@ interface User {
   role: string;
   photo: string | null;
   phone_number: string | null;
-  profession: string | null;
-  age: number | null;
   gender: string | null;
   created_at: string;
 }
@@ -126,11 +124,6 @@ export default function UserCard({ user }: UserCardProps) {
             <h3 className="text-xl font-bold text-zinc-900 mb-1">
               {user.name || 'User'}
             </h3>
-            {user.profession && (
-              <p className="text-sm text-zinc-400 font-medium">
-                {user.profession}
-              </p>
-            )}
           </div>
           
           {/* Email */}
@@ -140,14 +133,6 @@ export default function UserCard({ user }: UserCardProps) {
           
           {/* Details Grid */}
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-zinc-600 pt-2 border-t border-zinc-200">
-            {user.age && (
-              <div className="flex items-center gap-1.5">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>{user.age} years</span>
-              </div>
-            )}
             {user.gender && (
               <div className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

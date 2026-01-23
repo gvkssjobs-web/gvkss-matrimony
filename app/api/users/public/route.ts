@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const client = await pool.connect();
     try {
       const result = await client.query(
-        'SELECT id, email, name, role, photo, phone_number, profession, age, gender, created_at FROM users WHERE role != $1 ORDER BY created_at DESC',
+        'SELECT id, email, name, role, photo, phone_number, gender, created_at FROM users WHERE role != $1 ORDER BY created_at DESC',
         ['admin']
       );
 

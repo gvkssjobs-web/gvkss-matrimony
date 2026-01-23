@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
           star, raasi, gothram, padam, uncle_gothram,
           education_category, education_details, employed_in, address
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23
         ) RETURNING id, email, name, role, photo, phone_number, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
           star, raasi, gothram, padam, uncle_gothram,

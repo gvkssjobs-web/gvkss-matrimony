@@ -10,8 +10,6 @@ interface User {
   role: string;
   photo: string | null;
   phone_number: string | null;
-  profession: string | null;
-  age: number | null;
   gender: string | null;
   created_at: string;
 }
@@ -170,12 +168,6 @@ export default function UsersDisplay() {
                     </div>
                   </div>
                   <div className="space-y-1.5 pt-2 blur-md text-sm text-zinc-400">
-                    {user.profession && (
-                      <div>Profession: {user.profession}</div>
-                    )}
-                    {user.age && (
-                      <div>Age: {user.age}</div>
-                    )}
                     {user.gender && (
                       <div>Gender: {user.gender}</div>
                     )}
