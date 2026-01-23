@@ -25,13 +25,7 @@ export async function GET(request: NextRequest) {
         `SELECT id, email, name, role, photo, phone_number, profession, age, gender, created_at 
          FROM users 
          WHERE role IN (${placeholders})
-         ORDER BY 
-           CASE role 
-             WHEN 'platinum' THEN 1 
-             WHEN 'gold' THEN 2 
-             WHEN 'silver' THEN 3 
-           END,
-           created_at DESC`,
+         ORDER BY created_at DESC`,
         roleArray
       );
 

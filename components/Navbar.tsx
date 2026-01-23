@@ -106,7 +106,7 @@ function Navbar() {
         if (userRole === 'admin') {
           router.push('/admin');
         } else {
-          router.push(`/${userRole}`);
+          router.push('/dashboard');
         }
       } else {
         setLoginError(data.error || 'Login failed');
@@ -371,7 +371,7 @@ function Navbar() {
                         Admin Panel
                       </Link>
                     )}
-                    {(pathname === '/silver' || pathname === '/gold' || pathname === '/platinum') && (
+                    {pathname === '/dashboard' && (
                       <button
                         onClick={() => {
                           setShowDropdown(false);

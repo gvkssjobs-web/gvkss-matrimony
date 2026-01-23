@@ -125,9 +125,7 @@ export default function AdminPage() {
                           onBlur={(e) => e.target.style.borderColor = '#22C55E'}
                           disabled={u.id === user?.id}
                         >
-                          <option value="silver">Silver</option>
-                          <option value="gold">Gold</option>
-                          <option value="platinum">Platinum</option>
+                          <option value="user">User</option>
                           <option value="admin">Admin</option>
                         </select>
                       </td>

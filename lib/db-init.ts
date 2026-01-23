@@ -19,18 +19,28 @@ export async function initDatabase() {
           email VARCHAR(255) UNIQUE NOT NULL,
           password VARCHAR(255) NOT NULL,
           name VARCHAR(255),
-          role VARCHAR(50) DEFAULT 'silver' CHECK (role IN ('admin', 'gold', 'silver', 'platinum')),
+          role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('admin', 'user')),
           photo VARCHAR(500),
           photo_blob BYTEA,
           photo_s3_url VARCHAR(500),
           phone_number VARCHAR(20),
-          profession VARCHAR(255),
-          age INTEGER,
           gender VARCHAR(20),
-          education VARCHAR(255),
-          city VARCHAR(255),
           dob DATE,
-          partner_preference TEXT,
+          marriage_status VARCHAR(50),
+          birth_time TIME,
+          birth_place VARCHAR(255),
+          height VARCHAR(20),
+          complexion VARCHAR(50),
+          siblings_info JSONB,
+          star VARCHAR(50),
+          raasi VARCHAR(50),
+          gothram VARCHAR(100),
+          padam VARCHAR(50),
+          uncle_gothram VARCHAR(100),
+          education_category VARCHAR(100),
+          education_details TEXT,
+          employed_in VARCHAR(255),
+          address TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -48,21 +58,28 @@ export async function initDatabase() {
       if (!roleColumnExists.rows[0].exists) {
         // Add role column if it doesn't exist
         await client.query(`
-          ALTER TABLE users ADD COLUMN role VARCHAR(50) DEFAULT 'silver';
+          ALTER TABLE users ADD COLUMN role VARCHAR(50) DEFAULT 'user';
           ALTER TABLE users ADD CONSTRAINT users_role_check 
-          CHECK (role IN ('admin', 'gold', 'silver', 'platinum'));
+          CHECK (role IN ('admin', 'user'));
         `);
         console.log('Role column added successfully');
       } else {
-        // Update constraint if it exists
+        // Update constraint if it exists - migrate from old roles to new simplified roles
         try {
           await client.query(`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;`);
+          // Update existing users with old roles to 'user'
+          // Handle all variations: gold, silver, platinum, plat, etc.
+          await client.query(`
+            UPDATE users 
+            SET role = 'user' 
+            WHERE role NOT IN ('admin', 'user') OR role IS NULL;
+          `);
           await client.query(`
             ALTER TABLE users ADD CONSTRAINT users_role_check 
-            CHECK (role IN ('admin', 'gold', 'silver', 'platinum'));
+            CHECK (role IN ('admin', 'user'));
           `);
-          await client.query(`ALTER TABLE users ALTER COLUMN role SET DEFAULT 'silver';`);
-          console.log('Role constraint updated successfully');
+          await client.query(`ALTER TABLE users ALTER COLUMN role SET DEFAULT 'user';`);
+          console.log('Role constraint updated successfully - migrated old roles to user');
         } catch (constraintError: any) {
           // Constraint might already exist with correct values, that's okay
           if (!constraintError.message.includes('already exists')) {
@@ -131,36 +148,6 @@ export async function initDatabase() {
         console.log('Phone number column added successfully');
       }
 
-      // Check and add profession column if it doesn't exist
-      const professionColumnExists = await client.query(`
-        SELECT EXISTS (
-          SELECT FROM information_schema.columns 
-          WHERE table_name = 'users' AND column_name = 'profession'
-        );
-      `);
-
-      if (!professionColumnExists.rows[0].exists) {
-        await client.query(`
-          ALTER TABLE users ADD COLUMN profession VARCHAR(255);
-        `);
-        console.log('Profession column added successfully');
-      }
-
-      // Check and add age column if it doesn't exist
-      const ageColumnExists = await client.query(`
-        SELECT EXISTS (
-          SELECT FROM information_schema.columns 
-          WHERE table_name = 'users' AND column_name = 'age'
-        );
-      `);
-
-      if (!ageColumnExists.rows[0].exists) {
-        await client.query(`
-          ALTER TABLE users ADD COLUMN age INTEGER;
-        `);
-        console.log('Age column added successfully');
-      }
-
       // Check and add gender column if it doesn't exist
       const genderColumnExists = await client.query(`
         SELECT EXISTS (
@@ -174,36 +161,6 @@ export async function initDatabase() {
           ALTER TABLE users ADD COLUMN gender VARCHAR(20);
         `);
         console.log('Gender column added successfully');
-      }
-
-      // Check and add education column if it doesn't exist
-      const educationColumnExists = await client.query(`
-        SELECT EXISTS (
-          SELECT FROM information_schema.columns 
-          WHERE table_name = 'users' AND column_name = 'education'
-        );
-      `);
-
-      if (!educationColumnExists.rows[0].exists) {
-        await client.query(`
-          ALTER TABLE users ADD COLUMN education VARCHAR(255);
-        `);
-        console.log('Education column added successfully');
-      }
-
-      // Check and add city column if it doesn't exist
-      const cityColumnExists = await client.query(`
-        SELECT EXISTS (
-          SELECT FROM information_schema.columns 
-          WHERE table_name = 'users' AND column_name = 'city'
-        );
-      `);
-
-      if (!cityColumnExists.rows[0].exists) {
-        await client.query(`
-          ALTER TABLE users ADD COLUMN city VARCHAR(255);
-        `);
-        console.log('City column added successfully');
       }
 
       // Check and add dob column if it doesn't exist
@@ -221,19 +178,39 @@ export async function initDatabase() {
         console.log('DOB column added successfully');
       }
 
-      // Check and add partner_preference column if it doesn't exist
-      const partnerPreferenceColumnExists = await client.query(`
-        SELECT EXISTS (
-          SELECT FROM information_schema.columns 
-          WHERE table_name = 'users' AND column_name = 'partner_preference'
-        );
-      `);
+      // Add new columns for extended profile information
+      const newColumns = [
+        { name: 'marriage_status', type: 'VARCHAR(50)' },
+        { name: 'birth_time', type: 'TIME' },
+        { name: 'birth_place', type: 'VARCHAR(255)' },
+        { name: 'height', type: 'VARCHAR(20)' },
+        { name: 'complexion', type: 'VARCHAR(50)' },
+        { name: 'siblings_info', type: 'JSONB' }, // Store siblings info as JSON: {sisters: [{name, marriage_status}], brothers: [{name, marriage_status}]}
+        { name: 'star', type: 'VARCHAR(50)' },
+        { name: 'raasi', type: 'VARCHAR(50)' },
+        { name: 'gothram', type: 'VARCHAR(100)' },
+        { name: 'padam', type: 'VARCHAR(50)' },
+        { name: 'uncle_gothram', type: 'VARCHAR(100)' },
+        { name: 'education_category', type: 'VARCHAR(100)' },
+        { name: 'education_details', type: 'TEXT' },
+        { name: 'employed_in', type: 'VARCHAR(255)' },
+        { name: 'address', type: 'TEXT' }
+      ];
 
-      if (!partnerPreferenceColumnExists.rows[0].exists) {
-        await client.query(`
-          ALTER TABLE users ADD COLUMN partner_preference TEXT;
-        `);
-        console.log('Partner preference column added successfully');
+      for (const column of newColumns) {
+        const columnExists = await client.query(`
+          SELECT EXISTS (
+            SELECT FROM information_schema.columns 
+            WHERE table_name = 'users' AND column_name = $1
+          );
+        `, [column.name]);
+
+        if (!columnExists.rows[0].exists) {
+          await client.query(`
+            ALTER TABLE users ADD COLUMN ${column.name} ${column.type};
+          `);
+          console.log(`${column.name} column added successfully`);
+        }
       }
     }
     

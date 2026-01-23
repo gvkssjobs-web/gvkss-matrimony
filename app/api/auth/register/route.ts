@@ -4,7 +4,12 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name, role, photo, phoneNumber, profession, age, gender, education, city, dob, partnerPreference } = await request.json();
+      const { 
+      email, password, name, role, photo, phoneNumber, gender, dob,
+      marriageStatus, birthTime, birthPlace, height, complexion, siblingsInfo,
+      star, raasi, gothram, padam, uncleGothram,
+      educationCategory, educationDetails, employedIn, address
+    } = await request.json();
 
     // Validation
     if (!email || !password) {
@@ -36,10 +41,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Validate role - only gold, silver, platinum can be registered
-      // Admin role cannot be registered through the form
-      const registrableRoles = ['gold', 'silver', 'platinum'];
-      
+      // Set default role to 'user' for all registrations (admin can only be created manually)
+      // Always set to 'user' regardless of what's passed in
       if (role === 'admin') {
         return NextResponse.json(
           { error: 'Admin role cannot be registered. Please contact administrator.' },
@@ -47,25 +50,25 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      const userRole = role && registrableRoles.includes(role) ? role : 'silver';
+      // Force role to 'user' for all new registrations
+      const userRole = 'user';
 
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Validate age if provided
-      const ageValue = age !== null && age !== undefined ? (typeof age === 'string' ? parseInt(age) : age) : null;
-      if (ageValue !== null) {
-        if (isNaN(ageValue) || ageValue < 1 || ageValue > 150) {
-          return NextResponse.json(
-            { error: 'Please enter a valid age (1-150)' },
-            { status: 400 }
-          );
-        }
-      }
-
       // Insert new user with all fields
       const result = await client.query(
-        'INSERT INTO users (email, password, name, role, photo, phone_number, profession, age, gender, education, city, dob, partner_preference) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id, email, name, role, photo, phone_number, profession, age, gender, education, city, dob, partner_preference',
+        `INSERT INTO users (
+          email, password, name, role, photo, phone_number, gender, dob,
+          marriage_status, birth_time, birth_place, height, complexion, siblings_info,
+          star, raasi, gothram, padam, uncle_gothram,
+          education_category, education_details, employed_in, address
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22
+        ) RETURNING id, email, name, role, photo, phone_number, gender, dob,
+          marriage_status, birth_time, birth_place, height, complexion, siblings_info,
+          star, raasi, gothram, padam, uncle_gothram,
+          education_category, education_details, employed_in, address`,
         [
           email, 
           hashedPassword, 
@@ -73,13 +76,23 @@ export async function POST(request: NextRequest) {
           userRole, 
           photo || null,
           phoneNumber || null,
-          profession || null,
-          ageValue,
           gender || null,
-          education || null,
-          city || null,
           dob || null,
-          partnerPreference || null
+          marriageStatus || null,
+          birthTime || null,
+          birthPlace || null,
+          height || null,
+          complexion || null,
+          siblingsInfo ? JSON.stringify(siblingsInfo) : null,
+          star || null,
+          raasi || null,
+          gothram || null,
+          padam || null,
+          uncleGothram || null,
+          educationCategory || null,
+          educationDetails || null,
+          employedIn || null,
+          address || null
         ]
       );
 
@@ -93,13 +106,23 @@ export async function POST(request: NextRequest) {
             role: result.rows[0].role,
             photo: result.rows[0].photo,
             phoneNumber: result.rows[0].phone_number,
-            profession: result.rows[0].profession,
-            age: result.rows[0].age,
             gender: result.rows[0].gender,
-            education: result.rows[0].education,
-            city: result.rows[0].city,
             dob: result.rows[0].dob,
-            partnerPreference: result.rows[0].partner_preference,
+            marriageStatus: result.rows[0].marriage_status,
+            birthTime: result.rows[0].birth_time,
+            birthPlace: result.rows[0].birth_place,
+            height: result.rows[0].height,
+            complexion: result.rows[0].complexion,
+            siblingsInfo: result.rows[0].siblings_info,
+            star: result.rows[0].star,
+            raasi: result.rows[0].raasi,
+            gothram: result.rows[0].gothram,
+            padam: result.rows[0].padam,
+            uncleGothram: result.rows[0].uncle_gothram,
+            educationCategory: result.rows[0].education_category,
+            educationDetails: result.rows[0].education_details,
+            employedIn: result.rows[0].employed_in,
+            address: result.rows[0].address,
           },
         },
         { status: 201 }

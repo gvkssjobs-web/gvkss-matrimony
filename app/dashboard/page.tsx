@@ -8,7 +8,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import RoleUsersDisplay from '@/components/RoleUsersDisplay';
 import RoleFilterBar from '@/components/RoleFilterBar';
 
-export default function PlatinumPage() {
+export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -24,8 +24,9 @@ export default function PlatinumPage() {
       router.push('/');
       return;
     }
-    if (currentUser.role !== 'platinum') {
-      router.push('/');
+    // Redirect admin to admin page
+    if (currentUser.role === 'admin') {
+      router.push('/admin');
       return;
     }
     setUser(currentUser);
@@ -60,14 +61,14 @@ export default function PlatinumPage() {
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="text-4xl md:text-5xl font-extrabold mb-2">
-              <span className="bg-gradient-to-r bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, #2563EB, #16A34A, #2563EB)' }}>Platinum</span>{' '}
+              <span className="bg-gradient-to-r bg-clip-text text-transparent" style={{ backgroundImage: 'linear-gradient(to right, #111827, #16A34A, #111827)' }}>User</span>{' '}
               <span style={{ color: '#111827' }}>Dashboard</span>
             </h1>
-            <p className="text-lg" style={{ color: '#374151' }}>Browse all Silver, Gold, and Platinum members</p>
+            <p className="text-lg" style={{ color: '#374151' }}>Browse all members</p>
           </div>
           
           <RoleFilterBar
-            availableRoles={['silver', 'gold', 'platinum']}
+            availableRoles={['user']}
             selectedRole={filterRole}
             selectedGender={filterGender}
             minAge={filterMinAge}
@@ -81,7 +82,7 @@ export default function PlatinumPage() {
             onClearFilters={handleClearFilters}
           />
           <RoleUsersDisplay 
-            roles={['silver', 'gold', 'platinum']} 
+            roles={['user']} 
             currentUserId={user.id} 
             searchQuery={searchQuery}
             filters={{

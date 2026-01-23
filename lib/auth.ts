@@ -1,6 +1,6 @@
 // Role-based access control utilities
 
-export type UserRole = 'admin' | 'gold' | 'silver' | 'platinum';
+export type UserRole = 'admin' | 'user';
 
 export interface User {
   id: number;
@@ -16,10 +16,8 @@ export interface User {
 
 // Role hierarchy (higher number = more permissions)
 const roleHierarchy: Record<UserRole, number> = {
-  silver: 1,
-  gold: 2,
-  platinum: 3,
-  admin: 4,
+  user: 1,
+  admin: 2,
 };
 
 /**
@@ -43,13 +41,6 @@ export function hasAnyRole(user: User | null, roles: UserRole[]): boolean {
  */
 export function isAdmin(user: User | null): boolean {
   return user?.role === 'admin';
-}
-
-/**
- * Check if a user has a premium role (gold or platinum)
- */
-export function isPremiumUser(user: User | null): boolean {
-  return hasAnyRole(user, ['gold', 'platinum']);
 }
 
 /**

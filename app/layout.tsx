@@ -33,7 +33,7 @@ export default function RootLayout({
       >
         <div id="theme-wrapper" className="min-h-screen transition-colors duration-200 flex flex-col" style={{ background: 'linear-gradient(135deg, #F0FDF4 0%, #ECFDF5 40%, #FFFFFF 100%)' }}>
           <Navbar />
-          <main id="theme-main" className="flex-1 flex min-h-screen flex-col items-center w-full transition-colors duration-200 pt-[82px]" style={{ backgroundColor: '#F0FDF4',paddingTop: '70px', paddingLeft: '100px', paddingRight: '100px' }}>
+          <main id="theme-main" className="flex-1 flex min-h-screen flex-col items-center w-full transition-colors duration-200 pt-[82px]" style={{ backgroundColor: '#F0FDF4',paddingTop: '70px', paddingLeft: '20px', paddingRight: '20px' }}>
             {children}
           </main>
           <Footer />

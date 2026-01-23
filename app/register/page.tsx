@@ -9,19 +9,30 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     gender: '', // Bride/Groom
+    marriageStatus: '',
     dob: '',
-    education: '',
-    job: '',
-    city: '',
+    birthTime: '',
+    birthPlace: '',
+    height: '',
+    complexion: '',
+    sisters: [{ name: '', marriageStatus: '' }],
+    brothers: [{ name: '', marriageStatus: '' }],
+    star: '',
+    raasi: '',
+    gothram: '',
+    padam: '',
+    uncleGothram: '',
+    educationCategory: '',
+    educationDetails: '',
+    employedIn: '',
     photo: null as File | null,
     photoPreview: '',
     phone: '',
     phoneCode: '+91',
-    partnerPreference: '',
     email: '',
     password: '',
     confirmPassword: '',
-    plan: 'silver'
+    address: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,17 +64,6 @@ export default function RegisterPage() {
     reader.readAsDataURL(file);
   };
 
-  const calculateAge = (dob: string): number | null => {
-    if (!dob) return null;
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
-  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,8 +103,11 @@ export default function RegisterPage() {
         setUploadingPhoto(false);
       }
 
-      // Calculate age from DOB
-      const age = calculateAge(formData.dob);
+      // Prepare siblings info
+      const siblingsInfo = {
+        sisters: formData.sisters.filter(s => s.name.trim() !== ''),
+        brothers: formData.brothers.filter(b => b.name.trim() !== '')
+      };
 
       // Register user
       const response = await fetch('/api/auth/register', {
@@ -117,16 +120,25 @@ export default function RegisterPage() {
           email: formData.email,
           password: formData.password,
           phoneNumber: formData.phoneCode + formData.phone,
-          role: formData.plan,
           gender: formData.gender,
           photo: photoPath,
-          profession: formData.job,
           age: age,
-          // Additional fields that might need database columns
-          education: formData.education,
-          city: formData.city,
           dob: formData.dob,
-          partnerPreference: formData.partnerPreference,
+          marriageStatus: formData.marriageStatus,
+          birthTime: formData.birthTime,
+          birthPlace: formData.birthPlace,
+          height: formData.height,
+          complexion: formData.complexion,
+          siblingsInfo: siblingsInfo,
+          star: formData.star,
+          raasi: formData.raasi,
+          gothram: formData.gothram,
+          padam: formData.padam,
+          uncleGothram: formData.uncleGothram,
+          educationCategory: formData.educationCategory,
+          educationDetails: formData.educationDetails,
+          employedIn: formData.employedIn,
+          address: formData.address,
         }),
       });
 
@@ -151,7 +163,7 @@ export default function RegisterPage() {
         }
         
         localStorage.setItem('user', JSON.stringify(data.user));
-        router.push(`/${formData.plan}`);
+        router.push('/dashboard');
       } else {
         setError(data.error || 'Registration failed');
       }
@@ -243,8 +255,29 @@ export default function RegisterPage() {
             </select>
           </div>
 
+          {/* Marriage Status */}
+          <div>
+            <select
+              value={formData.marriageStatus}
+              onChange={(e) => setFormData({ ...formData, marriageStatus: e.target.value })}
+              required
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            >
+              <option value="">Select Marriage Status</option>
+              <option value="unmarried">Unmarried</option>
+              <option value="divorced">Divorced</option>
+              <option value="widowed">Widowed</option>
+            </select>
+          </div>
+
           {/* DOB */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>
+              Date of Birth
+            </label>
             <input
               type="date"
               value={formData.dob}
@@ -257,14 +290,15 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Education */}
+          {/* Birth Time */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>
+              Birth Time
+            </label>
             <input
-              type="text"
-              placeholder="Enter Your Education"
-              value={formData.education}
-              onChange={(e) => setFormData({ ...formData, education: e.target.value })}
-              required
+              type="time"
+              value={formData.birthTime}
+              onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
@@ -272,14 +306,13 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Job */}
+          {/* Birth Place */}
           <div>
             <input
               type="text"
-              placeholder="Enter Your Job/Profession"
-              value={formData.job}
-              onChange={(e) => setFormData({ ...formData, job: e.target.value })}
-              required
+              placeholder="Birth Place"
+              value={formData.birthPlace}
+              onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value })}
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
@@ -287,14 +320,235 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* City */}
+          {/* Height */}
           <div>
             <input
               type="text"
-              placeholder="Enter Your City"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              required
+              placeholder="Height (e.g., 5ft 8in)"
+              value={formData.height}
+              onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Complexion */}
+          <div>
+            <select
+              value={formData.complexion}
+              onChange={(e) => setFormData({ ...formData, complexion: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            >
+              <option value="">Select Complexion</option>
+              <option value="fair">Fair</option>
+              <option value="wheatish">Wheatish</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+
+          {/* Siblings - Sisters */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>
+              Sisters (Name, Marriage Status)
+            </label>
+            {formData.sisters.map((sister, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Sister Name"
+                  value={sister.name}
+                  onChange={(e) => {
+                    const newSisters = [...formData.sisters];
+                    newSisters[index].name = e.target.value;
+                    setFormData({ ...formData, sisters: newSisters });
+                  }}
+                  className="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                />
+                <select
+                  value={sister.marriageStatus}
+                  onChange={(e) => {
+                    const newSisters = [...formData.sisters];
+                    newSisters[index].marriageStatus = e.target.value;
+                    setFormData({ ...formData, sisters: newSisters });
+                  }}
+                  className="w-32 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                >
+                  <option value="">Status</option>
+                  <option value="married">Married</option>
+                  <option value="unmarried">Unmarried</option>
+                </select>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, sisters: [...formData.sisters, { name: '', marriageStatus: '' }] })}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              + Add Sister
+            </button>
+          </div>
+
+          {/* Siblings - Brothers */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>
+              Brothers (Name, Marriage Status)
+            </label>
+            {formData.brothers.map((brother, index) => (
+              <div key={index} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Brother Name"
+                  value={brother.name}
+                  onChange={(e) => {
+                    const newBrothers = [...formData.brothers];
+                    newBrothers[index].name = e.target.value;
+                    setFormData({ ...formData, brothers: newBrothers });
+                  }}
+                  className="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                />
+                <select
+                  value={brother.marriageStatus}
+                  onChange={(e) => {
+                    const newBrothers = [...formData.brothers];
+                    newBrothers[index].marriageStatus = e.target.value;
+                    setFormData({ ...formData, brothers: newBrothers });
+                  }}
+                  className="w-32 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                >
+                  <option value="">Status</option>
+                  <option value="married">Married</option>
+                  <option value="unmarried">Unmarried</option>
+                </select>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, brothers: [...formData.brothers, { name: '', marriageStatus: '' }] })}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              + Add Brother
+            </button>
+          </div>
+
+          {/* Star */}
+          <div>
+            <input
+              type="text"
+              placeholder="Star"
+              value={formData.star}
+              onChange={(e) => setFormData({ ...formData, star: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Raasi */}
+          <div>
+            <input
+              type="text"
+              placeholder="Raasi"
+              value={formData.raasi}
+              onChange={(e) => setFormData({ ...formData, raasi: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Gothram */}
+          <div>
+            <input
+              type="text"
+              placeholder="Gothram"
+              value={formData.gothram}
+              onChange={(e) => setFormData({ ...formData, gothram: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Padam */}
+          <div>
+            <input
+              type="text"
+              placeholder="Padam"
+              value={formData.padam}
+              onChange={(e) => setFormData({ ...formData, padam: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Uncle Gothram */}
+          <div>
+            <input
+              type="text"
+              placeholder="Uncle Gothram"
+              value={formData.uncleGothram}
+              onChange={(e) => setFormData({ ...formData, uncleGothram: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Education Category */}
+          <div>
+            <select
+              value={formData.educationCategory}
+              onChange={(e) => setFormData({ ...formData, educationCategory: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            >
+              <option value="">Select Education Category</option>
+              <option value="school">School</option>
+              <option value="diploma">Diploma</option>
+              <option value="graduate">Graduate</option>
+              <option value="post-graduate">Post Graduate</option>
+              <option value="doctorate">Doctorate</option>
+            </select>
+          </div>
+
+          {/* Education Details */}
+          <div>
+            <textarea
+              placeholder="Education Details"
+              value={formData.educationDetails}
+              onChange={(e) => setFormData({ ...formData, educationDetails: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors resize-none"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Employed In */}
+          <div>
+            <input
+              type="text"
+              placeholder="Employed In"
+              value={formData.employedIn}
+              onChange={(e) => setFormData({ ...formData, employedIn: e.target.value })}
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
@@ -366,12 +620,12 @@ export default function RegisterPage() {
             />
           </div>
 
-          {/* Partner Preference (Optional) */}
+          {/* Address (For Admin) */}
           <div>
             <textarea
-              placeholder="Partner Preference (Optional)"
-              value={formData.partnerPreference}
-              onChange={(e) => setFormData({ ...formData, partnerPreference: e.target.value })}
+              placeholder="Address (For Admin)"
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               rows={3}
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors resize-none"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
@@ -423,23 +677,6 @@ export default function RegisterPage() {
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             />
-          </div>
-
-          {/* Plan */}
-          <div>
-            <select
-              value={formData.plan}
-              onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
-              required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            >
-              <option value="silver">Silver Plan</option>
-              <option value="gold">Gold Plan</option>
-              <option value="platinum">Platinum Plan</option>
-            </select>
           </div>
 
           <button
