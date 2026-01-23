@@ -38,6 +38,11 @@ export default function UserCard({ user }: UserCardProps) {
         {user.photo ? (
           <img
             src={(() => {
+              // If photo is from S3 and we have user ID, use PostgreSQL blob API to avoid CORS issues
+              if (user.id && user.photo?.includes('s3')) {
+                return `/api/photo?userId=${user.id}`;
+              }
+              
               // Normalize the photo URL
               let photoUrl = user.photo.trim();
               
@@ -65,15 +70,30 @@ export default function UserCard({ user }: UserCardProps) {
             alt={user.name || user.email}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             onError={(e) => {
-              // Fallback to placeholder if image fails to load
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              const parent = target.parentElement;
-              if (parent && !parent.querySelector('.photo-placeholder')) {
-                const placeholder = document.createElement('div');
-                placeholder.className = 'photo-placeholder w-full h-full bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-300 flex items-center justify-center';
-                placeholder.innerHTML = `<div class="text-7xl font-bold text-zinc-400">${user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}</div>`;
-                parent.appendChild(placeholder);
+              const img = e.target as HTMLImageElement;
+              // If we're already using the API endpoint and it fails, show placeholder
+              if (img.src.includes('/api/photo')) {
+                img.style.display = 'none';
+                const parent = img.parentElement;
+                if (parent && !parent.querySelector('.photo-placeholder')) {
+                  const placeholder = document.createElement('div');
+                  placeholder.className = 'photo-placeholder w-full h-full bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-300 flex items-center justify-center';
+                  placeholder.innerHTML = `<div class="text-7xl font-bold text-zinc-400">${user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}</div>`;
+                  parent.appendChild(placeholder);
+                }
+              } else if (user.id && user.photo?.includes('s3')) {
+                // Try fallback to PostgreSQL blob API if S3 fails
+                img.src = `/api/photo?userId=${user.id}`;
+              } else {
+                // Fallback to placeholder if image fails to load
+                img.style.display = 'none';
+                const parent = img.parentElement;
+                if (parent && !parent.querySelector('.photo-placeholder')) {
+                  const placeholder = document.createElement('div');
+                  placeholder.className = 'photo-placeholder w-full h-full bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-300 flex items-center justify-center';
+                  placeholder.innerHTML = `<div class="text-7xl font-bold text-zinc-400">${user.name ? user.name[0].toUpperCase() : user.email[0].toUpperCase()}</div>`;
+                  parent.appendChild(placeholder);
+                }
               }
             }}
           />

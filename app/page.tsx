@@ -53,12 +53,12 @@ export default function Home() {
         backgroundRepeat: 'no-repeat',
         borderBottom: '1px solid var(--border)',
         textAlign: 'center',
-        minHeight: '500px',
+        minHeight: '570px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         width: 'calc(100vw)',
-        margin: '82px calc(-118px) 0px',
+        margin: '',
         left: 0,
         right: 0
       }}>
@@ -66,7 +66,7 @@ export default function Home() {
           <div style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(135deg, rgba(233,75,106,.4), rgba(247,200,115,.3))',
+            //background: 'linear-gradient(135deg, rgba(233,75,106,.4), rgba(247,200,115,.3))',
             zIndex: 1
           }}></div>
           <div className="container" style={{ maxWidth: 'var(--max)', margin: '0 auto', padding: '0 18px', position: 'relative', zIndex: 2 }}>

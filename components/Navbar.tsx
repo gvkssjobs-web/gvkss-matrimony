@@ -29,16 +29,22 @@ function Navbar() {
     if (currentUser) {
       console.log('User object:', currentUser);
       console.log('User photo:', currentUser.photo);
-      // If user doesn't have photo, try to refresh user data from API
-      if (!currentUser.photo) {
+      console.log('User ID:', currentUser.id);
+      // ALWAYS ensure user has ID - fetch from API if missing
+      if (!currentUser.id && currentUser.email) {
+        console.log('User ID missing, fetching from API...');
         fetch(`/api/auth/current-user?email=${encodeURIComponent(currentUser.email)}`)
           .then(res => res.json())
           .then(data => {
-            if (data.user && data.user.photo) {
-              const updatedUser = { ...currentUser, photo: data.user.photo };
+            if (data.user && data.user.id) {
+              const updatedUser = { 
+                ...currentUser, 
+                id: data.user.id,
+                photo: data.user.photo || currentUser.photo 
+              };
               localStorage.setItem('user', JSON.stringify(updatedUser));
               setUser(updatedUser);
-              console.log('Updated user with photo:', updatedUser);
+              console.log('Updated user with ID:', updatedUser);
             }
           })
           .catch(err => console.error('Failed to refresh user data:', err));
@@ -122,7 +128,7 @@ function Navbar() {
               <Image 
                 src="/logo.jpg" 
                 alt="GVKSS Software Pvt. Ltd." 
-                width={100} 
+                width={50} 
                 height={40}
                 className="h-auto"
                 priority
@@ -158,6 +164,26 @@ function Navbar() {
                   {user.photo && !photoError ? (
                     <img
                       src={(() => {
+                        // Check if photo is from S3 (more robust detection)
+                        const isS3Url = user.photo && (
+                          user.photo.includes('s3.amazonaws.com') || 
+                          user.photo.includes('.s3.') ||
+                          user.photo.includes('s3-') ||
+                          user.photo.includes('amazonaws.com')
+                        );
+                        
+                        // ALWAYS use PostgreSQL blob API for S3 URLs to avoid CORS issues
+                        if (isS3Url && user.id) {
+                          console.log('Using PostgreSQL blob API for S3 photo, userId:', user.id);
+                          return `/api/photo?userId=${user.id}`;
+                        }
+                        
+                        // If S3 URL but no ID yet, return S3 URL (will be updated when ID is fetched)
+                        if (isS3Url && !user.id) {
+                          console.warn('S3 URL detected but no user ID available yet');
+                          return user.photo;
+                        }
+                        
                         // Normalize the photo URL
                         let photoUrl = user.photo.trim();
                         
@@ -186,13 +212,55 @@ function Navbar() {
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         console.error('Image failed to load:', user.photo);
-                        if (user.photo) {
-                          console.error('Attempted path:', user.photo);
+                        console.error('User ID:', user.id);
+                        // If we're already using the API endpoint and it fails, show error
+                        const img = e.target as HTMLImageElement;
+                        if (img.src.includes('/api/photo')) {
+                          console.error('PostgreSQL blob API failed');
+                          setPhotoError(true);
+                        } else {
+                          // Check if it's an S3 URL
+                          const isS3Url = user.photo && (
+                            user.photo.includes('s3.amazonaws.com') || 
+                            user.photo.includes('.s3.') ||
+                            user.photo.includes('s3-') ||
+                            user.photo.includes('amazonaws.com')
+                          );
+                          if (isS3Url) {
+                            // Try to get user ID and use API endpoint
+                            if (user.id) {
+                              console.log('Trying fallback to PostgreSQL blob API');
+                              img.src = `/api/photo?userId=${user.id}`;
+                              img.onerror = () => {
+                                console.error('Fallback also failed');
+                                setPhotoError(true);
+                              };
+                            } else if (user.email) {
+                              // Fetch user ID and retry
+                              fetch(`/api/auth/current-user?email=${encodeURIComponent(user.email)}`)
+                                .then(res => res.json())
+                                .then(data => {
+                                  if (data.user && data.user.id) {
+                                    const updatedUser = { ...user, id: data.user.id };
+                                    localStorage.setItem('user', JSON.stringify(updatedUser));
+                                    setUser(updatedUser);
+                                    img.src = `/api/photo?userId=${data.user.id}`;
+                                    img.onerror = () => setPhotoError(true);
+                                  } else {
+                                    setPhotoError(true);
+                                  }
+                                })
+                                .catch(() => setPhotoError(true));
+                            } else {
+                              setPhotoError(true);
+                            }
+                          } else {
+                            setPhotoError(true);
+                          }
                         }
-                        setPhotoError(true);
                       }}
                       onLoad={() => {
-                        console.log('Image loaded successfully:', user.photo);
+                        console.log('Image loaded successfully');
                       }}
                     />
                   ) : (
@@ -207,6 +275,18 @@ function Navbar() {
                         {user.photo && !photoError ? (
                           <img
                             src={(() => {
+                              // Check if photo is from S3 (more robust detection)
+                              const isS3Url = user.photo && (
+                                user.photo.includes('s3.amazonaws.com') || 
+                                user.photo.includes('.s3.') ||
+                                user.photo.includes('s3-')
+                              );
+                              
+                              // If photo is from S3 and we have user ID, use PostgreSQL blob API to avoid CORS issues
+                              if (user.id && isS3Url) {
+                                return `/api/photo?userId=${user.id}`;
+                              }
+                              
                               // Normalize the photo URL
                               let photoUrl = user.photo.trim();
                               
@@ -233,7 +313,24 @@ function Navbar() {
                             })()}
                             alt={user.name || user.email}
                             className="w-full h-full object-cover rounded-full"
-                            onError={() => setPhotoError(true)}
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              if (img.src.includes('/api/photo')) {
+                                setPhotoError(true);
+                              } else {
+                                const isS3Url = user.photo && (
+                                  user.photo.includes('s3.amazonaws.com') || 
+                                  user.photo.includes('.s3.') ||
+                                  user.photo.includes('s3-')
+                                );
+                                if (user.id && isS3Url) {
+                                  img.src = `/api/photo?userId=${user.id}`;
+                                  img.onerror = () => setPhotoError(true);
+                                } else {
+                                  setPhotoError(true);
+                                }
+                              }
+                            }}
                           />
                         ) : (
                           getInitials(user.name, user.email)

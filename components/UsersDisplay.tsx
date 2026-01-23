@@ -96,6 +96,11 @@ export default function UsersDisplay() {
                   {user.photo ? (
                     <img
                       src={(() => {
+                        // If photo is from S3 and we have user ID, use PostgreSQL blob API to avoid CORS issues
+                        if (user.id && user.photo?.includes('s3')) {
+                          return `/api/photo?userId=${user.id}`;
+                        }
+                        
                         // Normalize the photo URL
                         let photoUrl = user.photo.trim();
                         
@@ -122,6 +127,16 @@ export default function UsersDisplay() {
                       })()}
                       alt={user.name || user.email}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        // If we're already using the API endpoint and it fails, show placeholder
+                        if (img.src.includes('/api/photo')) {
+                          img.style.display = 'none';
+                        } else if (user.id && user.photo?.includes('s3')) {
+                          // Try fallback to PostgreSQL blob API if S3 fails
+                          img.src = `/api/photo?userId=${user.id}`;
+                        }
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-zinc-100 via-zinc-200 to-zinc-300 flex items-center justify-center">

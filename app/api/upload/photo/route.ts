@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { put } from '@vercel/blob';
+import { uploadToS3, validateS3Config } from '@/lib/aws-s3';
+import pool from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('photo') as File;
+    const userId = formData.get('userId') as string | null;
 
     if (!file) {
       return NextResponse.json(
@@ -30,14 +32,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if BLOB_READ_WRITE_TOKEN is set
-    const token = process.env.BLOB_READ_WRITE_TOKEN;
-    if (!token) {
-      console.error('BLOB_READ_WRITE_TOKEN is not set');
+    // Validate AWS S3 configuration
+    if (!validateS3Config()) {
       return NextResponse.json(
         { 
-          error: 'Blob storage not configured. Please set BLOB_READ_WRITE_TOKEN environment variable.',
-          details: 'Visit Vercel dashboard > Storage > Create Blob store to get your token'
+          error: 'AWS S3 storage not configured. Please set AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION, and AWS_S3_BUCKET_NAME environment variables.',
         },
         { status: 500 }
       );
@@ -49,27 +48,32 @@ export async function POST(request: NextRequest) {
     const fileExtension = file.name.split('.').pop() || 'jpg';
     const filename = `photos/${timestamp}-${randomString}.${fileExtension}`;
 
-    // Upload to Vercel Blob Storage
-    const blob = await put(filename, file, {
-      access: 'public',
-      contentType: file.type,
-      token: token,
-    });
+    // Upload to AWS S3
+    const s3Url = await uploadToS3(file, filename);
 
-    // Ensure the URL is properly formatted (remove any double slashes or malformed URLs)
-    let photoUrl = blob.url;
-    if (photoUrl && !photoUrl.startsWith('http://') && !photoUrl.startsWith('https://')) {
-      // If somehow the URL is malformed, try to fix it
-      if (photoUrl.startsWith('http:/') || photoUrl.startsWith('https:/')) {
-        photoUrl = photoUrl.replace('http:/', 'http://').replace('https:/', 'https://');
+    // Convert file to buffer for PostgreSQL storage
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Store blob in PostgreSQL if userId is provided
+    if (userId) {
+      const client = await pool.connect();
+      try {
+        await client.query(
+          'UPDATE users SET photo_blob = $1, photo_s3_url = $2, photo = $3 WHERE id = $4',
+          [buffer, s3Url, s3Url, parseInt(userId)]
+        );
+      } finally {
+        client.release();
       }
     }
 
     return NextResponse.json(
       { 
         success: true,
-        path: photoUrl,
-        filename: filename
+        path: s3Url,
+        filename: filename,
+        s3Url: s3Url
       },
       { status: 200 }
     );
@@ -83,8 +87,8 @@ export async function POST(request: NextRequest) {
     
     // Provide more specific error messages
     let errorMessage = 'Failed to upload photo';
-    if (error.message?.includes('token')) {
-      errorMessage = 'Blob storage token is invalid or missing';
+    if (error.message?.includes('AWS') || error.message?.includes('S3')) {
+      errorMessage = 'AWS S3 configuration error: ' + error.message;
     } else if (error.message?.includes('network') || error.message?.includes('fetch')) {
       errorMessage = 'Network error while uploading photo';
     }

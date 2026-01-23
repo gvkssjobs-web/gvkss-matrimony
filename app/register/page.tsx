@@ -133,6 +133,23 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (response.ok) {
+        // If photo was uploaded, update the user's photo blob in database
+        if (formData.photo && data.user?.id) {
+          try {
+            const updatePhotoFormData = new FormData();
+            updatePhotoFormData.append('photo', formData.photo);
+            updatePhotoFormData.append('userId', data.user.id.toString());
+            
+            await fetch('/api/upload/photo', {
+              method: 'POST',
+              body: updatePhotoFormData,
+            });
+          } catch (err) {
+            console.error('Failed to update photo blob:', err);
+            // Non-critical error, continue with registration
+          }
+        }
+        
         localStorage.setItem('user', JSON.stringify(data.user));
         router.push(`/${formData.plan}`);
       } else {

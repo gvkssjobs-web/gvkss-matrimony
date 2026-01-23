@@ -21,6 +21,8 @@ export async function initDatabase() {
           name VARCHAR(255),
           role VARCHAR(50) DEFAULT 'silver' CHECK (role IN ('admin', 'gold', 'silver', 'platinum')),
           photo VARCHAR(500),
+          photo_blob BYTEA,
+          photo_s3_url VARCHAR(500),
           phone_number VARCHAR(20),
           profession VARCHAR(255),
           age INTEGER,
@@ -82,6 +84,36 @@ export async function initDatabase() {
           ALTER TABLE users ADD COLUMN photo VARCHAR(500);
         `);
         console.log('Photo column added successfully');
+      }
+
+      // Check and add photo_blob column for storing binary data
+      const photoBlobColumnExists = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_name = 'users' AND column_name = 'photo_blob'
+        );
+      `);
+
+      if (!photoBlobColumnExists.rows[0].exists) {
+        await client.query(`
+          ALTER TABLE users ADD COLUMN photo_blob BYTEA;
+        `);
+        console.log('Photo blob column added successfully');
+      }
+
+      // Check and add photo_s3_url column for S3 URL reference
+      const photoS3UrlColumnExists = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_name = 'users' AND column_name = 'photo_s3_url'
+        );
+      `);
+
+      if (!photoS3UrlColumnExists.rows[0].exists) {
+        await client.query(`
+          ALTER TABLE users ADD COLUMN photo_s3_url VARCHAR(500);
+        `);
+        console.log('Photo S3 URL column added successfully');
       }
 
       // Check and add phone_number column if it doesn't exist
