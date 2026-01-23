@@ -112,7 +112,10 @@ export async function GET(request: NextRequest) {
           else if (extension === 'webp') contentType = 'image/webp';
           
           console.log('Photo API - Successfully fetched from S3, content-type:', contentType);
-          return new NextResponse(imageBuffer, {
+          // Convert Buffer to Uint8Array for NextResponse (which accepts it as BodyInit)
+          const uint8Array = new Uint8Array(imageBuffer);
+          
+          return new NextResponse(uint8Array, {
             status: 200,
             headers: {
               'Content-Type': contentType,
