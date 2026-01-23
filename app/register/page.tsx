@@ -122,7 +122,6 @@ export default function RegisterPage() {
           phoneNumber: formData.phoneCode + formData.phone,
           gender: formData.gender,
           photo: photoPath,
-          age: age,
           dob: formData.dob,
           marriageStatus: formData.marriageStatus,
           birthTime: formData.birthTime,
