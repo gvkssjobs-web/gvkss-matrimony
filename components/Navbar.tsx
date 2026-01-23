@@ -121,7 +121,7 @@ function Navbar() {
   return (
     <>
       <nav id="theme-navbar" className='fixed w-full z-10 top-0 transition-all duration-200 border-b' style={{ backgroundColor: 'rgba(255,255,255,.78)', backdropFilter: 'blur(10px)', borderColor: 'var(--border)' }}>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1'>
           <div className='flex justify-between items-center gap-4'>
             {/* Logo */}
             <Link href="/" className='flex items-center gap-2 hover:opacity-80 transition-opacity'>
