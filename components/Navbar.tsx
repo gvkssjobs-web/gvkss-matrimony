@@ -13,9 +13,6 @@ function Navbar() {
   const [mounted, setMounted] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [photoError, setPhotoError] = useState(false);
-  const [loginData, setLoginData] = useState({ email: '', password: '' });
-  const [loginError, setLoginError] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -82,41 +79,6 @@ function Navbar() {
     return email[0].toUpperCase();
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoginError('');
-    setLoginLoading(true);
-
-    try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        setUser(data.user);
-        setLoginData({ email: '', password: '' });
-        const userRole = data.user.role;
-        if (userRole === 'admin') {
-          router.push('/admin');
-        } else {
-          router.push('/dashboard');
-        }
-      } else {
-        setLoginError(data.error || 'Login failed');
-      }
-    } catch (err) {
-      setLoginError('An error occurred. Please try again.');
-    } finally {
-      setLoginLoading(false);
-    }
-  };
 
   return (
     <>
@@ -130,6 +92,7 @@ function Navbar() {
                 alt="GVKSS Software Pvt. Ltd." 
                 width={50} 
                 height={40}
+                style={{ width: 'auto', height: 'auto' }}
                 className="h-auto"
                 priority
               />
@@ -434,57 +397,19 @@ function Navbar() {
                 )}
               </div>
             ) : (
-              <form onSubmit={handleLogin} className="flex items-center gap-2">
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={loginData.email}
-                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                  required
-                  className="px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 bg-white text-sm w-40 transition-all duration-200 shadow-sm"
-                  style={{ borderColor: 'var(--border)', color: 'var(--text)', borderWidth: '2px' }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = 'var(--primary)';
-                    e.target.style.borderWidth = '2px';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = 'var(--border)';
-                    e.target.style.borderWidth = '2px';
-                  }}
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={loginData.password}
-                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  required
-                  className="px-3 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 bg-white text-sm w-32 transition-all duration-200 shadow-sm"
-                  style={{ borderColor: 'var(--border)', color: 'var(--text)', borderWidth: '2px' }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = 'var(--primary)';
-                    e.target.style.borderWidth = '2px';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = 'var(--border)';
-                    e.target.style.borderWidth = '2px';
-                  }}
-                />
-                {loginError && (
-                  <span className="text-red-600 text-xs whitespace-nowrap">{loginError}</span>
-                )}
-                <button
-                  type="submit"
-                  disabled={loginLoading}
-                  className='px-4 py-2 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed'
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className='px-4 py-2 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl'
                   style={{ 
                     background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
                     boxShadow: '0 12px 22px rgba(233,75,106,.22)'
                   }}
-                  onMouseEnter={(e) => !loginLoading && (e.currentTarget.style.transform = 'translateY(-1px)')}
-                  onMouseLeave={(e) => !loginLoading && (e.currentTarget.style.transform = 'translateY(0)')}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
-                  {loginLoading ? '...' : 'Login'}
-                </button>
+                  Login
+                </Link>
                 <Link
                   href="/register"
                   className='px-4 py-2 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl'
@@ -497,7 +422,7 @@ function Navbar() {
                 >
                   Register
                 </Link>
-              </form>
+              </div>
             )}
             </div>
           </div>

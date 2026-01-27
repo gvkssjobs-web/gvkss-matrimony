@@ -19,6 +19,13 @@ export default function Home() {
   const [brides, setBrides] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null }>>([]);
   const [grooms, setGrooms] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null }>>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const carouselImages = [
+    '/Media (1).jpg',
+    '/Media (2).jpg',
+    '/Media.jpg'
+  ];
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -70,6 +77,15 @@ export default function Home() {
     fetchBridesAndGrooms();
   }, []);
 
+  // Auto-rotate carousel images
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % carouselImages.length);
+    }, 4000); // Change image every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [carouselImages.length]);
+
   // Show loading state while checking user
   if (loading && user) {
     return (
@@ -94,13 +110,23 @@ export default function Home() {
   }
 
   const handleSearch = () => {
-    // Handle search logic here
-    console.log('Search:', { searchType, minAge, maxAge, minHeight, maxHeight });
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.set('type', searchType);
+    if (minAge) params.set('minAge', minAge.toString());
+    if (maxAge) params.set('maxAge', maxAge.toString());
+    if (minHeight) params.set('minHeight', minHeight);
+    if (maxHeight) params.set('maxHeight', maxHeight);
+    
+    // Redirect to search results page
+    router.push(`/search?${params.toString()}`);
   };
 
   const handleProfileIdSearch = () => {
     // Handle profile ID search
-    console.log('Profile ID Search:', profileId);
+    if (profileId.trim()) {
+      router.push(`/${profileId.trim()}`);
+    }
   };
 
   return (
@@ -269,7 +295,7 @@ export default function Home() {
           </button>
         </div>
 
-        {/* Right Side - Image */}
+        {/* Right Side - Image Carousel */}
         <div style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ 
             width: '100%', 
@@ -279,13 +305,119 @@ export default function Home() {
             borderRadius: '8px',
             overflow: 'hidden'
           }}>
-            <Image
-              src="/images.jpg"
-              alt="Happy Couple"
-              fill
-              style={{ objectFit: 'cover' }}
-              priority
-            />
+            {/* Carousel Images */}
+            {carouselImages.map((image, index) => (
+              <div
+                key={index}
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  opacity: index === currentImageIndex ? 1 : 0,
+                  transition: 'opacity 0.8s ease-in-out',
+                  zIndex: index === currentImageIndex ? 1 : 0
+                }}
+              >
+                <Image
+                  src={image}
+                  alt={`Happy Couple ${index + 1}`}
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  priority={index === 0}
+                />
+              </div>
+            ))}
+            
+            {/* Carousel Indicators */}
+            <div style={{
+              position: 'absolute',
+              bottom: '15px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              gap: '8px',
+              zIndex: 2
+            }}>
+              {carouselImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentImageIndex(index)}
+                  style={{
+                    width: index === currentImageIndex ? '24px' : '10px',
+                    height: '10px',
+                    borderRadius: '5px',
+                    border: 'none',
+                    backgroundColor: index === currentImageIndex ? '#fff' : 'rgba(255, 255, 255, 0.5)',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease'
+                  }}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+            
+            {/* Navigation Arrows */}
+            <button
+              onClick={() => setCurrentImageIndex((prevIndex) => 
+                prevIndex === 0 ? carouselImages.length - 1 : prevIndex - 1
+              )}
+              style={{
+                position: 'absolute',
+                left: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 2,
+                transition: 'background-color 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
+              aria-label="Previous image"
+            >
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            
+            <button
+              onClick={() => setCurrentImageIndex((prevIndex) => 
+                (prevIndex + 1) % carouselImages.length
+              )}
+              style={{
+                position: 'absolute',
+                right: '15px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                zIndex: 2,
+                transition: 'background-color 0.3s ease'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
+              aria-label="Next image"
+            >
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       </div>
@@ -314,6 +446,11 @@ export default function Home() {
             type="text"
             value={profileId}
             onChange={(e) => setProfileId(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleProfileIdSearch();
+              }
+            }}
             placeholder="Enter Profile ID"
             style={{
               padding: '10px 15px',
@@ -378,7 +515,7 @@ export default function Home() {
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '15px' }}>
-              {brides.map((bride) => {
+              {brides.slice(0, 4).map((bride) => {
                 const getPhotoUrl = () => {
                   const photoUrl = bride.photo_s3_url || bride.photo;
                   
@@ -439,6 +576,7 @@ export default function Home() {
                 return (
                   <div
                     key={bride.id}
+                    onClick={() => router.push(`/${bride.id}`)}
                     style={{
                       border: '1px solid #eee',
                       borderRadius: '6px',
@@ -545,7 +683,7 @@ export default function Home() {
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '15px' }}>
-              {grooms.map((groom) => {
+              {grooms.slice(0, 4).map((groom) => {
                 const getPhotoUrl = () => {
                   const photoUrl = groom.photo_s3_url || groom.photo;
                   
@@ -606,6 +744,7 @@ export default function Home() {
                 return (
                   <div
                     key={groom.id}
+                    onClick={() => router.push(`/${groom.id}`)}
                     style={{
                       border: '1px solid #eee',
                       borderRadius: '6px',
