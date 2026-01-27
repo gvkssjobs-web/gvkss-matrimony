@@ -265,7 +265,7 @@ function SearchResultsContent() {
                             style={{
                               width: '100%',
                               height: '100%',
-                              objectFit: 'cover'
+                              objectFit: 'contain'
                             }}
                             onError={(e) => {
                               const img = e.target as HTMLImageElement;
