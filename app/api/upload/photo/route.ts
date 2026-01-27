@@ -62,9 +62,11 @@ export async function POST(request: NextRequest) {
     if (userId) {
       const client = await pool.connect();
       try {
+        // Only set photo to S3 URL if it exists, otherwise set to null
+        // The frontend will use /api/photo?userId= to fetch from blob
         await client.query(
           'UPDATE users SET photo_blob = $1, photo_s3_url = $2, photo = $3 WHERE id = $4',
-          [buffer, s3Url, s3Url || `local-${userId}`, parseInt(userId)]
+          [buffer, s3Url, s3Url || null, parseInt(userId)]
         );
       } finally {
         client.release();

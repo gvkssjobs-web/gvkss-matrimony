@@ -381,6 +381,12 @@ export default function Home() {
               {brides.map((bride) => {
                 const getPhotoUrl = () => {
                   const photoUrl = bride.photo_s3_url || bride.photo;
+                  
+                  // If no photo URL but we have user ID, use blob API
+                  if (!photoUrl && bride.id) {
+                    return `/api/photo?userId=${bride.id}`;
+                  }
+                  
                   if (!photoUrl) return null;
                   
                   // Check if photo is from S3 (more robust detection)
@@ -393,6 +399,11 @@ export default function Home() {
                   
                   // Use PostgreSQL blob API for S3 URLs to avoid CORS issues
                   if (isS3Url && bride.id) {
+                    return `/api/photo?userId=${bride.id}`;
+                  }
+                  
+                  // If photo starts with "local-", it means it's stored in DB blob
+                  if (photoUrl.startsWith('local-') && bride.id) {
                     return `/api/photo?userId=${bride.id}`;
                   }
                   
@@ -415,6 +426,11 @@ export default function Home() {
                   // Handle relative paths
                   if (normalizedUrl.startsWith('/')) {
                     return normalizedUrl;
+                  }
+                  
+                  // If we have user ID but no valid URL, use blob API
+                  if (bride.id) {
+                    return `/api/photo?userId=${bride.id}`;
                   }
                   
                   return `/${normalizedUrl}`;
@@ -532,6 +548,12 @@ export default function Home() {
               {grooms.map((groom) => {
                 const getPhotoUrl = () => {
                   const photoUrl = groom.photo_s3_url || groom.photo;
+                  
+                  // If no photo URL but we have user ID, use blob API
+                  if (!photoUrl && groom.id) {
+                    return `/api/photo?userId=${groom.id}`;
+                  }
+                  
                   if (!photoUrl) return null;
                   
                   // Check if photo is from S3 (more robust detection)
@@ -544,6 +566,11 @@ export default function Home() {
                   
                   // Use PostgreSQL blob API for S3 URLs to avoid CORS issues
                   if (isS3Url && groom.id) {
+                    return `/api/photo?userId=${groom.id}`;
+                  }
+                  
+                  // If photo starts with "local-", it means it's stored in DB blob
+                  if (photoUrl.startsWith('local-') && groom.id) {
                     return `/api/photo?userId=${groom.id}`;
                   }
                   
@@ -566,6 +593,11 @@ export default function Home() {
                   // Handle relative paths
                   if (normalizedUrl.startsWith('/')) {
                     return normalizedUrl;
+                  }
+                  
+                  // If we have user ID but no valid URL, use blob API
+                  if (groom.id) {
+                    return `/api/photo?userId=${groom.id}`;
                   }
                   
                   return `/${normalizedUrl}`;

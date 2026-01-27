@@ -164,6 +164,13 @@ function Navbar() {
                   {user.photo && !photoError ? (
                     <img
                       src={(() => {
+                        // If no photo URL but we have user ID, use blob API
+                        if (!user.photo && user.id) {
+                          return `/api/photo?userId=${user.id}`;
+                        }
+                        
+                        if (!user.photo) return '';
+                        
                         // Check if photo is from S3 (more robust detection)
                         const isS3Url = user.photo && (
                           user.photo.includes('s3.amazonaws.com') || 
@@ -175,6 +182,11 @@ function Navbar() {
                         // ALWAYS use PostgreSQL blob API for S3 URLs to avoid CORS issues
                         if (isS3Url && user.id) {
                           console.log('Using PostgreSQL blob API for S3 photo, userId:', user.id);
+                          return `/api/photo?userId=${user.id}`;
+                        }
+                        
+                        // If photo starts with "local-", it means it's stored in DB blob
+                        if (user.photo.startsWith('local-') && user.id) {
                           return `/api/photo?userId=${user.id}`;
                         }
                         
@@ -203,6 +215,11 @@ function Navbar() {
                         // Handle relative paths
                         if (photoUrl.startsWith('/')) {
                           return photoUrl;
+                        }
+                        
+                        // If we have user ID but no valid URL, use blob API
+                        if (user.id) {
+                          return `/api/photo?userId=${user.id}`;
                         }
                         
                         // Default: prepend / for relative paths
@@ -275,6 +292,13 @@ function Navbar() {
                         {user.photo && !photoError ? (
                           <img
                             src={(() => {
+                              // If no photo URL but we have user ID, use blob API
+                              if (!user.photo && user.id) {
+                                return `/api/photo?userId=${user.id}`;
+                              }
+                              
+                              if (!user.photo) return '';
+                              
                               // Check if photo is from S3 (more robust detection)
                               const isS3Url = user.photo && (
                                 user.photo.includes('s3.amazonaws.com') || 
@@ -284,6 +308,11 @@ function Navbar() {
                               
                               // If photo is from S3 and we have user ID, use PostgreSQL blob API to avoid CORS issues
                               if (user.id && isS3Url) {
+                                return `/api/photo?userId=${user.id}`;
+                              }
+                              
+                              // If photo starts with "local-", it means it's stored in DB blob
+                              if (user.photo.startsWith('local-') && user.id) {
                                 return `/api/photo?userId=${user.id}`;
                               }
                               
@@ -306,6 +335,11 @@ function Navbar() {
                               // Handle relative paths
                               if (photoUrl.startsWith('/')) {
                                 return photoUrl;
+                              }
+                              
+                              // If we have user ID but no valid URL, use blob API
+                              if (user.id) {
+                                return `/api/photo?userId=${user.id}`;
                               }
                               
                               // Default: prepend / for relative paths
