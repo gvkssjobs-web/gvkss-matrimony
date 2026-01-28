@@ -131,294 +131,308 @@ export default function Home() {
 
   return (
     <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      {/* Quick Search Section */}
-      <div className="quick-search-container" style={{
+      {/* Image Carousel with Quick Search Overlay */}
+      <div style={{
         background: '#fff',
         border: '1px solid #90EE90',
         borderRadius: '8px',
-        padding: '30px',
+        padding: '0',
         marginBottom: '30px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        display: 'flex',
-        gap: '30px',
-        alignItems: 'flex-start'
+        overflow: 'hidden',
+        position: 'relative'
       }}>
-        {/* Left Side - Form */}
-        <div style={{ flex: '1', minWidth: '300px' }}>
-          <h2 style={{ 
-            fontSize: '24px', 
-            fontWeight: 'bold', 
-            marginBottom: '20px',
-            color: '#333',
-            borderBottom: '2px solid #E94B6A',
-            paddingBottom: '10px',
-            width: '66%'
+        <div style={{ 
+          width: '100%', 
+          height: '500px',
+          position: 'relative',
+          borderRadius: '8px',
+          overflow: 'hidden'
+        }}>
+          {/* Carousel Images */}
+          {carouselImages.map((image, index) => (
+            <div
+              key={index}
+              style={{
+                position: 'absolute',
+                width: '100%',
+                height: '100%',
+                opacity: index === currentImageIndex ? 1 : 0,
+                transition: 'opacity 0.8s ease-in-out',
+                zIndex: index === currentImageIndex ? 1 : 0
+              }}
+            >
+              <Image
+                src={image}
+                alt={`Happy Couple ${index + 1}`}
+                fill
+                style={{ objectFit: 'cover' }}
+                priority={index === 0}
+              />
+            </div>
+          ))}
+
+          {/* Quick Search Overlay */}
+          <div style={{
+            position: 'absolute',
+            top: '20px',
+            left: '20px',
+            right: '20px',
+            zIndex: 5,
+            background: 'transparent',
+            borderRadius: '8px',
+            padding: '30px',
+            boxShadow: 'none',
+            border: 'none'
           }}>
-            Quick Search
-          </h2>
+            <h2 style={{ 
+              fontSize: '24px', 
+              fontWeight: 'bold', 
+              marginBottom: '20px',
+              color: '#fff',
+              borderBottom: '2px solid #fff',
+              paddingBottom: '10px',
+              width: 'fit-content'
+            }}>
+              Quick Search
+            </h2>
 
-          {/* Looking For */}
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#555' }}>
-              <strong>Looking For</strong>
-            </label>
-            <div style={{ display: 'flex', gap: '20px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                <input
-                  type="radio"
-                  name="searchType"
-                  value="bride"
-                  checked={searchType === 'bride'}
-                  onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
-                />
-                <span style={{ fontSize: '16px', color: '#333' }}>Bride</span>
+            {/* Looking For */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#fff' }}>
+                <strong>Looking For</strong>
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                <input
-                  type="radio"
-                  name="searchType"
-                  value="groom"
-                  checked={searchType === 'groom'}
-                  onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
-                />
-                <span style={{ fontSize: '16px', color: '#333' }}>Groom</span>
+              <div style={{ display: 'flex', gap: '20px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="searchType"
+                    value="bride"
+                    checked={searchType === 'bride'}
+                    onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
+                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
+                  />
+                  <span style={{ fontSize: '16px', color: '#fff' }}>Bride</span>
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="radio"
+                    name="searchType"
+                    value="groom"
+                    checked={searchType === 'groom'}
+                    onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
+                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
+                  />
+                  <span style={{ fontSize: '16px', color: '#fff' }}>Groom</span>
+                </label>
+              </div>
+            </div>
+
+            {/* Age */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#fff' }}>
+                <strong>Age</strong>
               </label>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <select
+                  value={minAge}
+                  onChange={(e) => setMinAge(Number(e.target.value))}
+                  style={{
+                    padding: '8px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    minWidth: '80px',
+                    background: '#fff',
+                    color: '#333'
+                  }}
+                >
+                  {Array.from({ length: 28 }, (_, i) => i + 18).map(age => (
+                    <option key={age} value={age}>{age}</option>
+                  ))}
+                </select>
+                <span style={{ color: '#fff' }}>to</span>
+                <select
+                  value={maxAge}
+                  onChange={(e) => setMaxAge(Number(e.target.value))}
+                  style={{
+                    padding: '8px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    minWidth: '80px',
+                    background: '#fff',
+                    color: '#333'
+                  }}
+                >
+                  {Array.from({ length: 28 }, (_, i) => i + 18).map(age => (
+                    <option key={age} value={age}>{age}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
 
-          {/* Age */}
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#555' }}>
-              <strong>Age</strong>
-            </label>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <select
-                value={minAge}
-                onChange={(e) => setMinAge(Number(e.target.value))}
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  minWidth: '80px'
-                }}
-              >
-                {Array.from({ length: 28 }, (_, i) => i + 18).map(age => (
-                  <option key={age} value={age}>{age}</option>
-                ))}
-              </select>
-              <span style={{ color: '#666' }}>to</span>
-              <select
-                value={maxAge}
-                onChange={(e) => setMaxAge(Number(e.target.value))}
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  minWidth: '80px'
-                }}
-              >
-                {Array.from({ length: 28 }, (_, i) => i + 18).map(age => (
-                  <option key={age} value={age}>{age}</option>
-                ))}
-              </select>
+            {/* Height */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#fff' }}>
+                <strong>Height</strong>
+              </label>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <select
+                  value={minHeight}
+                  onChange={(e) => setMinHeight(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    minWidth: '120px',
+                    background: '#fff',
+                    color: '#333'
+                  }}
+                >
+                  <option value="">Select</option>
+                  {heightOptions.map(height => (
+                    <option key={height} value={height}>{height}</option>
+                  ))}
+                </select>
+                <span style={{ color: '#fff' }}>to</span>
+                <select
+                  value={maxHeight}
+                  onChange={(e) => setMaxHeight(e.target.value)}
+                  style={{
+                    padding: '8px 12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '14px',
+                    minWidth: '120px',
+                    background: '#fff',
+                    color: '#333'
+                  }}
+                >
+                  <option value="">Select</option>
+                  {heightOptions.map(height => (
+                    <option key={height} value={height}>{height}</option>
+                  ))}
+                </select>
+              </div>
             </div>
-          </div>
 
-          {/* Height */}
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#555' }}>
-              <strong>Height</strong>
-            </label>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <select
-                value={minHeight}
-                onChange={(e) => setMinHeight(e.target.value)}
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  minWidth: '120px'
-                }}
-              >
-                <option value="">Select</option>
-                {heightOptions.map(height => (
-                  <option key={height} value={height}>{height}</option>
-                ))}
-              </select>
-              <span style={{ color: '#666' }}>to</span>
-              <select
-                value={maxHeight}
-                onChange={(e) => setMaxHeight(e.target.value)}
-                style={{
-                  padding: '8px 12px',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                  minWidth: '120px'
-                }}
-              >
-                <option value="">Select</option>
-                {heightOptions.map(height => (
-                  <option key={height} value={height}>{height}</option>
-                ))}
-              </select>
-            </div>
+            <button
+              onClick={handleSearch}
+              style={{
+                padding: '12px 30px',
+                background: '#E94B6A',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                transition: 'transform 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
+            >
+              Search
+            </button>
           </div>
-
+          
+          {/* Carousel Indicators */}
+          <div style={{
+            position: 'absolute',
+            bottom: '15px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            gap: '8px',
+            zIndex: 15
+          }}>
+            {carouselImages.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentImageIndex(index)}
+                style={{
+                  width: index === currentImageIndex ? '24px' : '10px',
+                  height: '10px',
+                  borderRadius: '5px',
+                  border: 'none',
+                  backgroundColor: index === currentImageIndex ? '#fff' : 'rgba(255, 255, 255, 0.5)',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+          
+          {/* Navigation Arrows */}
           <button
-            onClick={handleSearch}
+            onClick={() => setCurrentImageIndex((prevIndex) => 
+              prevIndex === 0 ? carouselImages.length - 1 : prevIndex - 1
+            )}
             style={{
-              padding: '12px 30px',
-              background: '#E94B6A',
+              position: 'absolute',
+              left: '15px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
               color: '#fff',
               border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-              transition: 'transform 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-          >
-            Search
-          </button>
-        </div>
-
-        {/* Right Side - Image Carousel */}
-        <div style={{ flex: '1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ 
-            width: '100%', 
-            height: '100%', 
-            minHeight: '400px',
-            position: 'relative',
-            borderRadius: '8px',
-            overflow: 'hidden'
-          }}>
-            {/* Carousel Images */}
-            {carouselImages.map((image, index) => (
-              <div
-                key={index}
-                style={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  opacity: index === currentImageIndex ? 1 : 0,
-                  transition: 'opacity 0.8s ease-in-out',
-                  zIndex: index === currentImageIndex ? 1 : 0
-                }}
-              >
-                <Image
-                  src={image}
-                  alt={`Happy Couple ${index + 1}`}
-                  fill
-                  style={{ objectFit: 'cover' }}
-                  priority={index === 0}
-                />
-              </div>
-            ))}
-            
-            {/* Carousel Indicators */}
-            <div style={{
-              position: 'absolute',
-              bottom: '15px',
-              left: '50%',
-              transform: 'translateX(-50%)',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
               display: 'flex',
-              gap: '8px',
-              zIndex: 2
-            }}>
-              {carouselImages.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  style={{
-                    width: index === currentImageIndex ? '24px' : '10px',
-                    height: '10px',
-                    borderRadius: '5px',
-                    border: 'none',
-                    backgroundColor: index === currentImageIndex ? '#fff' : 'rgba(255, 255, 255, 0.5)',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease'
-                  }}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-            
-            {/* Navigation Arrows */}
-            <button
-              onClick={() => setCurrentImageIndex((prevIndex) => 
-                prevIndex === 0 ? carouselImages.length - 1 : prevIndex - 1
-              )}
-              style={{
-                position: 'absolute',
-                left: '15px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '50%',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                zIndex: 2,
-                transition: 'background-color 0.3s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
-              aria-label="Previous image"
-            >
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            
-            <button
-              onClick={() => setCurrentImageIndex((prevIndex) => 
-                (prevIndex + 1) % carouselImages.length
-              )}
-              style={{
-                position: 'absolute',
-                right: '15px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '50%',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                zIndex: 2,
-                transition: 'background-color 0.3s ease'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
-              aria-label="Next image"
-            >
-              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 15,
+              transition: 'background-color 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
+            aria-label="Previous image"
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <button
+            onClick={() => setCurrentImageIndex((prevIndex) => 
+              (prevIndex + 1) % carouselImages.length
+            )}
+            style={{
+              position: 'absolute',
+              right: '15px',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              zIndex: 15,
+              transition: 'background-color 0.3s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
+            aria-label="Next image"
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
       </div>
 
