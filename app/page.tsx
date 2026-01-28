@@ -186,7 +186,7 @@ export default function Home() {
                     name="searchType"
                     value="bride"
                     checked={searchType === 'bride'}
-                    onChange={(e) => setSearchType(e.target.value)}
+                    onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
                     style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
                   />
                   <span style={{ fontSize: '16px', color: '#fff' }}>Bride</span>
@@ -198,7 +198,7 @@ export default function Home() {
                     name="searchType"
                     value="groom"
                     checked={searchType === 'groom'}
-                    onChange={(e) => setSearchType(e.target.value)}
+                    onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
                     style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
                   />
                   <span style={{ fontSize: '16px', color: '#fff' }}>Groom</span>
