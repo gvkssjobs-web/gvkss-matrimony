@@ -47,16 +47,26 @@ body {
 }
 
 /* Navbar styling - solid background, no transparency */
-nav#theme-navbar {
-  background-color: #ffffff !important;
+nav#theme-navbar,
+nav#theme-navbar.fixed,
+nav#theme-navbar[style],
+body nav#theme-navbar,
+html body nav#theme-navbar {
+  background-color: #e95353 !important;
+  background: #e95353!important;
   opacity: 1 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
-.dark nav#theme-navbar {
-  background-color: #1a1a1a !important;
+.dark nav#theme-navbar,
+.dark nav#theme-navbar.fixed,
+.dark nav#theme-navbar[style],
+.dark body nav#theme-navbar,
+.dark html body nav#theme-navbar {
+  background-color : #e95353 !important;
+  background: #e95353 !important;
   opacity: 1 !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;

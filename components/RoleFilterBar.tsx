@@ -110,9 +110,9 @@ export default function RoleFilterBar({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className='w-full px-5 py-3 pl-12 pr-12 rounded-lg bg-white border transition-all duration-300 placeholder:text-[#9CA3AF]'
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              style={{ borderColor: '#FF8AA2', color: '#111827' }}
+              onFocus={(e) => e.target.style.borderColor = '#E94B6A'}
+              onBlur={(e) => e.target.style.borderColor = '#FF8AA2'}
             />
             <svg
               className='absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 transition-colors duration-300'
@@ -155,7 +155,7 @@ export default function RoleFilterBar({
             <select
               value={selectedRole}
               onChange={(e) => onRoleChange(e.target.value)}
-              className='px-4 py-3 rounded-lg border border-zinc-300 bg-gradient-to-r from-zinc-50 via-white to-zinc-50 text-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 transition-all duration-300 cursor-pointer hover:border-green-400'
+              className='px-4 py-3 rounded-lg border border-zinc-300 bg-gradient-to-r from-zinc-50 via-white to-zinc-50 text-zinc-900 text-sm focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 transition-all duration-300 cursor-pointer hover:border-pink-400'
             >
               <option value="all">All Roles</option>
               {availableRoles.map((role) => (
@@ -178,11 +178,11 @@ export default function RoleFilterBar({
               value={selectedGender}
               onChange={(e) => onGenderChange(e.target.value)}
               className='px-4 py-3 rounded-lg border bg-white text-sm focus:outline-none focus:ring-2 transition-all duration-300 cursor-pointer'
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#16A34A'}
-              onMouseLeave={(e) => e.currentTarget.style.borderColor = '#22C55E'}
+              style={{ borderColor: '#FF8AA2', color: '#111827' }}
+              onFocus={(e) => e.target.style.borderColor = '#E94B6A'}
+              onBlur={(e) => e.target.style.borderColor = '#FF8AA2'}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#E94B6A'}
+              onMouseLeave={(e) => e.currentTarget.style.borderColor = '#FF8AA2'}
             >
               <option value="all">All Genders</option>
               <option value="male">Male</option>
@@ -205,7 +205,7 @@ export default function RoleFilterBar({
                 value={minAge || sliderMin}
                 onChange={(e) => handleMinInputChange(e.target.value)}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#22C55E';
+                  e.target.style.borderColor = '#FF8AA2';
                   const val = e.target.value;
                   if (val === '') {
                     setSliderMin(18);
@@ -241,7 +241,7 @@ export default function RoleFilterBar({
                 value={maxAge || sliderMax}
                 onChange={(e) => handleMaxInputChange(e.target.value)}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#22C55E';
+                  e.target.style.borderColor = '#FF8AA2';
                   const val = e.target.value;
                   if (val === '') {
                     setSliderMax(50);
@@ -281,9 +281,9 @@ export default function RoleFilterBar({
                 type="button"
                 onClick={onClearFilters}
                 className='px-6 py-3 text-sm font-semibold text-white rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 flex items-center gap-2.5 shadow-md hover:shadow-lg'
-                style={{ backgroundColor: '#16A34A' }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#15803D'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#16A34A'}
+                style={{ backgroundColor: '#E94B6A' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#C7365A'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#E94B6A'}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

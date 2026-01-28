@@ -30,7 +30,7 @@ export default function UserCard({ user }: UserCardProps) {
   };
 
   return (
-    <div className="group relative rounded-2xl overflow-hidden border border-zinc-200 h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style={{ backgroundColor: '#FFFFFF' }} onMouseEnter={(e) => e.currentTarget.style.borderColor = '#22C55E'} onMouseLeave={(e) => e.currentTarget.style.borderColor = '#E5E7EB'}>
+    <div className="group relative rounded-2xl overflow-hidden border border-zinc-200 h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style={{ backgroundColor: '#FFFFFF' }} onMouseEnter={(e) => e.currentTarget.style.borderColor = '#FF8AA2'} onMouseLeave={(e) => e.currentTarget.style.borderColor = '#E5E7EB'}>
       {/* Photo Section with Role Badge */}
       <div className="relative h-72 overflow-hidden">
         {user.photo ? (

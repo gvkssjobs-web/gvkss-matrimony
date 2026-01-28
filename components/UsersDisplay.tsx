@@ -74,7 +74,7 @@ export default function UsersDisplay() {
       <div className="mt-20">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent mb-3" style={{ backgroundImage: 'linear-gradient(to right, #111827, #16A34A, #111827)' }}>
+          <h2 className="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent mb-3" style={{ backgroundImage: 'linear-gradient(to right, #111827, #E94B6A, #111827)' }}>
             Our Members
           </h2>
           <p className="text-lg" style={{ color: '#374151' }}>Discover our community members</p>

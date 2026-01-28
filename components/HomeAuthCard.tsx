@@ -183,9 +183,9 @@ export default function HomeAuthCard() {
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               required
               className="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors placeholder:text-[#9CA3AF]"
-              style={{ borderColor: '#22C55E', color: '#111827' }}
-              onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-              onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+              style={{ borderColor: '#FF8AA2', color: '#111827' }}
+              onFocus={(e) => e.target.style.borderColor = '#E94B6A'}
+              onBlur={(e) => e.target.style.borderColor = '#FF8AA2'}
             />
           </div>
 

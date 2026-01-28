@@ -34,6 +34,7 @@ export async function GET(
           dob, birth_time, birth_place, height, complexion,
           star, raasi, gothram, padam, uncle_gothram,
           education_category, education_details, employed_in,
+          occupation, occupation_in_details, annual_income,
           address, created_at, siblings_info
         FROM users 
         WHERE id = $1`,
@@ -72,6 +73,9 @@ export async function GET(
             educationCategory: user.education_category || null,
             educationDetails: user.education_details || null,
             employedIn: user.employed_in || null,
+            occupation: user.occupation || null,
+            occupationInDetails: user.occupation_in_details || null,
+            annualIncome: user.annual_income || null,
             address: user.address || null,
             createdAt: user.created_at,
             siblingsInfo: user.siblings_info || null,

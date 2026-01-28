@@ -19,6 +19,7 @@ export default function Home() {
   const [brides, setBrides] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null }>>([]);
   const [grooms, setGrooms] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null }>>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [profileType, setProfileType] = useState<'bride' | 'groom'>('bride');
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -119,17 +120,14 @@ export default function Home() {
       {/* Quick Search with Background Image */}
       <div style={{
         background: '#fff',
-        border: '1px solid #90EE90',
         borderRadius: '8px',
         padding: '0',
-        marginBottom: '30px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
         overflow: 'hidden',
         position: 'relative'
       }}>
         <div style={{ 
           width: '100%', 
-          height: '500px',
+          height: '565px',
           position: 'relative',
           borderRadius: '8px',
           overflow: 'hidden'
@@ -147,21 +145,27 @@ export default function Home() {
           <div style={{
             position: 'absolute',
             top: '20px',
-            left: '20px',
-            right: '20px',
+            right: '145px',
+            width: '400px',
+            maxWidth: 'calc(100% - 40px)',
             zIndex: 5,
-            background: 'transparent',
-            borderRadius: '8px',
+
+            background: 'rgba(255, 255, 255, 0.35)',      // light glacy tone
+            backdropFilter: 'blur(12px)',                // frosted effect
+            WebkitBackdropFilter: 'blur(12px)',          // Safari support
+            borderRadius: '25px',
             padding: '30px',
-            boxShadow: 'none',
-            border: 'none'
+
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',  // subtle depth
+            border: '1px solid rgba(255, 255, 255, 0.4)'  // soft edge
           }}>
+
             <h2 style={{ 
               fontSize: '24px', 
               fontWeight: 'bold', 
               marginBottom: '20px',
-              color: '#fff',
-              borderBottom: '2px solid #fff',
+              color: '#333',
+              borderBottom: 'none',
               paddingBottom: '10px',
               width: 'fit-content'
             }}>
@@ -170,7 +174,7 @@ export default function Home() {
 
             {/* Looking For */}
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#fff' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#333' }}>
                 <strong>Looking For</strong>
               </label>
               <div style={{ display: 'flex', gap: '20px' }}>
@@ -183,7 +187,7 @@ export default function Home() {
                     onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
                     style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
                   />
-                  <span style={{ fontSize: '16px', color: '#fff' }}>Bride</span>
+                  <span style={{ fontSize: '16px', color: '#333' }}>Bride</span>
                 </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                   <input
@@ -194,14 +198,14 @@ export default function Home() {
                     onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
                     style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
                   />
-                  <span style={{ fontSize: '16px', color: '#fff' }}>Groom</span>
+                  <span style={{ fontSize: '16px', color: '#333' }}>Groom</span>
                 </label>
               </div>
             </div>
 
             {/* Age */}
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#fff' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#333' }}>
                 <strong>Age</strong>
               </label>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -210,30 +214,30 @@ export default function Home() {
                   onChange={(e) => setMinAge(Number(e.target.value))}
                   style={{
                     padding: '8px 12px',
-                    border: '1px solid #ddd',
                     borderRadius: '4px',
                     fontSize: '14px',
                     minWidth: '80px',
                     background: '#fff',
-                    color: '#333'
+                    color: '#333',
+                    border: 'none'
                   }}
                 >
                   {Array.from({ length: 28 }, (_, i) => i + 18).map(age => (
                     <option key={age} value={age}>{age}</option>
                   ))}
                 </select>
-                <span style={{ color: '#fff' }}>to</span>
+                <span style={{ color: '#333' }}>to</span>
                 <select
                   value={maxAge}
                   onChange={(e) => setMaxAge(Number(e.target.value))}
                   style={{
                     padding: '8px 12px',
-                    border: '1px solid #ddd',
                     borderRadius: '4px',
                     fontSize: '14px',
                     minWidth: '80px',
                     background: '#fff',
-                    color: '#333'
+                    color: '#333',
+                    border: 'none'
                   }}
                 >
                   {Array.from({ length: 28 }, (_, i) => i + 18).map(age => (
@@ -245,7 +249,7 @@ export default function Home() {
 
             {/* Height */}
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#fff' }}>
+              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#333' }}>
                 <strong>Height</strong>
               </label>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -254,12 +258,12 @@ export default function Home() {
                   onChange={(e) => setMinHeight(e.target.value)}
                   style={{
                     padding: '8px 12px',
-                    border: '1px solid #ddd',
                     borderRadius: '4px',
                     fontSize: '14px',
                     minWidth: '120px',
                     background: '#fff',
-                    color: '#333'
+                    color: '#333',
+                    border: 'none'
                   }}
                 >
                   <option value="">Select</option>
@@ -267,18 +271,18 @@ export default function Home() {
                     <option key={height} value={height}>{height}</option>
                   ))}
                 </select>
-                <span style={{ color: '#fff' }}>to</span>
+                <span style={{ color: '#333' }}>to</span>
                 <select
                   value={maxHeight}
                   onChange={(e) => setMaxHeight(e.target.value)}
                   style={{
                     padding: '8px 12px',
-                    border: '1px solid #ddd',
                     borderRadius: '4px',
                     fontSize: '14px',
                     minWidth: '120px',
                     background: '#fff',
-                    color: '#333'
+                    color: '#333',
+                    border: 'none'
                   }}
                 >
                   <option value="">Select</option>
@@ -300,7 +304,6 @@ export default function Home() {
                 fontSize: '16px',
                 fontWeight: '600',
                 cursor: 'pointer',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
                 transition: 'transform 0.2s'
               }}
               onMouseEnter={(e) => {
@@ -319,25 +322,24 @@ export default function Home() {
       {/* Unified Section: Profile ID Search, Brides, and Grooms */}
       <div style={{
         background: '#fff',
-        border: '1px solid #ddd',
         borderRadius: '8px',
         padding: '30px',
-        marginBottom: '30px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        marginBottom: '30px'
       }}>
         {/* Profile ID Search */}
-        <div style={{ marginBottom: '40px' }}>
+        <div style={{ marginBottom: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <h2 style={{ 
             fontSize: '24px', 
             fontWeight: 'bold', 
             marginBottom: '20px',
             color: '#333',
-            borderBottom: '2px solid #E94B6A',
-            paddingBottom: '10px'
+            borderBottom: 'none',
+            paddingBottom: '10px',
+            textAlign: 'center'
           }}>
             Profile ID Search
           </h2>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
             <input
               type="text"
               value={profileId}
@@ -350,11 +352,11 @@ export default function Home() {
               placeholder="Enter Profile ID"
               style={{
                 padding: '10px 15px',
-                border: '1px solid #ddd',
                 borderRadius: '4px',
                 fontSize: '16px',
                 flex: 1,
-                maxWidth: '300px'
+                maxWidth: '300px',
+                border: 'none'
               }}
             />
             <button
@@ -367,8 +369,7 @@ export default function Home() {
                 borderRadius: '6px',
                 fontSize: '16px',
                 fontWeight: '600',
-                cursor: 'pointer',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                cursor: 'pointer'
               }}
             >
               Search
@@ -376,336 +377,229 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Brides and Grooms Side by Side */}
-        <div className="brides-grooms-container" style={{
-          display: 'flex',
-          gap: '20px'
+        {/* Toggle Button and Profiles Section */}
+        <div style={{
+          background: '#fff',
+          borderRadius: '8px',
+          padding: '30px',
+          marginBottom: '30px'
         }}>
-          {/* Brides Section */}
-          <div style={{
-            flex: '1'
+          {/* Toggle Button */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            marginBottom: '30px' 
           }}>
-          <h2 style={{ 
-            fontSize: '24px', 
-            fontWeight: 'bold', 
-            marginBottom: '20px',
-            color: '#333',
-            borderBottom: '2px solid #E94B6A',
-            paddingBottom: '10px'
-          }}>
-            Brides
-          </h2>
-          {dataLoading ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-              Loading brides...
+            <div style={{
+              display: 'flex',
+              borderRadius: '25px',
+              border: '2px solid #9333EA',
+              overflow: 'hidden',
+              backgroundColor: '#FFFFFF',
+              width: 'fit-content'
+            }}>
+              <button
+                onClick={() => setProfileType('bride')}
+                style={{
+                  padding: '10px 30px',
+                  border: 'none',
+                  borderRadius: profileType === 'bride' ? '23px 0 0 23px' : '0',
+                  backgroundColor: profileType === 'bride' ? '#3B82F6' : '#FFFFFF',
+                  color: profileType === 'bride' ? '#FFFFFF' : '#9333EA',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  outline: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (profileType !== 'bride') {
+                    e.currentTarget.style.backgroundColor = '#F9FAFB';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (profileType !== 'bride') {
+                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                  }
+                }}
+              >
+                Bride
+              </button>
+              <button
+                onClick={() => setProfileType('groom')}
+                style={{
+                  padding: '10px 30px',
+                  border: 'none',
+                  borderRadius: profileType === 'groom' ? '0 23px 23px 0' : '0',
+                  backgroundColor: profileType === 'groom' ? '#3B82F6' : '#FFFFFF',
+                  color: profileType === 'groom' ? '#FFFFFF' : '#9333EA',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  outline: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (profileType !== 'groom') {
+                    e.currentTarget.style.backgroundColor = '#F9FAFB';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (profileType !== 'groom') {
+                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                  }
+                }}
+              >
+                Groom
+              </button>
             </div>
-          ) : brides.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-              No brides found
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
-              {brides.slice(0, 6).map((bride) => {
-                const getPhotoUrl = () => {
-                  const photoUrl = bride.photo_s3_url || bride.photo;
-                  
-                  // If no photo URL but we have user ID, use blob API
-                  if (!photoUrl && bride.id) {
-                    return `/api/photo?userId=${bride.id}`;
-                  }
-                  
-                  if (!photoUrl) return null;
-                  
-                  // Check if photo is from S3 (more robust detection)
-                  const isS3Url = photoUrl && (
-                    photoUrl.includes('s3.amazonaws.com') || 
-                    photoUrl.includes('.s3.') ||
-                    photoUrl.includes('s3-') ||
-                    photoUrl.includes('amazonaws.com')
-                  );
-                  
-                  // Use PostgreSQL blob API for S3 URLs to avoid CORS issues
-                  if (isS3Url && bride.id) {
-                    return `/api/photo?userId=${bride.id}`;
-                  }
-                  
-                  // If photo starts with "local-", it means it's stored in DB blob
-                  if (photoUrl.startsWith('local-') && bride.id) {
-                    return `/api/photo?userId=${bride.id}`;
-                  }
-                  
-                  // Normalize the photo URL
-                  let normalizedUrl = photoUrl.trim();
-                  
-                  // Fix malformed URLs
-                  if (normalizedUrl.startsWith('https:/') && !normalizedUrl.startsWith('https://')) {
-                    normalizedUrl = normalizedUrl.replace('https:/', 'https://');
-                  }
-                  if (normalizedUrl.startsWith('http:/') && !normalizedUrl.startsWith('http://')) {
-                    normalizedUrl = normalizedUrl.replace('http:/', 'http://');
-                  }
-                  
-                  // Handle full URLs
-                  if (normalizedUrl.startsWith('http://') || normalizedUrl.startsWith('https://')) {
-                    return normalizedUrl;
-                  }
-                  
-                  // Handle relative paths
-                  if (normalizedUrl.startsWith('/')) {
-                    return normalizedUrl;
-                  }
-                  
-                  // If we have user ID but no valid URL, use blob API
-                  if (bride.id) {
-                    return `/api/photo?userId=${bride.id}`;
-                  }
-                  
-                  return `/${normalizedUrl}`;
-                };
-
-                return (
-                  <div
-                    key={bride.id}
-                    onClick={() => router.push(`/${bride.id}`)}
-                    style={{
-                      border: '1px solid #eee',
-                      borderRadius: '6px',
-                      background: '#fff',
-                      transition: 'all 0.2s',
-                      cursor: 'pointer',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                      overflow: 'hidden'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                    }}
-                  >
-                    {/* Photo Section */}
-                    <div style={{ 
-                      width: '100%', 
-                      height: '200px', 
-                      position: 'relative',
-                      overflow: 'hidden',
-                      background: 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%)'
-                    }}>
-                      {getPhotoUrl() ? (
-                        <img
-                          src={getPhotoUrl() || ''}
-                          alt={bride.name}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain'
-                          }}
-                          onError={(e) => {
-                            const img = e.target as HTMLImageElement;
-                            if (img.src.includes('/api/photo')) {
-                              img.style.display = 'none';
-                            } else if (bride.id && (bride.photo_s3_url || bride.photo)?.includes('s3')) {
-                              img.src = `/api/photo?userId=${bride.id}`;
-                            } else {
-                              img.style.display = 'none';
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div style={{
-                          width: '100%',
-                          height: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '48px',
-                          fontWeight: 'bold',
-                          color: '#ccc'
-                        }}>
-                          {bride.name ? bride.name[0].toUpperCase() : '?'}
-                        </div>
-                      )}
-                    </div>
-                    {/* Info Section */}
-                    <div style={{ padding: '15px' }}>
-                      <div style={{ fontWeight: '600', color: '#E94B6A', marginBottom: '5px', fontSize: '14px' }}>
-                        ID: {bride.id}
-                      </div>
-                      <div style={{ color: '#333', fontSize: '15px', fontWeight: '500' }}>
-                        {bride.name}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-          {/* Grooms Section */}
-          <div style={{
-            flex: '1'
-          }}>
-          <h2 style={{ 
-            fontSize: '24px', 
-            fontWeight: 'bold', 
-            marginBottom: '20px',
-            color: '#333',
-            borderBottom: '2px solid #E94B6A',
-            paddingBottom: '10px'
-          }}>
-            Grooms
-          </h2>
-          {dataLoading ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-              Loading grooms...
-            </div>
-          ) : grooms.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
-              No grooms found
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
-              {grooms.slice(0, 6).map((groom) => {
-                const getPhotoUrl = () => {
-                  const photoUrl = groom.photo_s3_url || groom.photo;
-                  
-                  // If no photo URL but we have user ID, use blob API
-                  if (!photoUrl && groom.id) {
-                    return `/api/photo?userId=${groom.id}`;
-                  }
-                  
-                  if (!photoUrl) return null;
-                  
-                  // Check if photo is from S3 (more robust detection)
-                  const isS3Url = photoUrl && (
-                    photoUrl.includes('s3.amazonaws.com') || 
-                    photoUrl.includes('.s3.') ||
-                    photoUrl.includes('s3-') ||
-                    photoUrl.includes('amazonaws.com')
-                  );
-                  
-                  // Use PostgreSQL blob API for S3 URLs to avoid CORS issues
-                  if (isS3Url && groom.id) {
-                    return `/api/photo?userId=${groom.id}`;
-                  }
-                  
-                  // If photo starts with "local-", it means it's stored in DB blob
-                  if (photoUrl.startsWith('local-') && groom.id) {
-                    return `/api/photo?userId=${groom.id}`;
-                  }
-                  
-                  // Normalize the photo URL
-                  let normalizedUrl = photoUrl.trim();
-                  
-                  // Fix malformed URLs
-                  if (normalizedUrl.startsWith('https:/') && !normalizedUrl.startsWith('https://')) {
-                    normalizedUrl = normalizedUrl.replace('https:/', 'https://');
-                  }
-                  if (normalizedUrl.startsWith('http:/') && !normalizedUrl.startsWith('http://')) {
-                    normalizedUrl = normalizedUrl.replace('http:/', 'http://');
-                  }
-                  
-                  // Handle full URLs
-                  if (normalizedUrl.startsWith('http://') || normalizedUrl.startsWith('https://')) {
-                    return normalizedUrl;
-                  }
-                  
-                  // Handle relative paths
-                  if (normalizedUrl.startsWith('/')) {
-                    return normalizedUrl;
-                  }
-                  
-                  // If we have user ID but no valid URL, use blob API
-                  if (groom.id) {
-                    return `/api/photo?userId=${groom.id}`;
-                  }
-                  
-                  return `/${normalizedUrl}`;
-                };
-
-                return (
-                  <div
-                    key={groom.id}
-                    onClick={() => router.push(`/${groom.id}`)}
-                    style={{
-                      border: '1px solid #eee',
-                      borderRadius: '6px',
-                      background: '#fff',
-                      transition: 'all 0.2s',
-                      cursor: 'pointer',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                      overflow: 'hidden'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                    }}
-                  >
-                    {/* Photo Section */}
-                    <div style={{ 
-                      width: '100%', 
-                      height: '200px', 
-                      position: 'relative',
-                      overflow: 'hidden',
-                      background: 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%)'
-                    }}>
-                      {getPhotoUrl() ? (
-                        <img
-                          src={getPhotoUrl() || ''}
-                          alt={groom.name}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain'
-                          }}
-                          onError={(e) => {
-                            const img = e.target as HTMLImageElement;
-                            if (img.src.includes('/api/photo')) {
-                              img.style.display = 'none';
-                            } else if (groom.id && (groom.photo_s3_url || groom.photo)?.includes('s3')) {
-                              img.src = `/api/photo?userId=${groom.id}`;
-                            } else {
-                              img.style.display = 'none';
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div style={{
-                          width: '100%',
-                          height: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '48px',
-                          fontWeight: 'bold',
-                          color: '#ccc'
-                        }}>
-                          {groom.name ? groom.name[0].toUpperCase() : '?'}
-                        </div>
-                      )}
-                    </div>
-                    {/* Info Section */}
-                    <div style={{ padding: '15px' }}>
-                      <div style={{ fontWeight: '600', color: '#E94B6A', marginBottom: '5px', fontSize: '14px' }}>
-                        ID: {groom.id}
-                      </div>
-                      <div style={{ color: '#333', fontSize: '15px', fontWeight: '500' }}>
-                        {groom.name}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
           </div>
+
+          {/* Profiles Grid */}
+          {dataLoading ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+              Loading {profileType === 'bride' ? 'brides' : 'grooms'}...
+            </div>
+          ) : (profileType === 'bride' ? brides : grooms).length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+              No {profileType === 'bride' ? 'brides' : 'grooms'} found
+            </div>
+          ) : (
+            <div className="profiles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '15px' }}>
+              {(profileType === 'bride' ? brides : grooms).map((profile) => {
+                const getPhotoUrl = () => {
+                  const photoUrl = profile.photo_s3_url || profile.photo;
+                  
+                  // If no photo URL but we have user ID, use blob API
+                  if (!photoUrl && profile.id) {
+                    return `/api/photo?userId=${profile.id}`;
+                  }
+                  
+                  if (!photoUrl) return null;
+                  
+                  // Check if photo is from S3 (more robust detection)
+                  const isS3Url = photoUrl && (
+                    photoUrl.includes('s3.amazonaws.com') || 
+                    photoUrl.includes('.s3.') ||
+                    photoUrl.includes('s3-') ||
+                    photoUrl.includes('amazonaws.com')
+                  );
+                  
+                  // Use PostgreSQL blob API for S3 URLs to avoid CORS issues
+                  if (isS3Url && profile.id) {
+                    return `/api/photo?userId=${profile.id}`;
+                  }
+                  
+                  // If photo starts with "local-", it means it's stored in DB blob
+                  if (photoUrl.startsWith('local-') && profile.id) {
+                    return `/api/photo?userId=${profile.id}`;
+                  }
+                  
+                  // Normalize the photo URL
+                  let normalizedUrl = photoUrl.trim();
+                  
+                  // Fix malformed URLs
+                  if (normalizedUrl.startsWith('https:/') && !normalizedUrl.startsWith('https://')) {
+                    normalizedUrl = normalizedUrl.replace('https:/', 'https://');
+                  }
+                  if (normalizedUrl.startsWith('http:/') && !normalizedUrl.startsWith('http://')) {
+                    normalizedUrl = normalizedUrl.replace('http:/', 'http://');
+                  }
+                  
+                  // Handle full URLs
+                  if (normalizedUrl.startsWith('http://') || normalizedUrl.startsWith('https://')) {
+                    return normalizedUrl;
+                  }
+                  
+                  // Handle relative paths
+                  if (normalizedUrl.startsWith('/')) {
+                    return normalizedUrl;
+                  }
+                  
+                  // If we have user ID but no valid URL, use blob API
+                  if (profile.id) {
+                    return `/api/photo?userId=${profile.id}`;
+                  }
+                  
+                  return `/${normalizedUrl}`;
+                };
+
+                return (
+                  <div
+                    key={profile.id}
+                    onClick={() => router.push(`/${profile.id}`)}
+                    style={{
+                      borderRadius: '6px',
+                      background: '#fff',
+                      transition: 'all 0.2s',
+                      cursor: 'pointer',
+                      overflow: 'hidden',
+                      border: 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    {/* Photo Section */}
+                    <div style={{ 
+                      width: '100%', 
+                      height: '200px', 
+                      position: 'relative',
+                      overflow: 'hidden',
+                      background: 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%)'
+                    }}>
+                      {getPhotoUrl() ? (
+                        <img
+                          src={getPhotoUrl() || ''}
+                          alt={profile.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'contain'
+                          }}
+                          onError={(e) => {
+                            const img = e.target as HTMLImageElement;
+                            if (img.src.includes('/api/photo')) {
+                              img.style.display = 'none';
+                            } else if (profile.id && (profile.photo_s3_url || profile.photo)?.includes('s3')) {
+                              img.src = `/api/photo?userId=${profile.id}`;
+                            } else {
+                              img.style.display = 'none';
+                            }
+                          }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '48px',
+                          fontWeight: 'bold',
+                          color: '#ccc'
+                        }}>
+                          {profile.name ? profile.name[0].toUpperCase() : '?'}
+                        </div>
+                      )}
+                    </div>
+                    {/* Info Section */}
+                    <div style={{ padding: '15px' }}>
+                      <div style={{ fontWeight: '600', color: '#E94B6A', marginBottom: '5px', fontSize: '14px' }}>
+                        ID: {profile.id}
+                      </div>
+                      <div style={{ color: '#333', fontSize: '15px', fontWeight: '500' }}>
+                        {profile.name}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
 
@@ -718,12 +612,27 @@ export default function Home() {
             width: 100% !important;
           }
         }
+        @media (max-width: 1200px) {
+          .profiles-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
         @media (max-width: 968px) {
           .quick-search-container {
             flex-direction: column !important;
           }
-          .brides-grooms-container {
-            flex-direction: column !important;
+          .profiles-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .profiles-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
+        }
+        @media (max-width: 480px) {
+          .profiles-grid {
+            grid-template-columns: repeat(1, 1fr) !important;
           }
         }
       `}</style>

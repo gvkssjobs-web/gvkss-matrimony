@@ -71,22 +71,22 @@ export default function AdminPage() {
   return (
     <ProtectedRoute requiredRole="admin">
       <div className="w-full max-w-6xl mx-auto mt-20">
-        <div className="p-8 rounded-3xl shadow-2xl border border-green-100" style={{ backgroundColor: '#FFFFFF' }}>
+        <div className="p-8 rounded-3xl shadow-2xl border border-pink-100" style={{ backgroundColor: '#FFFFFF' }}>
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold">Admin Panel</h1>
             <Link
               href="/"
               className="font-bold transition-colors"
-              style={{ color: '#16A34A' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#15803D'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#16A34A'}
+              style={{ color: '#E94B6A' }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#C7365A'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#E94B6A'}
             >
               + Add User
             </Link>
           </div>
 
           {error && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
+            <div className="bg-pink-50 border border-pink-200 text-pink-700 px-4 py-3 rounded-lg mb-4">
               {error}
             </div>
           )}
@@ -120,9 +120,9 @@ export default function AdminPage() {
                           value={u.role}
                           onChange={(e) => handleRoleChange(u.id, e.target.value)}
                           className="px-3 py-1 border-2 rounded-xl bg-white transition-colors"
-                          style={{ borderColor: '#22C55E', color: '#111827' }}
-                          onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-                          onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+                          style={{ borderColor: '#FF8AA2', color: '#111827' }}
+                          onFocus={(e) => e.target.style.borderColor = '#E94B6A'}
+                          onBlur={(e) => e.target.style.borderColor = '#FF8AA2'}
                           disabled={u.id === user?.id}
                         >
                           <option value="user">User</option>

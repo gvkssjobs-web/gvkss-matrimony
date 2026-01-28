@@ -143,6 +143,30 @@ BEGIN
     END IF;
 END $$;
 
+-- Occupation
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'occupation') THEN
+        ALTER TABLE users ADD COLUMN occupation VARCHAR(255);
+    END IF;
+END $$;
+
+-- Occupation in Details
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'occupation_in_details') THEN
+        ALTER TABLE users ADD COLUMN occupation_in_details TEXT;
+    END IF;
+END $$;
+
+-- Annual Income
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'annual_income') THEN
+        ALTER TABLE users ADD COLUMN annual_income VARCHAR(100);
+    END IF;
+END $$;
+
 -- Address
 DO $$
 BEGIN
@@ -219,7 +243,8 @@ WHERE table_name = 'users'
 AND column_name IN (
     'marriage_status', 'birth_time', 'birth_place', 'height', 'complexion',
     'siblings_info', 'star', 'raasi', 'gothram', 'padam', 'uncle_gothram',
-    'education_category', 'education_details', 'employed_in', 'address'
+    'education_category', 'education_details', 'employed_in', 
+    'occupation', 'occupation_in_details', 'annual_income', 'address'
 )
 ORDER BY column_name;
 

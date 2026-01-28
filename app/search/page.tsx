@@ -159,17 +159,7 @@ function SearchResultsContent() {
       paddingTop: 'calc(20px + 10px)'
     }}>
       <div className="max-w-7xl mx-auto">
-        {/* Back Button */}
-        <Link 
-          href="/"
-          className="inline-flex items-center gap-2 mb-3 text-sm font-medium hover:underline"
-          style={{ color: 'var(--primary)' }}
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Home
-        </Link>
+      
 
         {/* Search Results Header */}
         <div className="bg-white rounded-2xl shadow-lg p-4 mb-4 border" style={{ borderColor: 'var(--border)' }}>

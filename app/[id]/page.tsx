@@ -26,6 +26,9 @@ interface UserProfile {
   educationCategory: string | null;
   educationDetails: string | null;
   employedIn: string | null;
+  occupation: string | null;
+  occupationInDetails: string | null;
+  annualIncome: string | null;
   address: string | null;
   createdAt: string;
   siblingsInfo: any;
@@ -176,18 +179,7 @@ export default function UserProfilePage() {
       paddingTop: 'calc(20px + 10px)'
     }}>
       <div style={{ width: '100%', margin: '0 auto'}}>
-        {/* Back Button */}
-        <Link 
-          href="/"
-          className="inline-flex items-center gap-2 mb-6 text-sm font-medium hover:underline"
-          style={{ color: 'var(--primary)' }}
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Home
-        </Link>
-
+       
         {/* Profile Card */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
           <div className="flex flex-col md:flex-row">
@@ -392,6 +384,36 @@ export default function UserProfilePage() {
                         </span>
                         <span style={{ color: 'var(--text)' }}>
                           {user.employedIn}
+                        </span>
+                      </div>
+                    )}
+                    {user.occupation && (
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Occupation:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
+                          {user.occupation}
+                        </span>
+                      </div>
+                    )}
+                    {user.occupationInDetails && (
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Occupation in Details:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
+                          {user.occupationInDetails}
+                        </span>
+                      </div>
+                    )}
+                    {user.annualIncome && (
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Annual Income:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
+                          {user.annualIncome}
                         </span>
                       </div>
                     )}

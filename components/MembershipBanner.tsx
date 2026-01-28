@@ -47,7 +47,7 @@ export default function MembershipBanner() {
     <div className="w-full mb-12">
       {/* Header */}
       <div className="text-center mb-10">
-        <h1 className="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent mb-3" style={{ backgroundImage: 'linear-gradient(to right, #111827, #16A34A, #111827)' }}>
+        <h1 className="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent mb-3" style={{ backgroundImage: 'linear-gradient(to right, #111827, #E94B6A, #111827)' }}>
           Choose Your Plan
         </h1>
         <p className="text-lg" style={{ color: '#374151' }}>Select the perfect membership for you</p>

@@ -40,6 +40,9 @@ export async function initDatabase() {
           education_category VARCHAR(100),
           education_details TEXT,
           employed_in VARCHAR(255),
+          occupation VARCHAR(255),
+          occupation_in_details TEXT,
+          annual_income VARCHAR(100),
           address TEXT,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -194,6 +197,9 @@ export async function initDatabase() {
         { name: 'education_category', type: 'VARCHAR(100)' },
         { name: 'education_details', type: 'TEXT' },
         { name: 'employed_in', type: 'VARCHAR(255)' },
+        { name: 'occupation', type: 'VARCHAR(255)' },
+        { name: 'occupation_in_details', type: 'TEXT' },
+        { name: 'annual_income', type: 'VARCHAR(100)' },
         { name: 'address', type: 'TEXT' }
       ];
 

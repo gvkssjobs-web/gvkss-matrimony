@@ -82,36 +82,61 @@ function Navbar() {
 
   return (
     <>
-      <nav id="theme-navbar" className='fixed w-full z-50 top-0 transition-all duration-200 border-b' style={{ backgroundColor: 'rgba(255,255,255,.78)', backdropFilter: 'blur(10px)', borderColor: 'var(--border)' }}>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1'>
+      <nav id="theme-navbar" className='fixed w-full z-50 top-0 transition-all duration-200' style={{ backgroundColor: '#e95353', borderBottom: 'none' }}>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3'>
           <div className='flex justify-between items-center gap-4'>
             {/* Logo */}
-            <Link href="/" className='flex items-center gap-2 hover:opacity-80 transition-opacity'>
+            <Link href="/" className='flex items-center gap-2 hover:opacity-90 transition-opacity'>
               <Image 
                 src="/logo.jpg" 
-                alt="GVKSS Software Pvt. Ltd." 
+                alt="Logo" 
                 width={50} 
                 height={40}
-                style={{ width: 'auto', height: 'auto' }}
+                style={{ width: 'auto', height: 'auto', maxHeight: '50px' }}
                 className="h-auto"
                 priority
               />
             </Link>
 
+            {/* Navigation Links */}
+            <div className='flex items-center gap-6'>
+              <Link 
+                href="/" 
+                className='text-white font-medium hover:opacity-80 transition-opacity'
+                style={{ color: pathname === '/' ? '#FFFFFF' : '#FFFFFF' }}
+              >
+                Home
+              </Link>
+              <Link 
+                href="#contact" 
+                className='text-white font-medium hover:opacity-80 transition-opacity'
+                onClick={(e) => {
+                  e.preventDefault();
+                  const footer = document.querySelector('footer');
+                  if (footer) {
+                    footer.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                Contact Us
+              </Link>
+            </div>
+
             {/* Login Button / User Menu */}
-            <div className='flex items-center gap-4'>
+            <div className='flex items-center gap-3'>
             {/* Notifications Bell Icon */}
             {user && (
               <button
-                className='p-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 transition-all duration-200 border border-zinc-700 relative'
+                className='p-2.5 rounded-lg hover:bg-white/20 transition-all duration-200 relative'
                 aria-label="Notifications"
                 type="button"
+                style={{ backgroundColor: 'transparent' }}
               >
-                <svg className="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 {/* Notification Badge */}
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-white text-pink-600 text-xs font-bold rounded-full flex items-center justify-center border-2 border-pink-600">
                   2
                 </span>
               </button>
@@ -121,11 +146,11 @@ function Navbar() {
               <div className="relative avatar-dropdown">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                  className="flex items-center gap-2 hover:opacity-90 transition-opacity"
                   aria-label="User menu"
                 >
                   {/* Avatar Frame */}
-                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-500 text-white font-semibold overflow-hidden border-2 border-white shadow-md">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white font-semibold overflow-hidden border-2 border-white shadow-md">
                     {user.photo && !photoError ? (
                       <img
                         src={(() => {
@@ -201,16 +226,16 @@ function Navbar() {
                         }}
                       />
                     ) : (
-                      <span className="text-lg">{getInitials(user.name, user.email)}</span>
+                      <span className="text-lg" style={{ color: '#E94B6A' }}>{getInitials(user.name, user.email)}</span>
                     )}
                   </div>
 
                   {/* User Info */}
                   <div className="flex flex-col items-start">
-                    <span className="text-sm font-semibold" style={{ color: '#333' }}>
+                    <span className="text-sm font-semibold" style={{ color: '#FFFFFF' }}>
                       {user.name || 'User'}
                     </span>
-                    <span className="text-xs" style={{ color: '#666' }}>
+                    <span className="text-xs" style={{ color: '#FFFFFF', opacity: 0.9 }}>
                       ID: {user.id || 'N/A'}
                     </span>
                   </div>
@@ -218,7 +243,7 @@ function Navbar() {
                   {/* Dropdown Arrow */}
                   <svg 
                     className={`w-4 h-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`}
-                    style={{ color: '#666' }}
+                    style={{ color: '#FFFFFF' }}
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -278,30 +303,47 @@ function Navbar() {
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/login"
-                  className='px-4 py-2 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl'
-                  style={{ 
-                    background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
-                    boxShadow: '0 12px 22px rgba(233,75,106,.22)'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                  Login
-                </Link>
+              <div className="flex items-center gap-3">
                 <Link
                   href="/register"
-                  className='px-4 py-2 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl'
+                  className='px-5 py-2 text-white font-semibold rounded-lg transition-all duration-200'
                   style={{ 
-                    background: 'linear-gradient(135deg, #16A34A, #22C55E)',
-                    boxShadow: '0 12px 22px rgba(34,197,94,.22)'
+                    backgroundColor: '#9333EA',
+                    boxShadow: '0 2px 4px rgba(147, 51, 234, 0.3)'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#7E22CE';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 6px rgba(147, 51, 234, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#9333EA';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(147, 51, 234, 0.3)';
+                  }}
                 >
-                  Register
+                  Free Registration
+                </Link>
+                <Link
+                  href="/login"
+                  className='px-5 py-2 font-semibold rounded-lg transition-all duration-200'
+                  style={{ 
+                    backgroundColor: '#FFFFFF',
+                    color: '#E94B6A',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FFF1F4';
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                    e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                  }}
+                >
+                  Login
                 </Link>
               </div>
             )}

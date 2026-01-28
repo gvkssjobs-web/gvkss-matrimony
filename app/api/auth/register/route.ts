@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
       email, password, name, role, photo, phoneNumber, gender, dob,
       marriageStatus, birthTime, birthPlace, height, complexion, siblingsInfo,
       star, raasi, gothram, padam, uncleGothram,
-      educationCategory, educationDetails, employedIn, address
+      educationCategory, educationDetails, employedIn, occupation, occupationInDetails, annualIncome, address
     } = await request.json();
 
     // Validation
@@ -62,13 +62,13 @@ export async function POST(request: NextRequest) {
           email, password, name, role, photo, phone_number, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
           star, raasi, gothram, padam, uncle_gothram,
-          education_category, education_details, employed_in, address
+          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26
         ) RETURNING id, email, name, role, photo, phone_number, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
           star, raasi, gothram, padam, uncle_gothram,
-          education_category, education_details, employed_in, address`,
+          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address`,
         [
           email, 
           hashedPassword, 
@@ -92,6 +92,9 @@ export async function POST(request: NextRequest) {
           educationCategory || null,
           educationDetails || null,
           employedIn || null,
+          occupation || null,
+          occupationInDetails || null,
+          annualIncome || null,
           address || null
         ]
       );
@@ -122,6 +125,9 @@ export async function POST(request: NextRequest) {
             educationCategory: result.rows[0].education_category,
             educationDetails: result.rows[0].education_details,
             employedIn: result.rows[0].employed_in,
+            occupation: result.rows[0].occupation,
+            occupationInDetails: result.rows[0].occupation_in_details,
+            annualIncome: result.rows[0].annual_income,
             address: result.rows[0].address,
           },
         },

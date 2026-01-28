@@ -47,9 +47,9 @@ export default function FormInput({
           onChange={onChange}
           className={`${baseInputClass} ${className}`}
           required={required}
-          style={{ borderColor: '#22C55E', color: '#111827' }}
-          onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-          onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+          style={{ borderColor: '#FF8AA2', color: '#111827' }}
+          onFocus={(e) => e.target.style.borderColor = '#E94B6A'}
+          onBlur={(e) => e.target.style.borderColor = '#FF8AA2'}
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>
@@ -78,9 +78,9 @@ export default function FormInput({
           required={required}
           minLength={minLength}
           placeholder={placeholder}
-          style={{ borderColor: '#22C55E', color: '#111827' }}
-          onFocus={(e) => e.target.style.borderColor = '#16A34A'}
-          onBlur={(e) => e.target.style.borderColor = '#22C55E'}
+          style={{ borderColor: '#FF8AA2', color: '#111827' }}
+          onFocus={(e) => e.target.style.borderColor = '#E94B6A'}
+          onBlur={(e) => e.target.style.borderColor = '#FF8AA2'}
         />
       )}
       {helperText && (

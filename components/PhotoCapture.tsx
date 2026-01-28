@@ -163,9 +163,9 @@ export default function PhotoCapture({ onPhotoCapture, label = 'Profile Photo' }
             type="button"
             onClick={removePhoto}
             className="absolute top-2 right-2 text-white rounded-full p-2 text-sm transition-colors"
-            style={{ backgroundColor: '#16A34A' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#15803D'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#16A34A'}
+            style={{ backgroundColor: '#E94B6A' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#C7365A'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#E94B6A'}
             title="Remove photo"
             disabled={isUploading}
           >

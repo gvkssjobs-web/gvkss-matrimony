@@ -25,6 +25,9 @@ export default function RegisterPage() {
     educationCategory: '',
     educationDetails: '',
     employedIn: '',
+    occupation: '',
+    occupationInDetails: '',
+    annualIncome: '',
     photo: null as File | null,
     photoPreview: '',
     phone: '',
@@ -143,6 +146,9 @@ export default function RegisterPage() {
           educationCategory: formData.educationCategory,
           educationDetails: formData.educationDetails,
           employedIn: formData.employedIn,
+          occupation: formData.occupation,
+          occupationInDetails: formData.occupationInDetails,
+          annualIncome: formData.annualIncome,
           address: formData.address,
         }),
       });
@@ -199,19 +205,7 @@ export default function RegisterPage() {
       justifyContent: 'center',
       flexDirection: 'column'
     }}>
-      <div className="w-full max-w-lg mb-6">
-        {/* Back Button */}
-        <Link 
-          href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
-          style={{ color: 'var(--primary)' }}
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Home
-        </Link>
-      </div>
+      
       <div className="w-full max-w-lg rounded-3xl shadow-2xl p-8 border" style={{ 
         backgroundColor: 'var(--card)', 
         borderColor: 'var(--border)', 
@@ -576,6 +570,48 @@ export default function RegisterPage() {
               placeholder="Employed In"
               value={formData.employedIn}
               onChange={(e) => setFormData({ ...formData, employedIn: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Occupation */}
+          <div>
+            <input
+              type="text"
+              placeholder="Occupation"
+              value={formData.occupation}
+              onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Occupation in Details */}
+          <div>
+            <textarea
+              placeholder="Occupation in Details"
+              value={formData.occupationInDetails}
+              onChange={(e) => setFormData({ ...formData, occupationInDetails: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors resize-none"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Annual Income */}
+          <div>
+            <input
+              type="text"
+              placeholder="Annual Income"
+              value={formData.annualIncome}
+              onChange={(e) => setFormData({ ...formData, annualIncome: e.target.value })}
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}

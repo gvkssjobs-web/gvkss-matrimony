@@ -30,7 +30,7 @@ export default function Button({
   
   const getVariantStyle = () => {
     if (variant === 'primary' || variant === 'danger' || variant === 'success') {
-      return { backgroundColor: '#16A34A', color: '#FFFFFF' };
+      return { backgroundColor: '#E94B6A', color: '#FFFFFF' };
     }
     return { backgroundColor: '#4B5563', color: '#FFFFFF' };
   };
@@ -47,13 +47,13 @@ export default function Button({
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLElement>) => {
     if (!disabled && !loading && (variant === 'primary' || variant === 'danger' || variant === 'success')) {
-      e.currentTarget.style.backgroundColor = '#15803D';
+      e.currentTarget.style.backgroundColor = '#C7365A';
     }
   };
 
   const handleMouseLeave = (e: React.MouseEvent<HTMLElement>) => {
     if (!disabled && !loading && (variant === 'primary' || variant === 'danger' || variant === 'success')) {
-      e.currentTarget.style.backgroundColor = '#16A34A';
+      e.currentTarget.style.backgroundColor = '#E94B6A';
     }
   };
 

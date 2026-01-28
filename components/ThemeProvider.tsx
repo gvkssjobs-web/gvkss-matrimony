@@ -51,7 +51,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Find wrapper div and main element by ID
     const wrapper = document.getElementById('theme-wrapper');
     const main = document.getElementById('theme-main');
-    const navbar = document.querySelector('nav') as HTMLElement;
+    const navbar = document.getElementById('theme-navbar') as HTMLElement;
     
     if (initialTheme === 'dark') {
       html.classList.add('dark');
@@ -66,7 +66,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         main.style.color = '#fafafa';
       }
       if (navbar) {
-        navbar.style.backgroundColor = '#18181b';
+        navbar.style.backgroundColor = '#B22222';
         navbar.style.borderColor = '#27272a';
       }
     } else {
@@ -82,7 +82,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         main.style.color = '#171717';
       }
       if (navbar) {
-        navbar.style.backgroundColor = '#ffffff';
+        navbar.style.backgroundColor = '#B22222';
         navbar.style.borderColor = '#e4e4e7';
       }
     }
@@ -99,7 +99,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       // Find wrapper div and main element by ID
       const wrapper = document.getElementById('theme-wrapper');
       const main = document.getElementById('theme-main');
-      const navbar = document.querySelector('nav') as HTMLElement;
+      const navbar = document.getElementById('theme-navbar') as HTMLElement;
       
       if (theme === 'dark') {
         html.classList.add('dark');
@@ -115,7 +115,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           main.style.color = '#fafafa';
         }
         if (navbar) {
-          navbar.style.backgroundColor = 'rgba(24, 24, 27, 0.95)';
+          navbar.style.backgroundColor = '#B22222';
           navbar.style.borderColor = '#3f3f46';
         }
       } else {
@@ -132,7 +132,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           main.style.color = '#171717';
         }
         if (navbar) {
-          navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+          navbar.style.backgroundColor = '#B22222';
           navbar.style.borderColor = '#d4d4d8';
         }
       }
@@ -150,7 +150,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       // Find wrapper div and main element by ID
       const wrapper = document.getElementById('theme-wrapper');
       const main = document.getElementById('theme-main');
-      const navbar = document.querySelector('nav') as HTMLElement;
+      const navbar = document.getElementById('theme-navbar') as HTMLElement;
       
       if (newTheme === 'dark') {
         html.classList.add('dark');
@@ -165,7 +165,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           main.style.color = '#fafafa';
         }
         if (navbar) {
-          navbar.style.backgroundColor = 'rgba(24, 24, 27, 0.95)';
+          navbar.style.backgroundColor = '#B22222';
           navbar.style.borderColor = '#3f3f46';
         }
       } else {
@@ -181,7 +181,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
           main.style.color = '#171717';
         }
         if (navbar) {
-          navbar.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+          navbar.style.backgroundColor = '#B22222';
           navbar.style.borderColor = '#d4d4d8';
         }
       }
