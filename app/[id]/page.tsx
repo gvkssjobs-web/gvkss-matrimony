@@ -252,105 +252,105 @@ export default function UserProfilePage() {
                   >
                     Personal Information
                   </h2>
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-3">
                     {user.dob && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Date of Birth
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Date of Birth:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {new Date(user.dob).toLocaleDateString()}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.birthTime && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Birth Time
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Birth Time:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {formatBirthTime(user.birthTime)}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.birthPlace && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Birth Place
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Birth Place:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {user.birthPlace}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.height && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Height
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Height:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {user.height}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.complexion && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Complexion
-                        </label>
-                        <p className="text-base capitalize" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Complexion:
+                        </span>
+                        <span className="capitalize" style={{ color: 'var(--text)' }}>
                           {user.complexion}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.star && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Star
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Star:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {user.star}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.raasi && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Raasi
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Raasi:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {user.raasi}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.gothram && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Gothram
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Gothram:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {user.gothram}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.padam && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Padam
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Padam:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {user.padam}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.uncleGothram && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Uncle Gothram
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Uncle Gothram:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {user.uncleGothram}
-                        </p>
+                        </span>
                       </div>
                     )}
                   </div>
@@ -364,35 +364,35 @@ export default function UserProfilePage() {
                   >
                     Educational & Professional Information
                   </h2>
-                  <div className="grid grid-cols-1 gap-4">
+                  <div className="grid grid-cols-1 gap-3">
                     {user.educationCategory && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Education Category
-                        </label>
-                        <p className="text-base capitalize" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Education Category:
+                        </span>
+                        <span className="capitalize" style={{ color: 'var(--text)' }}>
                           {user.educationCategory.replace('-', ' ')}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.educationDetails && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Education Details
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Education Details:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {user.educationDetails}
-                        </p>
+                        </span>
                       </div>
                     )}
                     {user.employedIn && (
-                      <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
-                          Employed In
-                        </label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                      <div className="flex gap-2 text-base">
+                        <span className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Employed In:
+                        </span>
+                        <span style={{ color: 'var(--text)' }}>
                           {user.employedIn}
-                        </p>
+                        </span>
                       </div>
                     )}
                   </div>
