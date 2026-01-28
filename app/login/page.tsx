@@ -22,7 +22,7 @@ export default function LoginPage() {
       if (userRole === 'admin') {
         router.push('/admin');
       } else {
-        router.push('/dashboard');
+        router.push('/');
       }
     }
   }, [router]);
@@ -49,7 +49,7 @@ export default function LoginPage() {
         if (userRole === 'admin') {
           router.push('/admin');
         } else {
-          router.push('/dashboard');
+          router.push('/');
         }
       } else {
         setError(data.error || 'Login failed');

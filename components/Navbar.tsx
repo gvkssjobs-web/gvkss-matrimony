@@ -121,102 +121,65 @@ function Navbar() {
               <div className="relative avatar-dropdown">
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-yellow-500 text-white font-semibold hover:bg-yellow-600 transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 overflow-hidden"
+                  className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                   aria-label="User menu"
                 >
-                  {user.photo && !photoError ? (
-                    <img
-                      src={(() => {
-                        // If no photo URL but we have user ID, use blob API
-                        if (!user.photo && user.id) {
-                          return `/api/photo?userId=${user.id}`;
-                        }
-                        
-                        if (!user.photo) return '';
-                        
-                        // Check if photo is from S3 (more robust detection)
-                        const isS3Url = user.photo && (
-                          user.photo.includes('s3.amazonaws.com') || 
-                          user.photo.includes('.s3.') ||
-                          user.photo.includes('s3-') ||
-                          user.photo.includes('amazonaws.com')
-                        );
-                        
-                        // ALWAYS use PostgreSQL blob API for S3 URLs to avoid CORS issues
-                        if (isS3Url && user.id) {
-                          console.log('Using PostgreSQL blob API for S3 photo, userId:', user.id);
-                          return `/api/photo?userId=${user.id}`;
-                        }
-                        
-                        // If photo starts with "local-", it means it's stored in DB blob
-                        if (user.photo.startsWith('local-') && user.id) {
-                          return `/api/photo?userId=${user.id}`;
-                        }
-                        
-                        // If S3 URL but no ID yet, return S3 URL (will be updated when ID is fetched)
-                        if (isS3Url && !user.id) {
-                          console.warn('S3 URL detected but no user ID available yet');
-                          return user.photo;
-                        }
-                        
-                        // Normalize the photo URL
-                        let photoUrl = user.photo.trim();
-                        
-                        // Fix malformed URLs (https:/ instead of https://)
-                        if (photoUrl.startsWith('https:/') && !photoUrl.startsWith('https://')) {
-                          photoUrl = photoUrl.replace('https:/', 'https://');
-                        }
-                        if (photoUrl.startsWith('http:/') && !photoUrl.startsWith('http://')) {
-                          photoUrl = photoUrl.replace('http:/', 'http://');
-                        }
-                        
-                        // Handle full URLs
-                        if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
-                          return photoUrl;
-                        }
-                        
-                        // Handle relative paths
-                        if (photoUrl.startsWith('/')) {
-                          return photoUrl;
-                        }
-                        
-                        // If we have user ID but no valid URL, use blob API
-                        if (user.id) {
-                          return `/api/photo?userId=${user.id}`;
-                        }
-                        
-                        // Default: prepend / for relative paths
-                        return `/${photoUrl}`;
-                      })()}
-                      alt={user.name || user.email}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        console.error('Image failed to load:', user.photo);
-                        console.error('User ID:', user.id);
-                        // If we're already using the API endpoint and it fails, show error
-                        const img = e.target as HTMLImageElement;
-                        if (img.src.includes('/api/photo')) {
-                          console.error('PostgreSQL blob API failed');
-                          setPhotoError(true);
-                        } else {
-                          // Check if it's an S3 URL
+                  {/* Avatar Frame */}
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-yellow-500 text-white font-semibold overflow-hidden border-2 border-white shadow-md">
+                    {user.photo && !photoError ? (
+                      <img
+                        src={(() => {
+                          if (!user.photo && user.id) {
+                            return `/api/photo?userId=${user.id}`;
+                          }
+                          if (!user.photo) return '';
                           const isS3Url = user.photo && (
                             user.photo.includes('s3.amazonaws.com') || 
                             user.photo.includes('.s3.') ||
                             user.photo.includes('s3-') ||
                             user.photo.includes('amazonaws.com')
                           );
-                          if (isS3Url) {
-                            // Try to get user ID and use API endpoint
-                            if (user.id) {
-                              console.log('Trying fallback to PostgreSQL blob API');
+                          if (isS3Url && user.id) {
+                            return `/api/photo?userId=${user.id}`;
+                          }
+                          if (user.photo.startsWith('local-') && user.id) {
+                            return `/api/photo?userId=${user.id}`;
+                          }
+                          let photoUrl = user.photo.trim();
+                          if (photoUrl.startsWith('https:/') && !photoUrl.startsWith('https://')) {
+                            photoUrl = photoUrl.replace('https:/', 'https://');
+                          }
+                          if (photoUrl.startsWith('http:/') && !photoUrl.startsWith('http://')) {
+                            photoUrl = photoUrl.replace('http:/', 'http://');
+                          }
+                          if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
+                            return photoUrl;
+                          }
+                          if (photoUrl.startsWith('/')) {
+                            return photoUrl;
+                          }
+                          if (user.id) {
+                            return `/api/photo?userId=${user.id}`;
+                          }
+                          return `/${photoUrl}`;
+                        })()}
+                        alt={user.name || user.email}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          if (img.src.includes('/api/photo')) {
+                            setPhotoError(true);
+                          } else {
+                            const isS3Url = user.photo && (
+                              user.photo.includes('s3.amazonaws.com') || 
+                              user.photo.includes('.s3.') ||
+                              user.photo.includes('s3-') ||
+                              user.photo.includes('amazonaws.com')
+                            );
+                            if (isS3Url && user.id) {
                               img.src = `/api/photo?userId=${user.id}`;
-                              img.onerror = () => {
-                                console.error('Fallback also failed');
-                                setPhotoError(true);
-                              };
-                            } else if (user.email) {
-                              // Fetch user ID and retry
+                              img.onerror = () => setPhotoError(true);
+                            } else if (isS3Url && user.email) {
                               fetch(`/api/auth/current-user?email=${encodeURIComponent(user.email)}`)
                                 .then(res => res.json())
                                 .then(data => {
@@ -234,164 +197,82 @@ function Navbar() {
                             } else {
                               setPhotoError(true);
                             }
-                          } else {
-                            setPhotoError(true);
                           }
-                        }
-                      }}
-                      onLoad={() => {
-                        console.log('Image loaded successfully');
-                      }}
-                    />
-                  ) : (
-                    getInitials(user.name, user.email)
-                  )}
+                        }}
+                      />
+                    ) : (
+                      <span className="text-lg">{getInitials(user.name, user.email)}</span>
+                    )}
+                  </div>
+
+                  {/* User Info */}
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-semibold" style={{ color: '#333' }}>
+                      {user.name || 'User'}
+                    </span>
+                    <span className="text-xs" style={{ color: '#666' }}>
+                      ID: {user.id || 'N/A'}
+                    </span>
+                  </div>
+
+                  {/* Dropdown Arrow */}
+                  <svg 
+                    className={`w-4 h-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`}
+                    style={{ color: '#666' }}
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
 
+                {/* Dropdown Menu */}
                 {showDropdown && (
-                  <div className="absolute right-0 mt-2 w-56 bg-zinc-700 rounded-lg shadow-xl border border-zinc-600 py-2 z-50">
-                    <div className="px-4 py-3 border-b border-zinc-600 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-yellow-500 flex items-center justify-center text-white font-semibold">
-                        {user.photo && !photoError ? (
-                          <img
-                            src={(() => {
-                              // If no photo URL but we have user ID, use blob API
-                              if (!user.photo && user.id) {
-                                return `/api/photo?userId=${user.id}`;
-                              }
-                              
-                              if (!user.photo) return '';
-                              
-                              // Check if photo is from S3 (more robust detection)
-                              const isS3Url = user.photo && (
-                                user.photo.includes('s3.amazonaws.com') || 
-                                user.photo.includes('.s3.') ||
-                                user.photo.includes('s3-')
-                              );
-                              
-                              // If photo is from S3 and we have user ID, use PostgreSQL blob API to avoid CORS issues
-                              if (user.id && isS3Url) {
-                                return `/api/photo?userId=${user.id}`;
-                              }
-                              
-                              // If photo starts with "local-", it means it's stored in DB blob
-                              if (user.photo.startsWith('local-') && user.id) {
-                                return `/api/photo?userId=${user.id}`;
-                              }
-                              
-                              // Normalize the photo URL
-                              let photoUrl = user.photo.trim();
-                              
-                              // Fix malformed URLs (https:/ instead of https://)
-                              if (photoUrl.startsWith('https:/') && !photoUrl.startsWith('https://')) {
-                                photoUrl = photoUrl.replace('https:/', 'https://');
-                              }
-                              if (photoUrl.startsWith('http:/') && !photoUrl.startsWith('http://')) {
-                                photoUrl = photoUrl.replace('http:/', 'http://');
-                              }
-                              
-                              // Handle full URLs
-                              if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
-                                return photoUrl;
-                              }
-                              
-                              // Handle relative paths
-                              if (photoUrl.startsWith('/')) {
-                                return photoUrl;
-                              }
-                              
-                              // If we have user ID but no valid URL, use blob API
-                              if (user.id) {
-                                return `/api/photo?userId=${user.id}`;
-                              }
-                              
-                              // Default: prepend / for relative paths
-                              return `/${photoUrl}`;
-                            })()}
-                            alt={user.name || user.email}
-                            className="w-full h-full object-cover rounded-full"
-                            onError={(e) => {
-                              const img = e.target as HTMLImageElement;
-                              if (img.src.includes('/api/photo')) {
-                                setPhotoError(true);
-                              } else {
-                                const isS3Url = user.photo && (
-                                  user.photo.includes('s3.amazonaws.com') || 
-                                  user.photo.includes('.s3.') ||
-                                  user.photo.includes('s3-')
-                                );
-                                if (user.id && isS3Url) {
-                                  img.src = `/api/photo?userId=${user.id}`;
-                                  img.onerror = () => setPhotoError(true);
-                                } else {
-                                  setPhotoError(true);
-                                }
-                              }
-                            }}
-                          />
-                        ) : (
-                          getInitials(user.name, user.email)
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-white">
-                          {user.name || 'User'}
-                        </p>
-                        <p className="text-xs text-zinc-400 truncate">
-                          {user.email}
-                        </p>
-                      </div>
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                    <div className="px-4 py-3 border-b border-gray-200">
+                      <p className="text-sm font-semibold" style={{ color: '#333' }}>
+                        {user.name || 'User'}
+                      </p>
+                      <p className="text-xs" style={{ color: '#666' }}>
+                        ID: {user.id || 'N/A'}
+                      </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setShowDropdown(false);
-                        // View Profile action
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-white hover:bg-zinc-600 transition-colors flex items-center justify-between"
+                    <Link
+                      href={user.id ? `/${user.id}` : '/'}
+                      onClick={() => setShowDropdown(false)}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors flex items-center gap-2"
+                      style={{ color: '#333' }}
                     >
-                      <div className="flex items-center gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <span>View Profile</span>
-                      </div>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
-                    </button>
+                      <span>Profile Info</span>
+                    </Link>
                     {isAdmin(user) && pathname !== '/admin' && (
                       <Link
                         href="/admin"
                         onClick={() => setShowDropdown(false)}
-                        className="block px-4 py-2 text-sm text-white hover:bg-zinc-600 transition-colors"
+                        className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                        style={{ color: '#333' }}
                       >
                         Admin Panel
                       </Link>
                     )}
-                    {pathname === '/dashboard' && (
-                      <button
-                        onClick={() => {
-                          setShowDropdown(false);
-                          // Dispatch custom event to reset filters
-                          window.dispatchEvent(new CustomEvent('resetFilters'));
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-white hover:bg-zinc-600 transition-colors flex items-center justify-between"
-                      >
-                        <span>Reset Filters</span>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    )}
                     <button
                       onClick={() => {
+                        setShowDropdown(false);
                         localStorage.removeItem('user');
-                        router.push('/');
+                        setUser(null);
+                        window.location.href = '/';
                       }}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-zinc-600 transition-colors"
-                      style={{ color: '#22C55E' }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors flex items-center gap-2"
+                      style={{ color: '#E94B6A' }}
                     >
-                      Logout
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      <span>Logout</span>
                     </button>
                   </div>
                 )}

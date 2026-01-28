@@ -32,12 +32,12 @@ export default function Home() {
     setUser(currentUser);
     
     if (currentUser) {
-      // Redirect to dashboard or admin page
+      // Redirect to admin page if admin, otherwise stay on home page
       const userRole = currentUser.role;
       if (userRole === 'admin') {
         router.push('/admin');
       } else {
-        router.push('/dashboard');
+        setLoading(false);
       }
     } else {
       setLoading(false);
@@ -65,7 +65,8 @@ export default function Home() {
             photo_s3_url: groom.photo_s3_url || null
           })));
         } else {
-          console.error('Failed to fetch brides and grooms');
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error('Failed to fetch brides and grooms:', response.status, errorData);
         }
       } catch (error) {
         console.error('Error fetching brides and grooms:', error);
@@ -528,8 +529,8 @@ export default function Home() {
               No brides found
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '15px' }}>
-              {brides.slice(0, 4).map((bride) => {
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+              {brides.slice(0, 6).map((bride) => {
                 const getPhotoUrl = () => {
                   const photoUrl = bride.photo_s3_url || bride.photo;
                   
@@ -696,8 +697,8 @@ export default function Home() {
               No grooms found
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '15px' }}>
-              {grooms.slice(0, 4).map((groom) => {
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+              {grooms.slice(0, 6).map((groom) => {
                 const getPhotoUrl = () => {
                   const photoUrl = groom.photo_s3_url || groom.photo;
                   
