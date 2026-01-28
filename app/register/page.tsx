@@ -196,8 +196,22 @@ export default function RegisterPage() {
       minHeight: 'calc(100vh - 82px)',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      flexDirection: 'column'
     }}>
+      <div className="w-full max-w-lg mb-6">
+        {/* Back Button */}
+        <Link 
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
+          style={{ color: 'var(--primary)' }}
+        >
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Home
+        </Link>
+      </div>
       <div className="w-full max-w-lg rounded-3xl shadow-2xl p-8 border" style={{ 
         backgroundColor: 'var(--card)', 
         borderColor: 'var(--border)', 
@@ -710,7 +724,7 @@ export default function RegisterPage() {
         <div className="mt-6 text-center">
           <p style={{ color: 'var(--muted)', fontSize: '14px' }}>
             Already have an account?{' '}
-            <Link href="/" style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none' }}>
+            <Link href="login" style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none' }}>
               Sign In
             </Link>
           </p>

@@ -7,12 +7,14 @@ export default function Footer() {
     <footer className="border-t mt-auto" style={{ backgroundColor: '#ECFDF5', borderColor: '#DCFCE7' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Company Info */}
+          {/* Contact Us */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-lg font-bold mb-4" style={{ color: '#16A34A' }}>GVKSS Software Pvt. Ltd.</h3>
-            <p className="text-sm text-zinc-600 mb-4">
-              Your trusted partner for finding your perfect match. Connecting hearts, building families.
-            </p>
+            <h3 className="text-lg font-bold mb-4" style={{ color: '#16A34A' }}>Contact Us</h3>
+            <div className="text-sm text-zinc-600 space-y-2">
+              <p>Anchuri Santosh Kumar</p>
+              <p>9573166450</p>
+              <p>B.N.Reddy Nagar, Vanasathalipuram, Hyderabad</p>
+            </div>
           </div>
 
           {/* Quick Links */}
@@ -25,19 +27,14 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-sm transition-colors" style={{ color: '#374151' }} onMouseEnter={(e) => e.currentTarget.style.color = '#16A34A'} onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}>
+                <Link href="/register" className="text-sm transition-colors" style={{ color: '#374151' }} onMouseEnter={(e) => e.currentTarget.style.color = '#16A34A'} onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}>
                   Register
                 </Link>
               </li>
               <li>
-                <Link href="/" className="text-sm transition-colors" style={{ color: '#374151' }} onMouseEnter={(e) => e.currentTarget.style.color = '#16A34A'} onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}>
+                <Link href="/login" className="text-sm transition-colors" style={{ color: '#374151' }} onMouseEnter={(e) => e.currentTarget.style.color = '#16A34A'} onMouseLeave={(e) => e.currentTarget.style.color = '#374151'}>
                   Login
                 </Link>
-              </li>
-              <li>
-                <a href="#" className="text-sm text-zinc-600 hover:text-green-600 transition-colors">
-                  About Us
-                </a>
               </li>
             </ul>
           </div>
