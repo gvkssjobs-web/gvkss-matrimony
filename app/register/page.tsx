@@ -191,7 +191,7 @@ export default function RegisterPage() {
   return (
     <div className="w-full" style={{ 
       background: 'var(--bg)',
-      padding: '20px',
+      padding: '20px 0',
       paddingTop: 'calc(20px + 10px)',
       minHeight: 'calc(100vh - 82px)',
       display: 'flex',
@@ -712,7 +712,7 @@ export default function RegisterPage() {
             className="w-full py-4 text-white font-bold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             style={{ 
               background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
-              boxShadow: '0 12px 22px rgba(233,75,106,.22)'
+              boxShadow: '0 12px 2 2px rgba(233,75,106,.22)'
             }}
             onMouseEnter={(e) => !loading && !uploadingPhoto && (e.currentTarget.style.transform = 'translateY(-1px)')}
             onMouseLeave={(e) => !loading && !uploadingPhoto && (e.currentTarget.style.transform = 'translateY(0)')}

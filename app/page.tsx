@@ -19,13 +19,6 @@ export default function Home() {
   const [brides, setBrides] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null }>>([]);
   const [grooms, setGrooms] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null }>>([]);
   const [dataLoading, setDataLoading] = useState(true);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-  const carouselImages = [
-    '/Media (1).jpg',
-    '/Media (2).jpg',
-    '/Media.jpg'
-  ];
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -78,15 +71,6 @@ export default function Home() {
     fetchBridesAndGrooms();
   }, []);
 
-  // Auto-rotate carousel images
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % carouselImages.length);
-    }, 4000); // Change image every 4 seconds
-
-    return () => clearInterval(interval);
-  }, [carouselImages.length]);
-
   // Show loading state while checking user
   if (loading && user) {
     return (
@@ -131,8 +115,8 @@ export default function Home() {
   };
 
   return (
-    <div style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      {/* Image Carousel with Quick Search Overlay */}
+    <div style={{ width: '100%', margin: '0 auto'}}>
+      {/* Quick Search with Background Image */}
       <div style={{
         background: '#fff',
         border: '1px solid #90EE90',
@@ -150,28 +134,14 @@ export default function Home() {
           borderRadius: '8px',
           overflow: 'hidden'
         }}>
-          {/* Carousel Images */}
-          {carouselImages.map((image, index) => (
-            <div
-              key={index}
-              style={{
-                position: 'absolute',
-                width: '100%',
-                height: '100%',
-                opacity: index === currentImageIndex ? 1 : 0,
-                transition: 'opacity 0.8s ease-in-out',
-                zIndex: index === currentImageIndex ? 1 : 0
-              }}
-            >
-              <Image
-                src={image}
-                alt={`Happy Couple ${index + 1}`}
-                fill
-                style={{ objectFit: 'cover' }}
-                priority={index === 0}
-              />
-            </div>
-          ))}
+          {/* Static Background Image */}
+          <Image
+            src="/Media.jpg"
+            alt="Happy Couple"
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
+          />
 
           {/* Quick Search Overlay */}
           <div style={{
@@ -343,173 +313,78 @@ export default function Home() {
               Search
             </button>
           </div>
-          
-          {/* Carousel Indicators */}
-          <div style={{
-            position: 'absolute',
-            bottom: '15px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            gap: '8px',
-            zIndex: 15
-          }}>
-            {carouselImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                style={{
-                  width: index === currentImageIndex ? '24px' : '10px',
-                  height: '10px',
-                  borderRadius: '5px',
-                  border: 'none',
-                  backgroundColor: index === currentImageIndex ? '#fff' : 'rgba(255, 255, 255, 0.5)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
-                }}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-          
-          {/* Navigation Arrows */}
-          <button
-            onClick={() => setCurrentImageIndex((prevIndex) => 
-              prevIndex === 0 ? carouselImages.length - 1 : prevIndex - 1
-            )}
-            style={{
-              position: 'absolute',
-              left: '15px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '50%',
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 15,
-              transition: 'background-color 0.3s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
-            aria-label="Previous image"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          
-          <button
-            onClick={() => setCurrentImageIndex((prevIndex) => 
-              (prevIndex + 1) % carouselImages.length
-            )}
-            style={{
-              position: 'absolute',
-              right: '15px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '50%',
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              zIndex: 15,
-              transition: 'background-color 0.3s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.5)'}
-            aria-label="Next image"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
         </div>
       </div>
 
-      {/* Profile ID Search */}
+      {/* Unified Section: Profile ID Search, Brides, and Grooms */}
       <div style={{
         background: '#fff',
         border: '1px solid #ddd',
         borderRadius: '8px',
         padding: '30px',
-        marginBottom: '1px',
+        marginBottom: '30px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
       }}>
-        <h2 style={{ 
-          fontSize: '24px', 
-          fontWeight: 'bold', 
-          marginBottom: '20px',
-          color: '#333',
-          borderBottom: '2px solid #E94B6A',
-          paddingBottom: '10px'
-        }}>
-          Profile ID Search
-        </h2>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <input
-            type="text"
-            value={profileId}
-            onChange={(e) => setProfileId(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleProfileIdSearch();
-              }
-            }}
-            placeholder="Enter Profile ID"
-            style={{
-              padding: '10px 15px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              fontSize: '16px',
-              flex: 1,
-              maxWidth: '300px'
-            }}
-          />
-          <button
-            onClick={handleProfileIdSearch}
-            style={{
-              padding: '10px 25px',
-              background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-            }}
-          >
-            Search
-          </button>
+        {/* Profile ID Search */}
+        <div style={{ marginBottom: '40px' }}>
+          <h2 style={{ 
+            fontSize: '24px', 
+            fontWeight: 'bold', 
+            marginBottom: '20px',
+            color: '#333',
+            borderBottom: '2px solid #E94B6A',
+            paddingBottom: '10px'
+          }}>
+            Profile ID Search
+          </h2>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={profileId}
+              onChange={(e) => setProfileId(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleProfileIdSearch();
+                }
+              }}
+              placeholder="Enter Profile ID"
+              style={{
+                padding: '10px 15px',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '16px',
+                flex: 1,
+                maxWidth: '300px'
+              }}
+            />
+            <button
+              onClick={handleProfileIdSearch}
+              style={{
+                padding: '10px 25px',
+                background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
+            >
+              Search
+            </button>
+          </div>
         </div>
-      </div>
 
-      {/* Brides and Grooms Side by Side */}
-      <div className="brides-grooms-container" style={{
-        display: 'flex',
-        gap: '2px',
-        marginBottom: '30px'
-      }}>
-        {/* Brides Section */}
-        <div style={{
-          flex: '1',
-          background: '#fff',
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          padding: '30px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        {/* Brides and Grooms Side by Side */}
+        <div className="brides-grooms-container" style={{
+          display: 'flex',
+          gap: '20px'
         }}>
+          {/* Brides Section */}
+          <div style={{
+            flex: '1'
+          }}>
           <h2 style={{ 
             fontSize: '24px', 
             fontWeight: 'bold', 
@@ -669,15 +544,10 @@ export default function Home() {
           )}
         </div>
 
-        {/* Grooms Section */}
-        <div style={{
-          flex: '1',
-          background: '#fff',
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          padding: '30px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-        }}>
+          {/* Grooms Section */}
+          <div style={{
+            flex: '1'
+          }}>
           <h2 style={{ 
             fontSize: '24px', 
             fontWeight: 'bold', 
@@ -835,6 +705,7 @@ export default function Home() {
               })}
             </div>
           )}
+          </div>
         </div>
       </div>
 

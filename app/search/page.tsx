@@ -155,7 +155,7 @@ function SearchResultsContent() {
   return (
     <div className="w-full min-h-screen" style={{ 
       backgroundColor: 'var(--bg)',
-      padding: '20px',
+      padding: '20px 0',
       paddingTop: 'calc(20px + 10px)'
     }}>
       <div className="max-w-7xl mx-auto">

@@ -154,7 +154,7 @@ export default function UserProfilePage() {
       padding: '20px',
       paddingTop: 'calc(20px + 10px)'
     }}>
-      <div className="max-w-6xl mx-auto">
+      <div style={{ width: '100%', margin: '0 auto'}}>
         {/* Back Button */}
         <Link 
           href="/"
