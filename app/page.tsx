@@ -144,39 +144,41 @@ export default function Home() {
           {/* Quick Search Overlay */}
           <div style={{
             position: 'absolute',
-            top: '20px',
-            right: '145px',
+            top: '60px',
+            right: '100px',
             width: '400px',
             maxWidth: 'calc(100% - 40px)',
             zIndex: 5,
 
-            background: 'rgba(255, 255, 255, 0.35)',      // light glacy tone
-            backdropFilter: 'blur(12px)',                // frosted effect
-            WebkitBackdropFilter: 'blur(12px)',          // Safari support
+            background: 'rgba(0, 0, 0, 0.6)',
             borderRadius: '25px',
             padding: '30px',
 
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',  // subtle depth
-            border: '1px solid rgba(255, 255, 255, 0.4)'  // soft edge
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
+            border: 'none',
+            color: '#fff' // base text color
           }}>
 
-            <h2 style={{ 
-              fontSize: '24px', 
-              fontWeight: 'bold', 
+            <h2 style={{
+              fontSize: '24px',
+              fontWeight: 'bold',
               marginBottom: '20px',
-              color: '#333',
-              borderBottom: 'none',
-              paddingBottom: '10px',
-              width: 'fit-content'
+              color: '#fff'
             }}>
               Quick Search
             </h2>
 
             {/* Looking For */}
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#333' }}>
-                <strong>Looking For</strong>
+              <label style={{
+                display: 'block',
+                marginBottom: '10px',
+                fontWeight: '600',
+                color: 'rgba(255,255,255,0.85)'
+              }}>
+                Looking For
               </label>
+
               <div style={{ display: 'flex', gap: '20px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                   <input
@@ -184,30 +186,37 @@ export default function Home() {
                     name="searchType"
                     value="bride"
                     checked={searchType === 'bride'}
-                    onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
+                    onChange={(e) => setSearchType(e.target.value)}
                     style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
                   />
-                  <span style={{ fontSize: '16px', color: '#333' }}>Bride</span>
+                  <span style={{ fontSize: '16px', color: '#fff' }}>Bride</span>
                 </label>
+
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                   <input
                     type="radio"
                     name="searchType"
                     value="groom"
                     checked={searchType === 'groom'}
-                    onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
+                    onChange={(e) => setSearchType(e.target.value)}
                     style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
                   />
-                  <span style={{ fontSize: '16px', color: '#333' }}>Groom</span>
+                  <span style={{ fontSize: '16px', color: '#fff' }}>Groom</span>
                 </label>
               </div>
             </div>
 
             {/* Age */}
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#333' }}>
-                <strong>Age</strong>
+              <label style={{
+                display: 'block',
+                marginBottom: '10px',
+                fontWeight: '600',
+                color: 'rgba(255,255,255,0.85)'
+              }}>
+                Age
               </label>
+
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <select
                   value={minAge}
@@ -217,16 +226,20 @@ export default function Home() {
                     borderRadius: '4px',
                     fontSize: '14px',
                     minWidth: '80px',
-                    background: '#fff',
-                    color: '#333',
-                    border: 'none'
+                    background: 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)'
                   }}
                 >
                   {Array.from({ length: 28 }, (_, i) => i + 18).map(age => (
-                    <option key={age} value={age}>{age}</option>
+                    <option key={age} value={age} style={{ color: '#000' }}>
+                      {age}
+                    </option>
                   ))}
                 </select>
-                <span style={{ color: '#333' }}>to</span>
+
+                <span style={{ color: 'rgba(255,255,255,0.7)' }}>to</span>
+
                 <select
                   value={maxAge}
                   onChange={(e) => setMaxAge(Number(e.target.value))}
@@ -235,13 +248,15 @@ export default function Home() {
                     borderRadius: '4px',
                     fontSize: '14px',
                     minWidth: '80px',
-                    background: '#fff',
-                    color: '#333',
-                    border: 'none'
+                    background: 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)'
                   }}
                 >
                   {Array.from({ length: 28 }, (_, i) => i + 18).map(age => (
-                    <option key={age} value={age}>{age}</option>
+                    <option key={age} value={age} style={{ color: '#000' }}>
+                      {age}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -249,9 +264,15 @@ export default function Home() {
 
             {/* Height */}
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#333' }}>
-                <strong>Height</strong>
+              <label style={{
+                display: 'block',
+                marginBottom: '10px',
+                fontWeight: '600',
+                color: 'rgba(255,255,255,0.85)'
+              }}>
+                Height
               </label>
+
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <select
                   value={minHeight}
@@ -261,17 +282,21 @@ export default function Home() {
                     borderRadius: '4px',
                     fontSize: '14px',
                     minWidth: '120px',
-                    background: '#fff',
-                    color: '#333',
-                    border: 'none'
+                    background: 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)'
                   }}
                 >
-                  <option value="">Select</option>
+                  <option value="" style={{ color: '#000' }}>Select</option>
                   {heightOptions.map(height => (
-                    <option key={height} value={height}>{height}</option>
+                    <option key={height} value={height} style={{ color: '#000' }}>
+                      {height}
+                    </option>
                   ))}
                 </select>
-                <span style={{ color: '#333' }}>to</span>
+
+                <span style={{ color: 'rgba(255,255,255,0.7)' }}>to</span>
+
                 <select
                   value={maxHeight}
                   onChange={(e) => setMaxHeight(e.target.value)}
@@ -280,14 +305,16 @@ export default function Home() {
                     borderRadius: '4px',
                     fontSize: '14px',
                     minWidth: '120px',
-                    background: '#fff',
-                    color: '#333',
-                    border: 'none'
+                    background: 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)'
                   }}
                 >
-                  <option value="">Select</option>
+                  <option value="" style={{ color: '#000' }}>Select</option>
                   {heightOptions.map(height => (
-                    <option key={height} value={height}>{height}</option>
+                    <option key={height} value={height} style={{ color: '#000' }}>
+                      {height}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -306,16 +333,14 @@ export default function Home() {
                 cursor: 'pointer',
                 transition: 'transform 0.2s'
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
               Search
             </button>
+
           </div>
+
         </div>
       </div>
 
@@ -331,7 +356,7 @@ export default function Home() {
           <h2 style={{ 
             fontSize: '24px', 
             fontWeight: 'bold', 
-            marginBottom: '20px',
+            marginBottom: '5px',
             color: '#333',
             borderBottom: 'none',
             paddingBottom: '10px',
@@ -339,7 +364,7 @@ export default function Home() {
           }}>
             Profile ID Search
           </h2>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '5px', alignItems: 'center', justifyContent: 'center' }}>
             <input
               type="text"
               value={profileId}
@@ -352,11 +377,11 @@ export default function Home() {
               placeholder="Enter Profile ID"
               style={{
                 padding: '10px 15px',
-                borderRadius: '4px',
+                borderRadius: '10px',
                 fontSize: '16px',
                 flex: 1,
                 maxWidth: '300px',
-                border: 'none'
+                border: '3px solid #333'
               }}
             />
             <button
@@ -366,7 +391,7 @@ export default function Home() {
                 background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
                 color: '#fff',
                 border: 'none',
-                borderRadius: '6px',
+                borderRadius: '10px',
                 fontSize: '16px',
                 fontWeight: '600',
                 cursor: 'pointer'
@@ -380,9 +405,7 @@ export default function Home() {
         {/* Toggle Button and Profiles Section */}
         <div style={{
           background: '#fff',
-          borderRadius: '8px',
-          padding: '30px',
-          marginBottom: '30px'
+          borderRadius: '8px'
         }}>
           {/* Toggle Button */}
           <div style={{ 
