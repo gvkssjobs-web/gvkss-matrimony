@@ -428,7 +428,7 @@ export default function Home() {
         border: '1px solid #ddd',
         borderRadius: '8px',
         padding: '30px',
-        marginBottom: '30px',
+        marginBottom: '1px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
       }}>
         <h2 style={{ 
@@ -483,7 +483,7 @@ export default function Home() {
       {/* Brides and Grooms Side by Side */}
       <div className="brides-grooms-container" style={{
         display: 'flex',
-        gap: '20px',
+        gap: '2px',
         marginBottom: '30px'
       }}>
         {/* Brides Section */}

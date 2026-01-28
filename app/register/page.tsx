@@ -192,7 +192,7 @@ export default function RegisterPage() {
     <div className="w-full" style={{ 
       background: 'var(--bg)',
       padding: '20px',
-      paddingTop: 'calc(82px + 20px)',
+      paddingTop: 'calc(20px + 10px)',
       minHeight: 'calc(100vh - 82px)',
       display: 'flex',
       alignItems: 'center',

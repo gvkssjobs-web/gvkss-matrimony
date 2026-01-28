@@ -156,13 +156,13 @@ function SearchResultsContent() {
     <div className="w-full min-h-screen" style={{ 
       backgroundColor: 'var(--bg)',
       padding: '20px',
-      paddingTop: 'calc(82px + 20px)'
+      paddingTop: 'calc(20px + 10px)'
     }}>
       <div className="max-w-7xl mx-auto">
         {/* Back Button */}
         <Link 
           href="/"
-          className="inline-flex items-center gap-2 mb-6 text-sm font-medium hover:underline"
+          className="inline-flex items-center gap-2 mb-3 text-sm font-medium hover:underline"
           style={{ color: 'var(--primary)' }}
         >
           <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,11 +172,11 @@ function SearchResultsContent() {
         </Link>
 
         {/* Search Results Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 border" style={{ borderColor: 'var(--border)' }}>
-          <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--text)' }}>
+        <div className="bg-white rounded-2xl shadow-lg p-4 mb-4 border" style={{ borderColor: 'var(--border)' }}>
+          <h1 className="text-2xl font-bold mb-2" style={{ color: 'var(--text)' }}>
             Search Results
           </h1>
-          <div className="flex flex-wrap gap-4 text-sm" style={{ color: 'var(--muted)' }}>
+          <div className="flex flex-wrap gap-3 text-sm" style={{ color: 'var(--muted)' }}>
             <span>Looking for: <strong className="capitalize">{searchType}</strong></span>
             {(minAge || maxAge) && (
               <span>Age: <strong>{minAge || '18'}-{maxAge || '45'}</strong></span>
@@ -223,7 +223,7 @@ function SearchResultsContent() {
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {results.map((user) => {
                   const photoUrl = getPhotoUrl(user);
                   const age = calculateAge(user.dob);

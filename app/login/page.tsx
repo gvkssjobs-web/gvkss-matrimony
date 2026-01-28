@@ -65,7 +65,7 @@ export default function LoginPage() {
     <div className="w-full" style={{ 
       background: 'var(--bg)',
       padding: '20px',
-      paddingTop: 'calc(82px + 20px)',
+      paddingTop: 'calc(10px + 1px)',
       minHeight: 'calc(100vh - 82px)',
       display: 'flex',
       alignItems: 'center',

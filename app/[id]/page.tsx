@@ -152,7 +152,7 @@ export default function UserProfilePage() {
     <div className="w-full min-h-screen" style={{ 
       backgroundColor: 'var(--bg)',
       padding: '20px',
-      paddingTop: 'calc(82px + 20px)'
+      paddingTop: 'calc(20px + 10px)'
     }}>
       <div className="max-w-6xl mx-auto">
         {/* Back Button */}
