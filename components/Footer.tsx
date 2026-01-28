@@ -9,11 +9,104 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Contact Us */}
           <div className="col-span-1 md:col-span-2">
-            <h3 className="text-lg font-bold mb-4" style={{ color: '#16A34A' }}>Contact Us</h3>
-            <div className="text-sm text-zinc-600 space-y-2">
-              <p>Anchuri Santosh Kumar</p>
-              <p>9573166450</p>
-              <p>B.N.Reddy Nagar, Vanasathalipuram, Hyderabad</p>
+            <h3 className="text-xl font-bold mb-6" style={{ color: '#2563EB', letterSpacing: '0.5px' }}>Contact Us</h3>
+            <div className="space-y-5">
+              {/* Name with Person Icon */}
+              <div className="flex items-start gap-4 group cursor-default">
+                <div 
+                  className="flex-shrink-0 mt-0.5 p-2.5 rounded-xl transition-all duration-300 shadow-sm group-hover:shadow-md" 
+                  style={{ 
+                    backgroundColor: '#DBEAFE',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#BFDBFE';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#DBEAFE';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <svg className="w-6 h-6 transition-colors duration-300" style={{ color: '#2563EB' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div className="flex-1 pt-1">
+                  <p className="text-base font-semibold transition-colors duration-200" style={{ color: '#1F2937' }}>
+                    Anchuri Santosh Kumar
+                  </p>
+                </div>
+              </div>
+
+              {/* Phone with Phone Icon */}
+              <div className="flex items-start gap-4 group">
+                <div 
+                  className="flex-shrink-0 mt-0.5 p-2.5 rounded-xl transition-all duration-300 shadow-sm group-hover:shadow-md" 
+                  style={{ 
+                    backgroundColor: '#DBEAFE',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#BFDBFE';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#DBEAFE';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <svg className="w-6 h-6 transition-colors duration-300" style={{ color: '#2563EB' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </div>
+                <div className="flex-1 pt-1">
+                  <a 
+                    href="tel:9573166450" 
+                    className="text-base font-semibold transition-all duration-200 inline-block" 
+                    style={{ color: '#1F2937' }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#2563EB';
+                      e.currentTarget.style.textDecoration = 'underline';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = '#1F2937';
+                      e.currentTarget.style.textDecoration = 'none';
+                    }}
+                  >
+                    9573166450
+                  </a>
+                </div>
+              </div>
+
+              {/* Address with Location Icon */}
+              <div className="flex items-start gap-4 group cursor-default">
+                <div 
+                  className="flex-shrink-0 mt-0.5 p-2.5 rounded-xl transition-all duration-300 shadow-sm group-hover:shadow-md" 
+                  style={{ 
+                    backgroundColor: '#DBEAFE',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#BFDBFE';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#DBEAFE';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <svg className="w-6 h-6 transition-colors duration-300" style={{ color: '#2563EB' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1 pt-1">
+                  <p className="text-base font-semibold leading-relaxed" style={{ color: '#1F2937' }}>
+                    B.N.Reddy Nagar, Vanasathalipuram, Hyderabad
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 

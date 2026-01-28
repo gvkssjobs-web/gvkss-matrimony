@@ -118,6 +118,27 @@ export default function UserProfilePage() {
     return `/${photoUrl}`;
   };
 
+  // Format 24-hour time (e.g. "14:30" or "14:30:00") to 12-hour format (e.g. "2:30 PM")
+  const formatBirthTime = (timeStr: string | null) => {
+    if (!timeStr) return '';
+
+    // Keep only the time part if there is a date prefix
+    const onlyTime = timeStr.trim().split(' ')[0];
+
+    const parts = onlyTime.split(':');
+    if (parts.length < 2) return timeStr; // fallback to original if unexpected format
+
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+    if (Number.isNaN(hours)) return timeStr;
+
+    const suffix = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    if (hours === 0) hours = 12;
+
+    return `${hours}:${minutes} ${suffix}`;
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
@@ -151,7 +172,7 @@ export default function UserProfilePage() {
   return (
     <div className="w-full min-h-screen" style={{ 
       backgroundColor: 'var(--bg)',
-      padding: '20px',
+      padding: '20px 0',
       paddingTop: 'calc(20px + 10px)'
     }}>
       <div style={{ width: '100%', margin: '0 auto'}}>
@@ -223,115 +244,155 @@ export default function UserProfilePage() {
 
               {/* Details Sections */}
               <div className="space-y-6">
-                {/* Personal Details Section 1 */}
+                {/* Personal Information (all personal + astrological) */}
                 <div className="space-y-4">
-                  <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}>
-                    Personal Details
+                  <h2
+                    className="text-2xl font-bold mb-4"
+                    style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}
+                  >
+                    Personal Information
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {user.dob && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Date of Birth</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{new Date(user.dob).toLocaleDateString()}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Date of Birth
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {new Date(user.dob).toLocaleDateString()}
+                        </p>
                       </div>
                     )}
                     {user.birthTime && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Birth Time</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.birthTime}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Birth Time
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {formatBirthTime(user.birthTime)}
+                        </p>
                       </div>
                     )}
                     {user.birthPlace && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Birth Place</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.birthPlace}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Birth Place
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {user.birthPlace}
+                        </p>
                       </div>
                     )}
-                  </div>
-                </div>
-
-                {/* Personal Details Section 2 */}
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}>
-                    Personal Details
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {user.height && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Height</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.height}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Height
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {user.height}
+                        </p>
                       </div>
                     )}
                     {user.complexion && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Complexion</label>
-                        <p className="text-base capitalize" style={{ color: 'var(--text)' }}>{user.complexion}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Complexion
+                        </label>
+                        <p className="text-base capitalize" style={{ color: 'var(--text)' }}>
+                          {user.complexion}
+                        </p>
                       </div>
                     )}
-                  </div>
-                </div>
-
-                {/* Astrological Details */}
-                <div className="space-y-4">
-                  <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}>
-                    Astrological Details
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {user.star && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Star</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.star}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Star
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {user.star}
+                        </p>
                       </div>
                     )}
                     {user.raasi && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Raasi</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.raasi}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Raasi
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {user.raasi}
+                        </p>
                       </div>
                     )}
                     {user.gothram && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Gothram</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.gothram}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Gothram
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {user.gothram}
+                        </p>
                       </div>
                     )}
                     {user.padam && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Padam</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.padam}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Padam
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {user.padam}
+                        </p>
                       </div>
                     )}
                     {user.uncleGothram && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Uncle Gothram</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.uncleGothram}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Uncle Gothram
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {user.uncleGothram}
+                        </p>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Education & Career */}
+                {/* Educational & Professional Information */}
                 <div className="space-y-4">
-                  <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}>
-                    Education & Career
+                  <h2
+                    className="text-2xl font-bold mb-4"
+                    style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}
+                  >
+                    Educational & Professional Information
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {user.educationCategory && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Education Category</label>
-                        <p className="text-base capitalize" style={{ color: 'var(--text)' }}>{user.educationCategory.replace('-', ' ')}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Education Category
+                        </label>
+                        <p className="text-base capitalize" style={{ color: 'var(--text)' }}>
+                          {user.educationCategory.replace('-', ' ')}
+                        </p>
                       </div>
                     )}
                     {user.educationDetails && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Education Details</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.educationDetails}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Education Details
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {user.educationDetails}
+                        </p>
                       </div>
                     )}
                     {user.employedIn && (
                       <div>
-                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>Employed In</label>
-                        <p className="text-base" style={{ color: 'var(--text)' }}>{user.employedIn}</p>
+                        <label className="text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                          Employed In
+                        </label>
+                        <p className="text-base" style={{ color: 'var(--text)' }}>
+                          {user.employedIn}
+                        </p>
                       </div>
                     )}
                   </div>
