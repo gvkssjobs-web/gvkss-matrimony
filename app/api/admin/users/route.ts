@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const client = await pool.connect();
     try {
       const result = await client.query(
-        'SELECT id, email, name, role, created_at FROM users ORDER BY created_at DESC'
+        'SELECT id, email, name, role, status, created_at FROM users ORDER BY created_at DESC'
       );
 
       return NextResponse.json(
@@ -31,31 +31,54 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH - Update user role (admin only)
+// PATCH - Update user role or status (admin only)
 export async function PATCH(request: NextRequest) {
   try {
-    const { userId, role } = await request.json();
+    const { userId, role, status } = await request.json();
 
-    if (!userId || !role) {
+    if (!userId) {
       return NextResponse.json(
-        { error: 'User ID and role are required' },
-        { status: 400 }
-      );
-    }
-
-    const validRoles = ['admin', 'gold', 'silver', 'platinum'];
-    if (!validRoles.includes(role)) {
-      return NextResponse.json(
-        { error: 'Invalid role' },
+        { error: 'User ID is required' },
         { status: 400 }
       );
     }
 
     const client = await pool.connect();
     try {
+      let updateQuery = '';
+      let updateValues: any[] = [];
+      let updateIndex = 1;
+
+      if (role) {
+        const validRoles = ['admin', 'user'];
+        if (!validRoles.includes(role)) {
+          return NextResponse.json(
+            { error: 'Invalid role' },
+            { status: 400 }
+          );
+        }
+        updateQuery = `UPDATE users SET role = $${updateIndex}, updated_at = CURRENT_TIMESTAMP WHERE id = $${updateIndex + 1}`;
+        updateValues = [role, userId];
+      } else if (status) {
+        const validStatuses = ['pending', 'accepted', 'rejected'];
+        if (!validStatuses.includes(status)) {
+          return NextResponse.json(
+            { error: 'Invalid status. Must be pending, accepted, or rejected' },
+            { status: 400 }
+          );
+        }
+        updateQuery = `UPDATE users SET status = $${updateIndex}, updated_at = CURRENT_TIMESTAMP WHERE id = $${updateIndex + 1}`;
+        updateValues = [status, userId];
+      } else {
+        return NextResponse.json(
+          { error: 'Either role or status must be provided' },
+          { status: 400 }
+        );
+      }
+
       const result = await client.query(
-        'UPDATE users SET role = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, email, name, role',
-        [role, userId]
+        `${updateQuery} RETURNING id, email, name, role, status`,
+        updateValues
       );
 
       if (result.rows.length === 0) {
@@ -67,7 +90,7 @@ export async function PATCH(request: NextRequest) {
 
       return NextResponse.json(
         {
-          message: 'User role updated successfully',
+          message: role ? 'User role updated successfully' : 'User status updated successfully',
           user: result.rows[0],
         },
         { status: 200 }
@@ -76,7 +99,7 @@ export async function PATCH(request: NextRequest) {
       client.release();
     }
   } catch (error: any) {
-    console.error('Error updating user role:', error);
+    console.error('Error updating user:', error);
     return NextResponse.json(
       { error: 'Internal server error', details: error.message },
       { status: 500 }

@@ -56,19 +56,19 @@ export async function POST(request: NextRequest) {
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Insert new user with all fields
+      // Insert new user with all fields (status is NULL initially)
       const result = await client.query(
         `INSERT INTO users (
           email, password, name, role, photo, phone_number, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
           star, raasi, gothram, padam, uncle_gothram,
-          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address
+          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, status
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, NULL
         ) RETURNING id, email, name, role, photo, phone_number, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
           star, raasi, gothram, padam, uncle_gothram,
-          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address`,
+          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, status`,
         [
           email, 
           hashedPassword, 
@@ -129,6 +129,7 @@ export async function POST(request: NextRequest) {
             occupationInDetails: result.rows[0].occupation_in_details,
             annualIncome: result.rows[0].annual_income,
             address: result.rows[0].address,
+            status: result.rows[0].status,
           },
         },
         { status: 201 }

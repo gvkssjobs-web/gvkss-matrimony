@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       const client = await pool.connect();
       try {
         const result = await client.query(
-          'SELECT id, email, password, name, role, photo, phone_number, gender FROM users WHERE email = $1',
+          'SELECT id, email, password, name, role, photo, phone_number, gender, status FROM users WHERE email = $1',
           [email]
         );
 
@@ -49,10 +49,11 @@ export async function POST(request: NextRequest) {
             id: user.id,
             email: user.email,
             name: user.name,
-            role: user.role || 'silver',
+            role: user.role || 'user',
             photo: user.photo || null,
             phoneNumber: user.phone_number || null,
             gender: user.gender || null,
+            status: user.status || null,
           },
         },
         { status: 200 }

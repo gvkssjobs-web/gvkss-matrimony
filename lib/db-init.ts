@@ -44,6 +44,7 @@ export async function initDatabase() {
           occupation_in_details TEXT,
           annual_income VARCHAR(100),
           address TEXT,
+          status VARCHAR(20) CHECK (status IN ('pending', 'accepted', 'rejected')),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -217,6 +218,21 @@ export async function initDatabase() {
           `);
           console.log(`${column.name} column added successfully`);
         }
+      }
+
+      // Check and add status column if it doesn't exist
+      const statusColumnExists = await client.query(`
+        SELECT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_name = 'users' AND column_name = 'status'
+        );
+      `);
+
+      if (!statusColumnExists.rows[0].exists) {
+        await client.query(`
+          ALTER TABLE users ADD COLUMN status VARCHAR(20) CHECK (status IN ('pending', 'accepted', 'rejected'));
+        `);
+        console.log('Status column added successfully');
       }
     }
     

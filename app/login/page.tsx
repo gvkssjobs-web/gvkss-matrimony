@@ -46,8 +46,13 @@ export default function LoginPage() {
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
         const userRole = data.user.role;
+        const userStatus = data.user.status;
+        
         if (userRole === 'admin') {
           router.push('/admin');
+        } else if (userStatus !== 'accepted') {
+          // If status is null, 'pending', or 'rejected', redirect to status page
+          router.push('/status');
         } else {
           router.push('/');
         }

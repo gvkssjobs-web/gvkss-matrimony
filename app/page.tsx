@@ -26,12 +26,28 @@ export default function Home() {
     setUser(currentUser);
     
     if (currentUser) {
-      // Redirect to admin page if admin, otherwise stay on home page
+      // Redirect to admin page if admin, otherwise check status
       const userRole = currentUser.role;
       if (userRole === 'admin') {
         router.push('/admin');
       } else {
-        setLoading(false);
+        // Check user status - if not accepted, redirect to status page
+        const checkUserStatus = async () => {
+          try {
+            const response = await fetch(`/api/users/${currentUser.id}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.status && data.status !== 'accepted') {
+                router.push('/status');
+                return;
+              }
+            }
+          } catch (err) {
+            console.error('Failed to check user status:', err);
+          }
+          setLoading(false);
+        };
+        checkUserStatus();
       }
     } else {
       setLoading(false);

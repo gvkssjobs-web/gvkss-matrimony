@@ -32,6 +32,7 @@ interface UserProfile {
   address: string | null;
   createdAt: string;
   siblingsInfo: any;
+  status: string | null;
 }
 
 export default function UserProfilePage() {
@@ -59,6 +60,11 @@ export default function UserProfilePage() {
         }
 
         const data = await response.json();
+        // Check status - if not accepted, redirect to status page
+        if (data.status && data.status !== 'accepted') {
+          router.push('/status');
+          return;
+        }
         setUser(data.user);
       } catch (err) {
         setError('An error occurred while loading the profile');
