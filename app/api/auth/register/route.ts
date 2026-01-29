@@ -19,26 +19,64 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
+    // Password validation: min 8 chars, 1 upper, 1 lower, 1 number, 1 special
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 6 characters' },
+        { error: 'Password must be at least 8 characters' },
+        { status: 400 }
+      );
+    }
+    if (!/[A-Z]/.test(password)) {
+      return NextResponse.json(
+        { error: 'Password must contain at least one uppercase letter' },
+        { status: 400 }
+      );
+    }
+    if (!/[a-z]/.test(password)) {
+      return NextResponse.json(
+        { error: 'Password must contain at least one lowercase letter' },
+        { status: 400 }
+      );
+    }
+    if (!/[0-9]/.test(password)) {
+      return NextResponse.json(
+        { error: 'Password must contain at least one number' },
+        { status: 400 }
+      );
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      return NextResponse.json(
+        { error: 'Password must contain at least one special character' },
         { status: 400 }
       );
     }
 
-    // Check if user already exists
     const client = await pool.connect();
     try {
-      const existingUser = await client.query(
-        'SELECT id FROM users WHERE email = $1',
+      const existingEmail = await client.query(
+        'SELECT id FROM users WHERE LOWER(email) = LOWER($1)',
         [email]
       );
 
-      if (existingUser.rows.length > 0) {
+      if (existingEmail.rows.length > 0) {
         return NextResponse.json(
           { error: 'User with this email already exists' },
           { status: 409 }
         );
+      }
+
+      const phone = phoneNumber ?? null;
+      if (phone) {
+        const existingPhone = await client.query(
+          'SELECT id FROM users WHERE phone_number = $1',
+          [phone]
+        );
+        if (existingPhone.rows.length > 0) {
+          return NextResponse.json(
+            { error: 'User with this phone number already exists' },
+            { status: 409 }
+          );
+        }
       }
 
       // Set default role to 'user' for all registrations (admin can only be created manually)

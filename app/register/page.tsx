@@ -4,6 +4,119 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+// Raasi options (zodiac order: Aries to Pisces)
+const raasiOptions = [
+  'Mesha (Aries) – మేషం ♈',
+  'Vrishabha (Taurus) – వృషభం ♉',
+  'Mithuna (Gemini) – మిథునం ♊',
+  'Karka (Cancer) – కర్కాటకం ♋',
+  'Simha (Leo) – సింహం ♌',
+  'Kanya (Virgo) – కన్య ♍',
+  'Tula (Libra) – తుల ♎',
+  'Vrischika (Scorpio) – వృశ్చికం ♏',
+  'Dhanu (Sagittarius) – ధనుస్సు ♐',
+  'Makara (Capricorn) – మకరం ♑',
+  'Kumbha (Aquarius) – కుంభం ♒',
+  'Meena (Pisces) – మీనం ♓'
+];
+
+// Star options (Nakshatra order)
+const starOptions = [
+  'Ashwini – అశ్విని',
+  'Bharani – భరణి',
+  'Krittika – కృత్తిక',
+  'Rohini – రోహిణి',
+  'Mrigashira – మృగశిర',
+  'Ardra – ఆర్ద్ర',
+  'Punarvasu – పునర్వసు',
+  'Pushya – పుష్య',
+  'Ashlesha – ఆశ్లేష',
+  'Magha – మఘ',
+  'Purva Phalguni – పూర్వ ఫల్గుణి',
+  'Uttara Phalguni – ఉత్తర ఫల్గుణి',
+  'Hasta – హస్త',
+  'Chitra – చిత్ర',
+  'Swati – స్వాతి',
+  'Vishakha – విశాఖ',
+  'Anuradha – అనురాధ',
+  'Jyeshtha – జ్యేష్ఠ',
+  'Moola – మూల',
+  'Purva Ashadha – పూర్వాషాఢ',
+  'Uttara Ashadha – ఉత్తరాషాఢ',
+  'Shravana – శ్రవణ',
+  'Dhanishta – ధనిష్ఠ',
+  'Shatabhisha – శతభిష',
+  'Purva Bhadrapada – పూర్వ భాద్రపద',
+  'Uttara Bhadrapada – ఉత్తర భాద్రపద',
+  'Revati – రేవతి'
+];
+
+// Padam options
+const padamOptions = [
+  '1st Padam',
+  '2nd Padam',
+  '3rd Padam',
+  '4th Padam'
+];
+
+// Gothram options (alphabetically sorted)
+const gothramOptions = [
+  'Aarakyamula (ఆరక్యముల)',
+  'Akramulakula (అక్రములకుల)',
+  'Akyamulakula (అక్యములకుల)',
+  'Amalakula (అమలకుల)',
+  'Ananthakula (అనంతకుల)',
+  'Anubala (అనుబాల)',
+  'Anubala Gula (అనుబాల గుల)',
+  'Anubha Gula (అనుభ గుల)',
+  'Arisetlakula (అరిశెట్లకుల)',
+  'Arisistakula (అరిశిష్టకుల)',
+  'Arasakula (అరసకుల)',
+  'Dhanakula (ధనకుల)',
+  'Elisistakula (ఎలిశిష్టకుల)',
+  'Gandhiseela (గంథిశీల)',
+  'Gandhiseelakula (గంథశీలకుల)',
+  'Ganamukukula (గనముకు కుల)',
+  'Garnakula (గర్నకుల)',
+  'Grandhiseela (గ్రంథిశీల)',
+  'Harisistakula (హరిశిష్టకుల)',
+  'Hasthakula (హస్తకుల)',
+  'Ikshvakukula (ఇక్ష్వాకుకుల)',
+  'Kamasista (కమశిష్ట)',
+  'Kanalola (కనలోల)',
+  'Kanasrila (కనశ్రిల)',
+  'Kanasrilakula (కనశ్రిలకుల)',
+  'Kanukula (కనుకుల)',
+  'Kanyakula (కన్యాకుల)',
+  'Karakapala (కరకపల)',
+  'Komarsistakula (కొమర్శిష్టాకుల)',
+  'Kranu (క్రను)',
+  'Kranukula (క్రనుకుల)',
+  'Kumarisista (కుమిరిశిష్ట)',
+  'Kumarsista (కుమర్శిష్ట)',
+  'Mandakula (మందకుల)',
+  'Mandhakula (మంధకుల)',
+  'Mandu (మండు)',
+  'Paipikula (పైపికుల)',
+  'Praheenikula (ప్రహీనికుల)',
+  'Praheenukula (ప్రహీనుకుల)',
+  'Samanakula (సమనకుల)',
+  'Sarakula (శరకుల)',
+  'Segolla (శెగొల్ల)',
+  'Sekotlakula (శెకొట్లకుల)',
+  'Sreshta Kundalakula (శ్రేష్ఠ కుండలకుల)',
+  'Thanankula (థననకుల)',
+  'Thenukula (థెనుకుల)',
+  'Uthakalakula (ఉథకలాకుల)',
+  'Uthakula (ఉథకుల)',
+  'Uthamakula (ఉహ్థమకుల)',
+  'Uthasistakula (ఉథశిష్టకుల)',
+  'Venkalakula (వెంకలాకుల)',
+  'Yanasabikula (యానశబికుల)',
+  'Yanasakalulu (యానశకలుల)',
+  'Yanasakula (యనశకుల)'
+].sort();
+
 export default function RegisterPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -40,6 +153,44 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+
+  const validatePassword = (pwd: string): string[] => {
+    const errs: string[] = [];
+    if (pwd.length < 8) errs.push('At least 8 characters');
+    if (!/[A-Z]/.test(pwd)) errs.push('One uppercase letter');
+    if (!/[a-z]/.test(pwd)) errs.push('One lowercase letter');
+    if (!/[0-9]/.test(pwd)) errs.push('One number');
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)) errs.push('One special character');
+    return errs;
+  };
+
+  const checkEmailAvailability = async (emailToCheck: string) => {
+    if (!emailToCheck?.trim()) { setEmailError(''); return; }
+    try {
+      const res = await fetch(`/api/auth/check-availability?email=${encodeURIComponent(emailToCheck.trim())}`);
+      const data = await res.json();
+      setEmailError(data.emailTaken ? 'This email is already registered' : '');
+    } catch {
+      setEmailError('');
+    }
+  };
+
+  const checkPhoneAvailability = async (phoneToCheck: string) => {
+    const full = (formData.phoneCode || '') + (phoneToCheck || '').replace(/\D/g, '');
+    if (!full || full.length < 10) { setPhoneError(''); return; }
+    try {
+      const res = await fetch(`/api/auth/check-availability?phone=${encodeURIComponent(full)}`);
+      const data = await res.json();
+      setPhoneError(data.phoneTaken ? 'This phone number is already registered' : '');
+    } catch {
+      setPhoneError('');
+    }
+  };
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,6 +226,19 @@ export default function RegisterPage() {
 
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    const pwdErrs = validatePassword(formData.password);
+    if (pwdErrs.length > 0) {
+      setError('Password must have: ' + pwdErrs.join(', '));
+      setLoading(false);
+      return;
+    }
+
+    if (emailError || phoneError) {
+      setError(emailError || phoneError);
       setLoading(false);
       return;
     }
@@ -246,6 +410,7 @@ export default function RegisterPage() {
         <form onSubmit={handleRegister} className="space-y-4">
           {/* Name */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Name <span style={{ color: '#dc2626' }}>*</span></label>
             <input
               type="text"
               placeholder="Enter Your Name"
@@ -261,6 +426,7 @@ export default function RegisterPage() {
 
           {/* Gender - Bride/Groom */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Gender (Bride/Groom) <span style={{ color: '#dc2626' }}>*</span></label>
             <select
               value={formData.gender}
               onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
@@ -278,6 +444,7 @@ export default function RegisterPage() {
 
           {/* Marriage Status */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Marriage Status <span style={{ color: '#dc2626' }}>*</span></label>
             <select
               value={formData.marriageStatus}
               onChange={(e) => setFormData({ ...formData, marriageStatus: e.target.value })}
@@ -297,7 +464,7 @@ export default function RegisterPage() {
           {/* DOB */}
           <div>
             <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>
-              Date of Birth
+              Date of Birth <span style={{ color: '#dc2626' }}>*</span>
             </label>
             <input
               type="date"
@@ -314,12 +481,13 @@ export default function RegisterPage() {
           {/* Birth Time */}
           <div>
             <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>
-              Birth Time
+              Birth Time <span style={{ color: '#dc2626' }}>*</span>
             </label>
             <input
               type="time"
               value={formData.birthTime}
               onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
@@ -329,11 +497,13 @@ export default function RegisterPage() {
 
           {/* Birth Place */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Birth Place <span style={{ color: '#dc2626' }}>*</span></label>
             <input
               type="text"
               placeholder="Birth Place"
               value={formData.birthPlace}
               onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
@@ -343,11 +513,13 @@ export default function RegisterPage() {
 
           {/* Height */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Height <span style={{ color: '#dc2626' }}>*</span></label>
             <input
               type="text"
               placeholder="Height (e.g., 5ft 8in)"
               value={formData.height}
               onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
@@ -357,9 +529,11 @@ export default function RegisterPage() {
 
           {/* Complexion */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Complexion <span style={{ color: '#dc2626' }}>*</span></label>
             <select
               value={formData.complexion}
               onChange={(e) => setFormData({ ...formData, complexion: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
@@ -462,79 +636,106 @@ export default function RegisterPage() {
 
           {/* Star */}
           <div>
-            <input
-              type="text"
-              placeholder="Star"
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Star <span style={{ color: '#dc2626' }}>*</span></label>
+            <select
               value={formData.star}
               onChange={(e) => setFormData({ ...formData, star: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              style={{ borderColor: 'var(--border)', color: formData.star ? 'var(--text)' : '#9CA3AF' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+            >
+              <option value="">Select Star</option>
+              {starOptions.map((star) => (
+                <option key={star} value={star}>{star}</option>
+              ))}
+            </select>
           </div>
 
           {/* Raasi */}
           <div>
-            <input
-              type="text"
-              placeholder="Raasi"
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Raasi <span style={{ color: '#dc2626' }}>*</span></label>
+            <select
               value={formData.raasi}
               onChange={(e) => setFormData({ ...formData, raasi: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              style={{ borderColor: 'var(--border)', color: formData.raasi ? 'var(--text)' : '#9CA3AF' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+            >
+              <option value="">Select Raasi</option>
+              {raasiOptions.map((raasi) => (
+                <option key={raasi} value={raasi}>{raasi}</option>
+              ))}
+            </select>
           </div>
 
           {/* Gothram */}
           <div>
-            <input
-              type="text"
-              placeholder="Gothram"
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Gothram <span style={{ color: '#dc2626' }}>*</span></label>
+            <select
               value={formData.gothram}
               onChange={(e) => setFormData({ ...formData, gothram: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              style={{ borderColor: 'var(--border)', color: formData.gothram ? 'var(--text)' : '#9CA3AF' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+            >
+              <option value="">Select Gothram</option>
+              {gothramOptions.map((gothram) => (
+                <option key={gothram} value={gothram}>{gothram}</option>
+              ))}
+            </select>
           </div>
 
           {/* Padam */}
           <div>
-            <input
-              type="text"
-              placeholder="Padam"
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Padam <span style={{ color: '#dc2626' }}>*</span></label>
+            <select
               value={formData.padam}
               onChange={(e) => setFormData({ ...formData, padam: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              style={{ borderColor: 'var(--border)', color: formData.padam ? 'var(--text)' : '#9CA3AF' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+            >
+              <option value="">Select Padam</option>
+              {padamOptions.map((padam) => (
+                <option key={padam} value={padam}>{padam}</option>
+              ))}
+            </select>
           </div>
 
           {/* Uncle Gothram */}
           <div>
-            <input
-              type="text"
-              placeholder="Uncle Gothram"
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Uncle Gothram <span style={{ color: '#dc2626' }}>*</span></label>
+            <select
               value={formData.uncleGothram}
               onChange={(e) => setFormData({ ...formData, uncleGothram: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              style={{ borderColor: 'var(--border)', color: formData.uncleGothram ? 'var(--text)' : '#9CA3AF' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+            >
+              <option value="">Select Uncle Gothram</option>
+              {gothramOptions.map((gothram) => (
+                <option key={gothram} value={gothram}>{gothram}</option>
+              ))}
+            </select>
           </div>
 
           {/* Education Category */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Education Category <span style={{ color: '#dc2626' }}>*</span></label>
             <select
               value={formData.educationCategory}
               onChange={(e) => setFormData({ ...formData, educationCategory: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
@@ -551,10 +752,12 @@ export default function RegisterPage() {
 
           {/* Education Details */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Education Details <span style={{ color: '#dc2626' }}>*</span></label>
             <textarea
               placeholder="Education Details"
               value={formData.educationDetails}
               onChange={(e) => setFormData({ ...formData, educationDetails: e.target.value })}
+              required
               rows={3}
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors resize-none"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
@@ -565,11 +768,13 @@ export default function RegisterPage() {
 
           {/* Employed In */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Employed In <span style={{ color: '#dc2626' }}>*</span></label>
             <input
               type="text"
               placeholder="Employed In"
               value={formData.employedIn}
               onChange={(e) => setFormData({ ...formData, employedIn: e.target.value })}
+              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
@@ -628,7 +833,7 @@ export default function RegisterPage() {
               fontWeight: 600,
               fontSize: '14px'
             }}>
-              Photo
+              Photo <span style={{ color: '#dc2626' }}>*</span>
             </label>
             {formData.photoPreview && (
               <div className="mb-3" style={{ textAlign: 'center' }}>
@@ -658,37 +863,43 @@ export default function RegisterPage() {
           </div>
 
           {/* Phone */}
-          <div className="flex gap-2">
-            <select
-              value={formData.phoneCode}
-              onChange={(e) => setFormData({ ...formData, phoneCode: e.target.value })}
-              className="w-24 px-3 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            >
-              <option value="+91">+91</option>
-              <option value="+1">+1</option>
-            </select>
-            <input
-              type="tel"
-              placeholder="Enter Your Phone Number"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              required
-              className="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Phone Number <span style={{ color: '#dc2626' }}>*</span></label>
+            <div className="flex gap-2">
+              <select
+                value={formData.phoneCode}
+                onChange={(e) => setFormData({ ...formData, phoneCode: e.target.value })}
+                className="w-24 px-3 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: phoneError ? '#dc2626' : 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+              >
+                <option value="+91">+91</option>
+                <option value="+1">+1</option>
+              </select>
+              <input
+                type="tel"
+                placeholder="Enter Your Phone Number"
+                value={formData.phone}
+                onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setPhoneError(''); }}
+                onBlur={() => checkPhoneAvailability(formData.phone)}
+                required
+                className="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: phoneError ? '#dc2626' : 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; setPhoneError(''); }}
+              />
+            </div>
+            {phoneError && <p className="text-sm mt-1" style={{ color: '#dc2626' }}>{phoneError}</p>}
           </div>
 
           {/* Address (For Admin) */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Address (For Admin) <span style={{ color: '#dc2626' }}>*</span></label>
             <textarea
               placeholder="Address (For Admin)"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              required
               rows={3}
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors resize-none"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
@@ -699,47 +910,94 @@ export default function RegisterPage() {
 
           {/* Email */}
           <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Email <span style={{ color: '#dc2626' }}>*</span></label>
             <input
               type="email"
               placeholder="Enter Your Email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
+              onBlur={() => checkEmailAvailability(formData.email)}
               required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+              style={{ borderColor: emailError ? '#dc2626' : 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; setEmailError(''); }}
             />
+            {emailError && <p className="text-sm mt-1" style={{ color: '#dc2626' }}>{emailError}</p>}
           </div>
 
           {/* Password */}
           <div>
-            <input
-              type="password"
-              placeholder="Enter Your Password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Password <span style={{ color: '#dc2626' }}>*</span></label>
+            <div className="relative flex items-center">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter Your Password"
+                value={formData.password}
+                onChange={(e) => {
+                  setFormData({ ...formData, password: e.target.value });
+                  setPasswordErrors(validatePassword(e.target.value));
+                }}
+                onBlur={() => setPasswordErrors(validatePassword(formData.password))}
+                required
+                minLength={8}
+                className="w-full px-4 py-3 pr-12 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: passwordErrors.length && formData.password ? '#dc2626' : 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 p-1 rounded focus:outline-none"
+                style={{ color: 'var(--muted)' }}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878a4.5 4.5 0 106.262 6.262M4.031 11.117A9.953 9.953 0 003 12c0 4.478 2.943 8.268 7 9.543 2.767 1.128 5.878 1.128 8.61 0a9.953 9.953 0 003.117-1.117m5.858-.908L4.031 4.031m13.938 13.938L4.031 4.031" /></svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                )}
+              </button>
+            </div>
+            <p className="text-xs mt-1" style={{ color: 'var(--muted)' }}>
+              Min 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
+            </p>
+            {formData.password && passwordErrors.length > 0 && (
+              <ul className="text-sm mt-1 list-disc list-inside" style={{ color: '#dc2626' }}>
+                {passwordErrors.map((err) => <li key={err}>{err}</li>)}
+              </ul>
+            )}
           </div>
 
           {/* Confirm Password */}
           <div>
-            <input
-              type="password"
-              placeholder="Confirm Your Password"
-              value={formData.confirmPassword}
-              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Confirm Password <span style={{ color: '#dc2626' }}>*</span></label>
+            <div className="relative flex items-center">
+              <input
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Confirm Your Password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                required
+                minLength={8}
+                className="w-full px-4 py-3 pr-12 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 p-1 rounded focus:outline-none"
+                style={{ color: 'var(--muted)' }}
+                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+              >
+                {showConfirmPassword ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878a4.5 4.5 0 106.262 6.262M4.031 11.117A9.953 9.953 0 003 12c0 4.478 2.943 8.268 7 9.543 2.767 1.128 5.878 1.128 8.61 0a9.953 9.953 0 003.117-1.117m5.858-.908L4.031 4.031m13.938 13.938L4.031 4.031" /></svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                )}
+              </button>
+            </div>
           </div>
 
           <button
