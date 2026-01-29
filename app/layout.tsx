@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ScrollingHeadline from "@/components/ScrollingHeadline";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -32,8 +33,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-200`}
       >
         <div id="theme-wrapper" className="min-h-screen transition-colors duration-200 flex flex-col" style={{ background: 'linear-gradient(135deg, #FFF1F4 0%, #FFF5F7 40%, #FFFFFF 100%)' }}>
+          <ScrollingHeadline />
           <Navbar />
-          <main id="theme-main" className="flex-1 flex min-h-screen flex-col items-center w-full transition-colors duration-200 pt-[82px]" style={{ backgroundColor: '#FFF1F4',paddingTop: '70px' }}>
+          <main id="theme-main" className="flex-1 flex min-h-screen flex-col items-center w-full transition-colors duration-200" style={{ backgroundColor: '#FFF1F4', paddingTop: '100px' }}>
             {children}
           </main>
           <Footer />

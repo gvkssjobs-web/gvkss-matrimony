@@ -1,6 +1,172 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
+// PATCH - Update own profile (user can only update their own profile)
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> | { id: string } }
+) {
+  try {
+    const resolvedParams = params instanceof Promise ? await params : params;
+    const userId = parseInt(resolvedParams.id);
+
+    if (isNaN(userId)) {
+      return NextResponse.json(
+        { error: 'Invalid user ID' },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    const { currentUserEmail } = body;
+
+    if (!currentUserEmail) {
+      return NextResponse.json(
+        { error: 'Authentication required. Please provide currentUserEmail.' },
+        { status: 401 }
+      );
+    }
+
+    const client = await pool.connect();
+    try {
+      // Verify the current user matches the profile being updated
+      const currentUserResult = await client.query(
+        'SELECT id, role FROM users WHERE email = $1',
+        [currentUserEmail]
+      );
+
+      if (currentUserResult.rows.length === 0) {
+        return NextResponse.json(
+          { error: 'User not found' },
+          { status: 404 }
+        );
+      }
+
+      const currentUser = currentUserResult.rows[0];
+      const isAdmin = currentUser.role === 'admin';
+
+      // Users can only update their own profile (unless admin)
+      if (!isAdmin && currentUser.id !== userId) {
+        return NextResponse.json(
+          { error: 'You can only update your own profile' },
+          { status: 403 }
+        );
+      }
+
+      // Fields that users can update (exclude status - admin only)
+      const allowedFields: Record<string, string> = {
+        email: 'email',
+        name: 'name',
+        phoneNumber: 'phone_number',
+        gender: 'gender',
+        dob: 'dob',
+        marriageStatus: 'marriage_status',
+        birthTime: 'birth_time',
+        birthPlace: 'birth_place',
+        height: 'height',
+        complexion: 'complexion',
+        star: 'star',
+        raasi: 'raasi',
+        gothram: 'gothram',
+        padam: 'padam',
+        uncleGothram: 'uncle_gothram',
+        educationCategory: 'education_category',
+        educationDetails: 'education_details',
+        employedIn: 'employed_in',
+        occupation: 'occupation',
+        occupationInDetails: 'occupation_in_details',
+        annualIncome: 'annual_income',
+        address: 'address',
+      };
+
+      // Admins can also update status
+      if (isAdmin && 'status' in body) {
+        allowedFields.status = 'status';
+      }
+
+      const siblingsInfo = body.siblingsInfo;
+      const setParts: string[] = [];
+      const values: any[] = [];
+      let idx = 1;
+
+      for (const [camelKey, dbCol] of Object.entries(allowedFields)) {
+        if (!(camelKey in body)) continue;
+        const val = body[camelKey];
+        setParts.push(`${dbCol} = $${idx}`);
+        values.push(val === '' ? null : val);
+        idx++;
+      }
+
+      if (siblingsInfo !== undefined) {
+        setParts.push(`siblings_info = $${idx}`);
+        values.push(siblingsInfo == null ? null : JSON.stringify(siblingsInfo));
+        idx++;
+      }
+
+      if (setParts.length === 0) {
+        return NextResponse.json(
+          { error: 'No valid fields to update' },
+          { status: 400 }
+        );
+      }
+
+      values.push(userId);
+      const result = await client.query(
+        `UPDATE users SET ${setParts.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${idx} RETURNING id, email, name, role, phone_number, gender, dob, marriage_status, birth_time, birth_place, height, complexion, star, raasi, gothram, padam, uncle_gothram, education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, siblings_info, status`,
+        values
+      );
+
+      if (result.rows.length === 0) {
+        return NextResponse.json(
+          { error: 'User not found' },
+          { status: 404 }
+        );
+      }
+
+      const u = result.rows[0];
+      return NextResponse.json({
+        message: 'Profile updated successfully',
+        user: {
+          id: u.id,
+          email: u.email,
+          name: u.name,
+          role: u.role,
+          phoneNumber: u.phone_number || null,
+          gender: u.gender || null,
+          dob: u.dob || null,
+          marriageStatus: u.marriage_status || null,
+          birthTime: u.birth_time || null,
+          birthPlace: u.birth_place || null,
+          height: u.height || null,
+          complexion: u.complexion || null,
+          star: u.star || null,
+          raasi: u.raasi || null,
+          gothram: u.gothram || null,
+          padam: u.padam || null,
+          uncleGothram: u.uncle_gothram || null,
+          educationCategory: u.education_category || null,
+          educationDetails: u.education_details || null,
+          employedIn: u.employed_in || null,
+          occupation: u.occupation || null,
+          occupationInDetails: u.occupation_in_details || null,
+          annualIncome: u.annual_income || null,
+          address: u.address || null,
+          siblingsInfo: u.siblings_info,
+          status: u.status || null,
+        },
+      });
+    } finally {
+      client.release();
+    }
+  } catch (error: any) {
+    console.error('Error updating user profile:', error);
+    return NextResponse.json(
+      { error: 'Internal server error', details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> | { id: string } }
@@ -30,7 +196,7 @@ export async function GET(
     try {
       const result = await client.query(
         `SELECT 
-          id, email, name, role, photo, phone_number, gender, 
+          id, email, name, role, photo, phone_number, gender, marriage_status,
           dob, birth_time, birth_place, height, complexion,
           star, raasi, gothram, padam, uncle_gothram,
           education_category, education_details, employed_in,
@@ -60,6 +226,7 @@ export async function GET(
             photo: user.photo || null,
             phoneNumber: user.phone_number || null,
             gender: user.gender || null,
+            marriageStatus: user.marriage_status || null,
             dob: user.dob || null,
             birthTime: user.birth_time || null,
             birthPlace: user.birth_place || null,

@@ -56,7 +56,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="fixed w-full z-50 top-0 bg-pink-600 transition-all duration-200">
+    <nav className="fixed w-full z-50 bg-pink-600 transition-all duration-200" style={{ top: '30px' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
         
         {/* Left: Logo only */}
