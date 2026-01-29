@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
@@ -13,7 +13,7 @@ function getRedirectPath(redirect: string | null): string | null {
   return path;
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = getRedirectPath(searchParams.get('redirect'));
@@ -189,5 +189,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="w-full" style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 82px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: 'var(--muted)' }}>Loading...</p>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
