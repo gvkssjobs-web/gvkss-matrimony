@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { getCurrentUser, User } from '@/lib/auth';
@@ -23,7 +24,11 @@ export default function AdminPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [actionsOpenForId, setActionsOpenForId] = useState<number | null>(null);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [deleteConfirmFor, setDeleteConfirmFor] = useState<{ id: number; name: string | null } | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const actionsButtonRef = useRef<HTMLButtonElement | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; openUp: boolean } | null>(null);
 
   useEffect(() => {
     const currentUser = getCurrentUser();
@@ -34,6 +39,29 @@ export default function AdminPage() {
     setUser(currentUser);
     fetchUsers();
   }, [router]);
+
+  // Position actions dropdown in portal when open so it's never clipped
+  useEffect(() => {
+    if (!actionsOpenForId || !actionsButtonRef.current) {
+      setDropdownPosition(null);
+      return;
+    }
+    const filtered = users
+      .filter((u) => u.id !== user?.id)
+      .filter((u) => {
+        if (!searchQuery.trim()) return true;
+        const q = searchQuery.trim().toLowerCase();
+        return (u.name || '').toLowerCase().includes(q) || String(u.id).includes(q);
+      });
+    const index = filtered.findIndex((u) => u.id === actionsOpenForId);
+    const openDropdownUp = index === 0 || index >= filtered.length - 2;
+    const rect = actionsButtonRef.current.getBoundingClientRect();
+    setDropdownPosition({
+      left: rect.right - 140,
+      top: openDropdownUp ? rect.top : rect.bottom,
+      openUp: openDropdownUp,
+    });
+  }, [actionsOpenForId, users, user?.id, searchQuery]);
 
   const fetchUsers = async () => {
     try {
@@ -51,33 +79,14 @@ export default function AdminPage() {
     }
   };
 
-  const handleRoleChange = async (userId: number, newRole: string) => {
-    try {
-      const response = await fetch('/api/admin/users', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId, role: newRole }),
-      });
-
-      if (response.ok) {
-        fetchUsers(); // Refresh the list
-      } else {
-        const data = await response.json();
-        setError(data.error || 'Failed to update role');
-      }
-    } catch (err) {
-      setError('An error occurred while updating role');
-    }
-  };
-
   const handleAction = async (userId: number, action: 'reject' | 'accept' | 'delete') => {
     setActionsOpenForId(null);
     setError('');
-    
+
     if (action === 'delete') {
-      if (!confirm(`Delete user ${userId}? This cannot be undone.`)) return;
+      const target = users.find((u) => u.id === userId);
+      setDeleteConfirmFor({ id: userId, name: target?.name ?? null });
+      return;
     }
 
     try {
@@ -99,24 +108,33 @@ export default function AdminPage() {
           const data = await response.json();
           setError(data.error || `Failed to ${action} user`);
         }
-      } else if (action === 'delete') {
-        // For delete, we'll use the same PATCH endpoint with a special status or create a DELETE endpoint
-        // For now, let's use a DELETE request to a delete endpoint if it exists
-        const response = await fetch(`/api/admin/users/${userId}`, {
-          method: 'DELETE',
-        });
-
-        if (response.ok) {
-          setSuccess('User deleted successfully');
-          setTimeout(() => setSuccess(''), 3000);
-          fetchUsers(); // Refresh the list
-        } else {
-          const data = await response.json();
-          setError(data.error || 'Failed to delete user');
-        }
       }
     } catch (err) {
-      setError(`An error occurred while ${action === 'delete' ? 'deleting' : action + 'ing'} user`);
+      setError(`An error occurred while ${action + 'ing'} user`);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirmFor) return;
+    setDeleting(true);
+    setError('');
+    try {
+      const response = await fetch(`/api/admin/users/${deleteConfirmFor.id}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setSuccess('User deleted successfully');
+        setTimeout(() => setSuccess(''), 3000);
+        setDeleteConfirmFor(null);
+        fetchUsers();
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to delete user');
+      }
+    } catch (err) {
+      setError('An error occurred while deleting user');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -127,7 +145,7 @@ export default function AdminPage() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold">Admin Panel</h1>
             <Link
-              href="/"
+              href="/admin/add_user"
               className="font-bold transition-colors"
               style={{ color: '#E94B6A' }}
               onMouseEnter={(e) => e.currentTarget.style.color = '#C7365A'}
@@ -149,20 +167,16 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Status Filter */}
-          <div className="mb-6 flex gap-2 items-center">
-            <label className="text-sm font-medium" style={{ color: '#374151' }}>Filter by Status:</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as 'all' | 'pending' | 'accepted' | 'rejected')}
-              className="px-3 py-1.5 border-2 rounded-lg bg-white"
+          {/* Search */}
+          <div className="mb-6">
+            <input
+              type="text"
+              placeholder="Search by name or ID..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full max-w-md px-4 py-2.5 border-2 rounded-xl bg-white"
               style={{ borderColor: '#FF8AA2', color: '#111827' }}
-            >
-              <option value="all">All Users</option>
-              <option value="pending">Pending</option>
-              <option value="accepted">Accepted</option>
-              <option value="rejected">Rejected</option>
-            </select>
+            />
           </div>
 
           {loading ? (
@@ -173,22 +187,24 @@ export default function AdminPage() {
                 <thead>
                   <tr className="border-b border-zinc-200 dark:border-zinc-700">
                     <th className="text-left p-4">ID</th>
-                    <th className="text-left p-4">Email</th>
                     <th className="text-left p-4">Name</th>
-                    <th className="text-left p-4">Role</th>
                     <th className="text-left p-4">Status</th>
-                    <th className="text-left p-4">Created At</th>
                     <th className="text-left p-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {users
-                    .filter((u) => {
-                      if (statusFilter === 'all') return true;
-                      if (statusFilter === 'pending') return !u.status || u.status === 'pending';
-                      return u.status === statusFilter;
-                    })
-                    .map((u) => {
+                  {(() => {
+                    const filtered = users
+                      .filter((u) => u.id !== user?.id)
+                      .filter((u) => {
+                        if (!searchQuery.trim()) return true;
+                        const q = searchQuery.trim().toLowerCase();
+                        const matchName = (u.name || '').toLowerCase().includes(q);
+                        const matchId = String(u.id).includes(q);
+                        return matchName || matchId;
+                      });
+                    return filtered.map((u, index) => {
+                      const openDropdownUp = index === 0 || index >= filtered.length - 2;
                       const getStatusBadge = (status: string | null) => {
                         if (!status || status === 'pending') {
                           return (
@@ -221,107 +237,170 @@ export default function AdminPage() {
                       return (
                     <tr
                       key={u.id}
-                      className="border-b border-zinc-100 hover:bg-zinc-50"
+                      role="button"
+                      tabIndex={0}
+                      className="border-b border-zinc-100 hover:bg-zinc-50 cursor-pointer"
+                      onClick={() => router.push(`/${u.id}`)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/${u.id}`); } }}
                     >
                       <td className="p-4">{u.id}</td>
-                      <td className="p-4">{u.email}</td>
                       <td className="p-4">{u.name || '-'}</td>
-                      <td className="p-4">
-                        <select
-                          value={u.role}
-                          onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                          className="px-3 py-1 border-2 rounded-xl bg-white transition-colors"
-                          style={{ borderColor: '#FF8AA2', color: '#111827' }}
-                          onFocus={(e) => e.target.style.borderColor = '#E94B6A'}
-                          onBlur={(e) => e.target.style.borderColor = '#FF8AA2'}
-                          disabled={u.id === user?.id}
-                        >
-                          <option value="user">User</option>
-                          <option value="admin">Admin</option>
-                        </select>
-                      </td>
                       <td className="p-4">
                         {getStatusBadge(u.status)}
                       </td>
-                      <td className="p-4">
-                        {new Date(u.created_at).toLocaleDateString()}
-                      </td>
-                      <td className="p-4 relative">
-                        {u.id === user?.id ? (
-                          <span className="text-sm text-zinc-500">(You)</span>
-                        ) : (
-                          <>
+                      <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                          <div className="relative inline-block">
                             <button
+                              ref={actionsOpenForId === u.id ? actionsButtonRef : undefined}
                               type="button"
-                              onClick={() => setActionsOpenForId(actionsOpenForId === u.id ? null : u.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (actionsOpenForId === u.id) {
+                                  setActionsOpenForId(null);
+                                } else {
+                                  actionsButtonRef.current = e.currentTarget;
+                                  setActionsOpenForId(u.id);
+                                }
+                              }}
                               className="px-3 py-1.5 border-2 rounded-xl bg-white transition-colors flex items-center gap-1"
                               style={{ borderColor: '#FF8AA2', color: '#111827' }}
+                              aria-haspopup="true"
+                              aria-expanded={actionsOpenForId === u.id}
                             >
                               Actions
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className={`w-4 h-4 transition-transform ${actionsOpenForId === u.id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                               </svg>
                             </button>
-                            {actionsOpenForId === u.id && (
-                              <>
-                                <div
-                                  className="fixed inset-0 z-10"
-                                  aria-hidden="true"
-                                  onClick={() => setActionsOpenForId(null)}
-                                />
-                                <div
-                                  className="absolute right-0 top-full mt-1 z-20 py-1 min-w-[120px] rounded-lg border border-zinc-200 bg-white shadow-lg"
-                                  style={{ borderColor: '#FF8AA2' }}
-                                >
-                                  <button
-                                    type="button"
-                                    onClick={() => handleAction(u.id, 'reject')}
-                                    className="w-full text-left px-4 py-2 text-sm hover:bg-pink-50 transition-colors"
-                                    style={{ color: '#C7365A' }}
-                                  >
-                                    Reject
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleAction(u.id, 'accept')}
-                                    className="w-full text-left px-4 py-2 text-sm hover:bg-pink-50 transition-colors"
-                                    style={{ color: '#15803d' }}
-                                  >
-                                    Accept
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleAction(u.id, 'delete')}
-                                    className="w-full text-left px-4 py-2 text-sm hover:bg-pink-50 transition-colors"
-                                    style={{ color: '#dc2626' }}
-                                  >
-                                    Delete
-                                  </button>
-                                </div>
-                              </>
-                            )}
-                          </>
-                        )}
+                          </div>
                       </td>
                     </tr>
                       );
-                    })}
+                    });
+                  })()}
                 </tbody>
               </table>
             </div>
           )}
 
-          {users.filter((u) => {
-            if (statusFilter === 'all') return true;
-            if (statusFilter === 'pending') return !u.status || u.status === 'pending';
-            return u.status === statusFilter;
-          }).length === 0 && !loading && (
+          {users
+            .filter((u) => u.id !== user?.id)
+            .filter((u) => {
+              if (!searchQuery.trim()) return true;
+              const q = searchQuery.trim().toLowerCase();
+              return (u.name || '').toLowerCase().includes(q) || String(u.id).includes(q);
+            }).length === 0 && !loading && (
             <div className="text-center py-8 text-zinc-500">
-              No users found{statusFilter !== 'all' ? ` with status "${statusFilter}"` : ''}
+              No users found{searchQuery.trim() ? ' matching search' : ''}
             </div>
           )}
         </div>
       </div>
+
+      {/* Actions dropdown - rendered in portal so all three options are always visible */}
+      {actionsOpenForId && dropdownPosition && typeof document !== 'undefined' && createPortal(
+        (() => {
+          const targetUser = users.find((u) => u.id === actionsOpenForId);
+          if (!targetUser) return null;
+          return (
+            <>
+              <div
+                className="fixed inset-0"
+                style={{ zIndex: 1000 }}
+                aria-hidden="true"
+                onClick={(e) => { e.stopPropagation(); setActionsOpenForId(null); }}
+              />
+              <div
+                role="menu"
+                className="fixed py-1 min-w-[140px] rounded-lg border-2 bg-white shadow-xl"
+                style={{
+                  zIndex: 1001,
+                  borderColor: '#FF8AA2',
+                  left: dropdownPosition.left,
+                  ...(dropdownPosition.openUp
+                    ? { bottom: `calc(100vh - ${dropdownPosition.top}px + 4px)` }
+                    : { top: dropdownPosition.top + 4 }),
+                }}
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={(e) => { e.stopPropagation(); handleAction(targetUser.id, 'reject'); }}
+                  className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors first:rounded-t-md"
+                  style={{ color: '#C7365A' }}
+                >
+                  Reject
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={(e) => { e.stopPropagation(); handleAction(targetUser.id, 'accept'); }}
+                  className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors"
+                  style={{ color: '#15803d' }}
+                >
+                  Accept
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); handleAction(targetUser.id, 'delete'); }}
+                  className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors rounded-b-md"
+                  style={{ color: '#dc2626' }}
+                >
+                  Delete
+                </button>
+              </div>
+            </>
+          );
+        })(),
+        document.body
+      )}
+
+      {/* Delete confirmation pop-up - rendered in portal so it always appears on top */}
+      {deleteConfirmFor && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 99999 }}
+          onClick={() => !deleting && setDeleteConfirmFor(null)}
+          aria-modal="true"
+          role="dialog"
+          aria-labelledby="delete-dialog-title"
+        >
+          <div
+            className="rounded-2xl shadow-2xl border-2 p-6 max-w-sm w-full bg-white"
+            style={{ borderColor: '#FF8AA2' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="delete-dialog-title" className="text-lg font-bold mb-3" style={{ color: '#111827' }}>
+              Delete user?
+            </h2>
+            <p className="text-sm mb-5" style={{ color: '#6B7280' }}>
+              Delete user {deleteConfirmFor.name ? `"${deleteConfirmFor.name}"` : ''} (ID: {deleteConfirmFor.id})? This cannot be undone.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                type="button"
+                onClick={() => !deleting && setDeleteConfirmFor(null)}
+                disabled={deleting}
+                className="px-4 py-2 rounded-xl font-semibold border-2 transition-colors disabled:opacity-50"
+                style={{ borderColor: '#FF8AA2', color: '#C7365A', backgroundColor: '#FFF' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                disabled={deleting}
+                className="px-4 py-2 rounded-xl font-semibold text-white transition-colors disabled:opacity-50"
+                style={{ backgroundColor: '#C7365A' }}
+              >
+                {deleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </ProtectedRoute>
   );
 }

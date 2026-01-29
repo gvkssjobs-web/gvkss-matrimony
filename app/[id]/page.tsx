@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser, isAdmin } from '@/lib/auth';
 
 interface UserProfile {
   id: number;
@@ -69,8 +69,9 @@ export default function UserProfilePage() {
         }
 
         const data = await response.json();
-        // Check status - if not accepted, redirect to status page
-        if (data.status && data.status !== 'accepted') {
+        // Admin can view every record; other users only see accepted profiles
+        const viewer = getCurrentUser();
+        if (!isAdmin(viewer) && data.status && data.status !== 'accepted') {
           router.push('/status');
           return;
         }

@@ -119,9 +119,10 @@ function Navbar() {
                     <p className="text-sm font-semibold text-gray-800">{user.name || 'User'}</p>
                     <p className="text-xs text-gray-500">ID: {user.id || 'N/A'}</p>
                   </div>
-                  <Link href={user.id ? `/${user.id}` : '/'} onClick={() => setShowDropdown(false)} className="block px-4 py-2 text-sm hover:bg-gray-100">Profile Info</Link>
-                  {isAdmin(user) && pathname !== '/admin' && (
+                  {isAdmin(user) ? (
                     <Link href="/admin" onClick={() => setShowDropdown(false)} className="block px-4 py-2 text-sm hover:bg-gray-100">Admin Panel</Link>
+                  ) : (
+                    <Link href={user.id ? `/${user.id}` : '/'} onClick={() => setShowDropdown(false)} className="block px-4 py-2 text-sm hover:bg-gray-100">Profile Info</Link>
                   )}
                   <button
                     onClick={() => {

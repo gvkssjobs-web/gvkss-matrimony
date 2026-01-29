@@ -32,12 +32,7 @@ function LoginForm() {
         router.push(redirectTo);
         return;
       }
-      const userRole = currentUser.role;
-      if (userRole === 'admin') {
-        router.push('/admin');
-      } else {
-        router.push('/');
-      }
+      router.push('/');
     }
   }, [router, redirectTo]);
 
@@ -67,9 +62,8 @@ function LoginForm() {
           router.push(redirectTo);
           return;
         }
-        if (userRole === 'admin') {
-          router.push('/admin');
-        } else if (userStatus !== 'accepted') {
+        // All users (including admin) go to home; admin can reach /admin via navbar dropdown
+        if (userStatus !== 'accepted') {
           router.push('/status');
         } else {
           router.push('/');
