@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getCurrentUser } from '@/lib/auth';
 
 interface UserProfile {
   id: number;
@@ -43,6 +44,14 @@ export default function UserProfilePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // Require login to view any profile
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      const profileId = params.id as string;
+      router.replace(`/login?redirect=/${profileId}`);
+      return;
+    }
+
     const fetchUser = async () => {
       try {
         setLoading(true);
@@ -77,7 +86,7 @@ export default function UserProfilePage() {
     if (params.id) {
       fetchUser();
     }
-  }, [params.id]);
+  }, [params.id, router]);
 
   const getPhotoUrl = () => {
     if (!user) return null;

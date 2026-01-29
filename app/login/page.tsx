@@ -1,12 +1,22 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 
+// Safe redirect: only allow same-origin paths starting with /
+function getRedirectPath(redirect: string | null): string | null {
+  if (!redirect || typeof redirect !== 'string') return null;
+  const path = redirect.startsWith('/') ? redirect : `/${redirect}`;
+  if (!path.startsWith('/') || path.startsWith('//')) return null;
+  return path;
+}
+
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = getRedirectPath(searchParams.get('redirect'));
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -18,6 +28,10 @@ export default function LoginPage() {
   useEffect(() => {
     const currentUser = getCurrentUser();
     if (currentUser) {
+      if (redirectTo) {
+        router.push(redirectTo);
+        return;
+      }
       const userRole = currentUser.role;
       if (userRole === 'admin') {
         router.push('/admin');
@@ -25,7 +39,7 @@ export default function LoginPage() {
         router.push('/');
       }
     }
-  }, [router]);
+  }, [router, redirectTo]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,11 +61,15 @@ export default function LoginPage() {
         localStorage.setItem('user', JSON.stringify(data.user));
         const userRole = data.user.role;
         const userStatus = data.user.status;
-        
+
+        // If they came from a profile link, send them back after login
+        if (redirectTo) {
+          router.push(redirectTo);
+          return;
+        }
         if (userRole === 'admin') {
           router.push('/admin');
         } else if (userStatus !== 'accepted') {
-          // If status is null, 'pending', or 'rejected', redirect to status page
           router.push('/status');
         } else {
           router.push('/');
@@ -98,7 +116,7 @@ export default function LoginPage() {
             fontSize: '14px',
             textAlign: 'center'
           }}>
-            Sign in to your account to continue
+            {redirectTo ? 'Please sign in to view this profile.' : 'Sign in to your account to continue'}
           </p>
         </div>
 
