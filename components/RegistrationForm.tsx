@@ -81,10 +81,10 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         break;
       case 4: // Horoscope
         if (!formData.star) errors.push('Star is required');
-        if (!formData.raasi) errors.push('Raasi is required');
-        if (!formData.gothram) errors.push('Gothram is required');
+        if (!formData.raasi) errors.push('Rasi is required');
         if (!formData.padam) errors.push('Padam is required');
-        if (!formData.uncleGothram) errors.push('Uncle Gothram is required');
+        if (!formData.gothram) errors.push('Gothram is required');
+        if (!formData.uncleGothram) errors.push('Uncle Gothram (Menamama) is required');
         break;
       case 5: // Education & Employment
         if (!formData.educationCategory) errors.push('Education Category is required');
@@ -687,9 +687,9 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             </select>
           </div>
 
-          {/* Raasi */}
+          {/* Rasi */}
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Raasi <span style={{ color: '#dc2626' }}>*</span></label>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Rasi <span style={{ color: '#dc2626' }}>*</span></label>
             <select
               value={formData.raasi}
               onChange={(e) => setFormData({ ...formData, raasi: e.target.value })}
@@ -699,28 +699,9 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             >
-              <option value="">Select Raasi</option>
+              <option value="">Select Rasi</option>
               {raasiOptions.map((raasi) => (
                 <option key={raasi} value={raasi}>{raasi}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Gothram */}
-          <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Gothram <span style={{ color: '#dc2626' }}>*</span></label>
-            <select
-              value={formData.gothram}
-              onChange={(e) => setFormData({ ...formData, gothram: e.target.value })}
-              required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: formData.gothram ? 'var(--text)' : '#9CA3AF' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            >
-              <option value="">Select Gothram</option>
-              {gothramOptions.map((gothram) => (
-                <option key={gothram} value={gothram}>{gothram}</option>
               ))}
             </select>
           </div>
@@ -744,9 +725,28 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             </select>
           </div>
 
-          {/* Uncle Gothram */}
+          {/* Gothram */}
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Uncle Gothram <span style={{ color: '#dc2626' }}>*</span></label>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Gothram <span style={{ color: '#dc2626' }}>*</span></label>
+            <select
+              value={formData.gothram}
+              onChange={(e) => setFormData({ ...formData, gothram: e.target.value })}
+              required
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: formData.gothram ? 'var(--text)' : '#9CA3AF' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            >
+              <option value="">Select Gothram</option>
+              {gothramOptions.map((gothram) => (
+                <option key={gothram} value={gothram}>{gothram}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Uncle Gothram (Menamama) */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Uncle Gothram (Menamama) <span style={{ color: '#dc2626' }}>*</span></label>
             <select
               value={formData.uncleGothram}
               onChange={(e) => setFormData({ ...formData, uncleGothram: e.target.value })}
@@ -756,7 +756,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             >
-              <option value="">Select Uncle Gothram</option>
+              <option value="">Select Uncle Gothram (Menamama)</option>
               {gothramOptions.map((gothram) => (
                 <option key={gothram} value={gothram}>{gothram}</option>
               ))}

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 export default function ScrollingHeadline() {
   const [isHovering, setIsHovering] = useState(false);
-  const welcomeText = "Formerly Known as Manikanta Marriage Bureau Contact Number: 9573166450";
+  const welcomeText = "Formerly Known as Manikanta Marriage Bureau-9573166450";
 
   return (
     <>
@@ -22,17 +22,23 @@ export default function ScrollingHeadline() {
             display: 'inline-flex'
           }}
         >
-          {/* Only two repetitions with large gap (25vw) between them; two identical halves for seamless loop */}
-          <span className="font-semibold text-sm" style={{ paddingLeft: '15vw', paddingRight: '20vw' }}>
+          {/* Three repetitions per half; minimal gap between last and first */}
+          <span className="font-semibold text-sm" style={{ paddingLeft: '8vw', paddingRight: '15vw' }}>
             {welcomeText}
           </span>
-          <span className="font-semibold text-sm" style={{ paddingRight: '25vw' }}>
+          <span className="font-semibold text-sm" style={{ paddingRight: '15vw' }}>
             {welcomeText}
           </span>
-          <span className="font-semibold text-sm" aria-hidden="true" style={{ paddingLeft: '50vw', paddingRight: '25vw' }}>
+          <span className="font-semibold text-sm" style={{ paddingRight: '57vw' }}>
             {welcomeText}
           </span>
-          <span className="font-semibold text-sm" aria-hidden="true" style={{ paddingRight: '25vw' }}>
+          <span className="font-semibold text-sm" aria-hidden="true" style={{ paddingLeft: '8vw', paddingRight: '15vw' }}>
+            {welcomeText}
+          </span>
+          <span className="font-semibold text-sm" aria-hidden="true" style={{ paddingRight: '15vw' }}>
+            {welcomeText}
+          </span>
+          <span className="font-semibold text-sm" aria-hidden="true" style={{ paddingRight: '57vw' }}>
             {welcomeText}
           </span>
         </div>
