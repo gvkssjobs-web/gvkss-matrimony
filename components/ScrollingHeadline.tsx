@@ -1,31 +1,39 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 export default function ScrollingHeadline() {
-  const welcomeText = "Manikanta Marriage Bureau 9573166450";
-  const repeatedText = welcomeText.repeat(8);
+  const [isHovering, setIsHovering] = useState(false);
+  const welcomeText = "Formerly Known as Manikanta Marriage Bureau Contact Number: 9573166450";
 
   return (
     <>
       <div 
-        className="fixed top-0 left-0 right-0 z-[60] bg-pink-600 text-white overflow-hidden flex items-center" 
-        style={{ height: '30px' }}
+        className="fixed top-0 left-0 right-0 z-[60] text-white overflow-hidden flex items-center cursor-default"
+        style={{ height: '30px', backgroundColor: '#16a34a' }}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
       >
         <div 
           className="flex items-center whitespace-nowrap"
           style={{
-            animation: 'scrollHeadline 25s linear infinite',
+            animation: 'scrollHeadline 50s linear infinite',
+            animationPlayState: isHovering ? 'paused' : 'running',
             display: 'inline-flex'
           }}
         >
-          {/* Equal spacing at start - using viewport width for consistent spacing */}
-          <span className="font-semibold text-sm" style={{ paddingLeft: '50vw', paddingRight: '1rem' }}>
-            {repeatedText}
+          {/* Only two repetitions with large gap (25vw) between them; two identical halves for seamless loop */}
+          <span className="font-semibold text-sm" style={{ paddingLeft: '15vw', paddingRight: '20vw' }}>
+            {welcomeText}
           </span>
-          {/* Duplicate for seamless loop with equal spacing at end */}
-          <span className="font-semibold text-sm" aria-hidden="true" style={{ paddingRight: '50vw' }}>
-            {repeatedText}
+          <span className="font-semibold text-sm" style={{ paddingRight: '25vw' }}>
+            {welcomeText}
+          </span>
+          <span className="font-semibold text-sm" aria-hidden="true" style={{ paddingLeft: '50vw', paddingRight: '25vw' }}>
+            {welcomeText}
+          </span>
+          <span className="font-semibold text-sm" aria-hidden="true" style={{ paddingRight: '25vw' }}>
+            {welcomeText}
           </span>
         </div>
       </div>
