@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const client = await pool.connect();
     try {
       const result = await client.query(
-        'SELECT id, profile_id, email, name, role, photo, phone_number, gender FROM users WHERE email = $1',
+        'SELECT id, email, name, role, photo, phone_number, gender FROM users WHERE email = $1',
         [email]
       );
 
@@ -34,7 +34,6 @@ export async function GET(request: NextRequest) {
         {
           user: {
             id: user.id,
-            profileId: user.profile_id ?? user.id,
             email: user.email,
             name: user.name,
             role: user.role || 'user',

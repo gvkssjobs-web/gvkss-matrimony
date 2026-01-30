@@ -94,33 +94,34 @@ export async function POST(request: NextRequest) {
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Random profile_id for new registrations (100000–999999); assigned 5000+ when accepted
-      let profileId: number;
+      // Random id for new registrations (100000–999999); changed to 5000+ when admin accepts
+      let newId: number;
       for (let attempt = 0; attempt < 20; attempt++) {
-        profileId = 100000 + Math.floor(Math.random() * 900000);
-        const exists = await client.query('SELECT 1 FROM users WHERE profile_id = $1', [profileId]);
+        newId = 100000 + Math.floor(Math.random() * 900000);
+        const exists = await client.query('SELECT 1 FROM users WHERE id = $1', [newId]);
         if (exists.rows.length === 0) break;
       }
-      const finalProfileId = profileId!;
+      const finalId = newId!;
 
-      // Insert new user with all fields (status is NULL initially, profile_id random)
+      // Insert new user with explicit id (status NULL until admin accepts)
       const result = await client.query(
         `INSERT INTO users (
-          email, password, name, role, photo, phone_number, gender, dob,
+          id, email, password, name, role, photo, phone_number, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
           star, raasi, gothram, padam, uncle_gothram,
-          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, status, profile_id
+          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, status
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, NULL, $27
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, NULL
         ) RETURNING id, email, name, role, photo, phone_number, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
           star, raasi, gothram, padam, uncle_gothram,
-          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, status, profile_id`,
+          education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, status`,
         [
-          email, 
-          hashedPassword, 
-          name || null, 
-          userRole, 
+          finalId,
+          email,
+          hashedPassword,
+          name || null,
+          userRole,
           photo || null,
           phoneNumber || null,
           gender || null,
@@ -142,8 +143,7 @@ export async function POST(request: NextRequest) {
           occupation || null,
           occupationInDetails || null,
           annualIncome || null,
-          address || null,
-          finalProfileId
+          address || null
         ]
       );
 
@@ -159,7 +159,6 @@ export async function POST(request: NextRequest) {
           message: 'User registered successfully',
           user: {
             id: row.id,
-            profileId: row.profile_id ?? row.id,
             email: row.email,
             name: row.name,
             role: row.role,

@@ -31,7 +31,7 @@ export async function PATCH(
     const client = await pool.connect();
     try {
       const targetUserResult = await client.query(
-        'SELECT id FROM users WHERE profile_id = $1 OR id = $1 LIMIT 1',
+        'SELECT id FROM users WHERE id = $1 LIMIT 1',
         [idNum]
       );
       if (targetUserResult.rows.length === 0) {
@@ -204,14 +204,14 @@ export async function GET(
     try {
       const result = await client.query(
         `SELECT 
-          id, profile_id, email, name, role, photo, phone_number, gender, marriage_status,
+          id, email, name, role, photo, phone_number, gender, marriage_status,
           dob, birth_time, birth_place, height, complexion,
           star, raasi, gothram, padam, uncle_gothram,
           education_category, education_details, employed_in,
           occupation, occupation_in_details, annual_income,
           address, created_at, siblings_info, status
         FROM users 
-        WHERE profile_id = $1 OR id = $1
+        WHERE id = $1
         LIMIT 1`,
         [idNum]
       );
@@ -229,7 +229,6 @@ export async function GET(
         {
           user: {
             id: user.id,
-            profileId: user.profile_id ?? user.id,
             email: user.email,
             name: user.name,
             role: user.role || 'silver',
