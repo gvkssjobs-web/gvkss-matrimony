@@ -39,7 +39,7 @@ interface UserProfile {
   marriageStatus?: string | null;
 }
 
-type EditFormState = { [K in keyof UserProfile]?: UserProfile[K] | null };
+type EditFormState = { [K in keyof UserProfile]?: UserProfile[K] | null } & { gothramOther?: string | null; uncleGothramOther?: string | null };
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -126,9 +126,11 @@ export default function UserProfilePage() {
         complexion: user.complexion ?? '',
         star: user.star ?? '',
         raasi: user.raasi ?? '',
-        gothram: user.gothram ?? '',
+        gothram: user.gothram && gothramOptions.includes(user.gothram) ? user.gothram : (user.gothram ? 'Other' : ''),
+        gothramOther: user.gothram && !gothramOptions.includes(user.gothram) ? user.gothram : '',
         padam: user.padam ?? '',
-        uncleGothram: user.uncleGothram ?? '',
+        uncleGothram: user.uncleGothram && gothramOptions.includes(user.uncleGothram) ? user.uncleGothram : (user.uncleGothram ? 'Other' : ''),
+        uncleGothramOther: user.uncleGothram && !gothramOptions.includes(user.uncleGothram) ? user.uncleGothram : '',
         educationCategory: user.educationCategory ?? '',
         educationDetails: user.educationDetails ?? '',
         employedIn: user.employedIn ?? '',
@@ -208,10 +210,12 @@ export default function UserProfilePage() {
     setSaveSuccess('');
     try {
       const payload: Record<string, unknown> = {};
-      const keys = ['name', 'email', 'phoneNumber', 'address', 'gender', 'marriageStatus', 'dob', 'birthTime', 'birthPlace', 'height', 'complexion', 'star', 'raasi', 'gothram', 'padam', 'uncleGothram', 'educationCategory', 'educationDetails', 'employedIn', 'occupation', 'occupationInDetails', 'annualIncome', 'siblingsInfo'] as const;
+      const keys = ['name', 'email', 'phoneNumber', 'address', 'gender', 'marriageStatus', 'dob', 'birthTime', 'birthPlace', 'height', 'complexion', 'star', 'raasi', 'padam', 'educationCategory', 'educationDetails', 'employedIn', 'occupation', 'occupationInDetails', 'annualIncome', 'siblingsInfo'] as const;
       keys.forEach((k) => {
         if (k in editForm) payload[k] = (editForm as Record<string, unknown>)[k];
       });
+      payload.gothram = editForm.gothram === 'Other' ? (editForm.gothramOther ?? '') : (editForm.gothram ?? '');
+      payload.uncleGothram = editForm.uncleGothram === 'Other' ? (editForm.uncleGothramOther ?? '') : (editForm.uncleGothram ?? '');
 
       // Add currentUserEmail for authentication
       payload.currentUserEmail = currentUser.email;
@@ -709,39 +713,69 @@ export default function UserProfilePage() {
                       </div>
                     )}
                     {(editing || user.gothram) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Gothram:</span>
-                        {editing ? (
-                          <select
-                            value={editForm.gothram ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, gothram: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <option value="">Select</option>
-                            {gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-                          </select>
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.gothram || '-'}</span>
-                        )}
+                      <div className="flex flex-col gap-2 text-base">
+                        <div className="flex gap-2 items-center">
+                          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Gothram:</span>
+                          {editing ? (
+                            <>
+                              <select
+                                value={editForm.gothram ?? ''}
+                                onChange={(e) => setEditForm((f) => ({ ...f, gothram: e.target.value || null }))}
+                                className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
+                                style={{ borderColor: 'var(--border)' }}
+                              >
+                                <option value="">Select</option>
+                                {gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}
+                                <option value="Other">Other</option>
+                              </select>
+                              {editForm.gothram === 'Other' && (
+                                <input
+                                  type="text"
+                                  placeholder="Enter Gothram"
+                                  value={editForm.gothramOther ?? ''}
+                                  onChange={(e) => setEditForm((f) => ({ ...f, gothramOther: e.target.value || null }))}
+                                  className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
+                                  style={{ borderColor: 'var(--border)' }}
+                                />
+                              )}
+                            </>
+                          ) : (
+                            <span style={{ color: 'var(--text)' }}>{user.gothram || '-'}</span>
+                          )}
+                        </div>
                       </div>
                     )}
                     {(editing || user.uncleGothram) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Uncle Gothram (Menamama):</span>
-                        {editing ? (
-                          <select
-                            value={editForm.uncleGothram ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, uncleGothram: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <option value="">Select</option>
-                            {gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-                          </select>
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.uncleGothram || '-'}</span>
-                        )}
+                      <div className="flex flex-col gap-2 text-base">
+                        <div className="flex gap-2 items-center">
+                          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Uncle Gothram (Menamama):</span>
+                          {editing ? (
+                            <>
+                              <select
+                                value={editForm.uncleGothram ?? ''}
+                                onChange={(e) => setEditForm((f) => ({ ...f, uncleGothram: e.target.value || null }))}
+                                className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
+                                style={{ borderColor: 'var(--border)' }}
+                              >
+                                <option value="">Select</option>
+                                {gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}
+                                <option value="Other">Other</option>
+                              </select>
+                              {editForm.uncleGothram === 'Other' && (
+                                <input
+                                  type="text"
+                                  placeholder="Enter Uncle Gothram (Menamama)"
+                                  value={editForm.uncleGothramOther ?? ''}
+                                  onChange={(e) => setEditForm((f) => ({ ...f, uncleGothramOther: e.target.value || null }))}
+                                  className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
+                                  style={{ borderColor: 'var(--border)' }}
+                                />
+                              )}
+                            </>
+                          ) : (
+                            <span style={{ color: 'var(--text)' }}>{user.uncleGothram || '-'}</span>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

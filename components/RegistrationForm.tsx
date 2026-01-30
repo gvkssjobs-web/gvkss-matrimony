@@ -21,8 +21,10 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
     star: '',
     raasi: '',
     gothram: '',
+    gothramOther: '',
     padam: '',
     uncleGothram: '',
+    uncleGothramOther: '',
     educationCategory: '',
     educationDetails: '',
     employedIn: '',
@@ -84,7 +86,9 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         if (!formData.raasi) errors.push('Rasi is required');
         if (!formData.padam) errors.push('Padam is required');
         if (!formData.gothram) errors.push('Gothram is required');
+        if (formData.gothram === 'Other' && !formData.gothramOther?.trim()) errors.push('Please enter Gothram');
         if (!formData.uncleGothram) errors.push('Uncle Gothram (Menamama) is required');
+        if (formData.uncleGothram === 'Other' && !formData.uncleGothramOther?.trim()) errors.push('Please enter Uncle Gothram (Menamama)');
         break;
       case 5: // Education & Employment
         if (!formData.educationCategory) errors.push('Education Category is required');
@@ -269,9 +273,9 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
           siblingsInfo: siblingsInfo,
           star: formData.star,
           raasi: formData.raasi,
-          gothram: formData.gothram,
+          gothram: formData.gothram === 'Other' ? formData.gothramOther : formData.gothram,
           padam: formData.padam,
-          uncleGothram: formData.uncleGothram,
+          uncleGothram: formData.uncleGothram === 'Other' ? formData.uncleGothramOther : formData.uncleGothram,
           educationCategory: formData.educationCategory,
           educationDetails: formData.educationDetails,
           employedIn: formData.employedIn,
@@ -741,7 +745,20 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               {gothramOptions.map((gothram) => (
                 <option key={gothram} value={gothram}>{gothram}</option>
               ))}
+              <option value="Other">Other</option>
             </select>
+            {formData.gothram === 'Other' && (
+              <input
+                type="text"
+                placeholder="Enter Gothram"
+                value={formData.gothramOther}
+                onChange={(e) => setFormData({ ...formData, gothramOther: e.target.value })}
+                className="w-full mt-2 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+              />
+            )}
           </div>
 
           {/* Uncle Gothram (Menamama) */}
@@ -760,7 +777,20 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               {gothramOptions.map((gothram) => (
                 <option key={gothram} value={gothram}>{gothram}</option>
               ))}
+              <option value="Other">Other</option>
             </select>
+            {formData.uncleGothram === 'Other' && (
+              <input
+                type="text"
+                placeholder="Enter Uncle Gothram (Menamama)"
+                value={formData.uncleGothramOther}
+                onChange={(e) => setFormData({ ...formData, uncleGothramOther: e.target.value })}
+                className="w-full mt-2 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+              />
+            )}
           </div>
             </>
           )}
