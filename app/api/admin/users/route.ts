@@ -34,11 +34,13 @@ export async function GET(request: NextRequest) {
 // PATCH - Update user role or status (admin only)
 export async function PATCH(request: NextRequest) {
   try {
-    const { userId, role, status } = await request.json();
+    const body = await request.json();
+    const userId = body.userId != null ? Number(body.userId) : null;
+    const { role, status } = body;
 
-    if (!userId) {
+    if (userId == null || isNaN(userId)) {
       return NextResponse.json(
-        { error: 'User ID is required' },
+        { error: 'User ID is required and must be a number' },
         { status: 400 }
       );
     }
@@ -90,18 +92,48 @@ export async function PATCH(request: NextRequest) {
 
       await client.query('DELETE FROM notifications WHERE user_id = $1', [userId]).catch(() => {});
 
-      // When accepting, assign next id from 5000 (update the id column itself)
+      // When accepting, assign next serial id from 5000 (5000, 5001, 5002, ...)
+      // Must use smallest available id >= 5000, NOT MAX(id)+1 (random ids like 887458 would give 887460)
       let returnedUser = result.rows[0];
       if (status === 'accepted') {
-        const nextResult = await client.query(
-          'SELECT COALESCE(MAX(id), 4999) + 1 AS next_id FROM users WHERE id >= 5000'
-        ).catch(() => ({ rows: [{ next_id: 5000 }] }));
-        const nextId = nextResult.rows[0]?.next_id ?? 5000;
-        await client.query(
-          'UPDATE users SET id = $1 WHERE id = $2',
-          [nextId, userId]
-        ).catch(() => {});
-        returnedUser = { ...returnedUser, id: nextId };
+        let nextId: number;
+        try {
+          const nextResult = await client.query(
+            "SELECT nextval('accepted_user_id_seq') AS next_id"
+          );
+          nextId = Number(nextResult.rows[0]?.next_id ?? 5000);
+        } catch {
+          // Sequence not created: use first available id in 5000, 5001, 5002, ...
+          const gapResult = await client.query(
+            `SELECT i AS next_id FROM generate_series(5000, 99999) i 
+             WHERE NOT EXISTS (SELECT 1 FROM users u WHERE u.id = i) 
+             ORDER BY i LIMIT 1`
+          );
+          nextId = Number(gapResult.rows[0]?.next_id ?? 5000);
+        }
+        console.log('[Accept] Updating user id', userId, '->', nextId);
+        try {
+          const updateIdResult = await client.query(
+            'UPDATE users SET id = $1 WHERE id = $2',
+            [nextId, userId]
+          );
+          if (updateIdResult.rowCount !== 1) {
+            console.error('[Accept] id update rowCount', updateIdResult.rowCount, { userId, nextId });
+            return NextResponse.json(
+              { error: 'Failed to assign new ID (update affected ' + updateIdResult.rowCount + ' rows).' },
+              { status: 500 }
+            );
+          }
+          console.log('[Accept] User id updated successfully:', userId, '->', nextId);
+          returnedUser = { ...returnedUser, id: nextId };
+        } catch (idUpdateErr: any) {
+          console.error('[Accept] id update failed', { userId, nextId, code: idUpdateErr?.code, message: idUpdateErr?.message });
+          const msg = idUpdateErr?.message || String(idUpdateErr);
+          return NextResponse.json(
+            { error: 'Failed to assign new ID. Database error: ' + msg },
+            { status: 500 }
+          );
+        }
       }
 
       return NextResponse.json(

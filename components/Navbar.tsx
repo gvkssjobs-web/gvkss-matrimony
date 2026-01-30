@@ -18,21 +18,26 @@ function Navbar() {
     setUser(currentUser);
     setPhotoError(false);
 
-    if (currentUser && !currentUser.id && currentUser.email) {
+    // Refresh user from API so we have latest id (e.g. after admin accept, id changes to 5000+)
+    if (currentUser?.email) {
       fetch(`/api/auth/current-user?email=${encodeURIComponent(currentUser.email)}`)
         .then(res => res.json())
         .then(data => {
-          if (data.user?.id) {
-            const updatedUser = { 
-              ...currentUser, 
+          if (data.user) {
+            const updatedUser = {
+              ...currentUser,
               id: data.user.id,
-              photo: data.user.photo || currentUser.photo
+              name: data.user.name ?? currentUser.name,
+              role: data.user.role ?? currentUser.role,
+              photo: data.user.photo ?? currentUser.photo,
+              phoneNumber: data.user.phoneNumber ?? currentUser.phoneNumber,
+              gender: data.user.gender ?? currentUser.gender,
             };
             localStorage.setItem('user', JSON.stringify(updatedUser));
             setUser(updatedUser);
           }
         })
-        .catch(err => console.error('Failed to refresh user:', err));
+        .catch(() => {});
     }
     if (currentUser && isAdmin(currentUser)) {
       fetch('/api/admin/notifications')
