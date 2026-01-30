@@ -62,8 +62,10 @@ function LoginForm() {
           router.push(redirectTo);
           return;
         }
-        // All users (including admin) go to home; admin can reach /admin via navbar dropdown
-        if (userStatus !== 'accepted') {
+        // Admin always goes to home; other users go to status if not accepted
+        if (userRole === 'admin') {
+          router.push('/');
+        } else if (userStatus !== 'accepted') {
           router.push('/status');
         } else {
           router.push('/');

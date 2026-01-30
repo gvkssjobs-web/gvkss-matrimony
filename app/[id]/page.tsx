@@ -919,24 +919,28 @@ export default function UserProfilePage() {
               top: dropdownPosition.top + 4,
             }}
           >
-            <button
-              type="button"
-              role="menuitem"
-              onClick={(e) => { e.stopPropagation(); handleProfileAction('reject'); }}
-              className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors first:rounded-t-md"
-              style={{ color: '#C7365A' }}
-            >
-              Reject
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              onClick={(e) => { e.stopPropagation(); handleProfileAction('accept'); }}
-              className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors"
-              style={{ color: '#15803d' }}
-            >
-              Accept
-            </button>
+            {user.status?.toLowerCase() !== 'rejected' && (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={(e) => { e.stopPropagation(); handleProfileAction('reject'); }}
+                className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors first:rounded-t-md"
+                style={{ color: '#C7365A' }}
+              >
+                Reject
+              </button>
+            )}
+            {user.status?.toLowerCase() !== 'accepted' && (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={(e) => { e.stopPropagation(); handleProfileAction('accept'); }}
+                className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors ${user.status?.toLowerCase() === 'rejected' ? 'first:rounded-t-md' : ''}`}
+                style={{ color: '#15803d' }}
+              >
+                Accept
+              </button>
+            )}
             <button
               type="button"
               role="menuitem"

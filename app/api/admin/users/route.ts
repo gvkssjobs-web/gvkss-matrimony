@@ -88,6 +88,8 @@ export async function PATCH(request: NextRequest) {
         );
       }
 
+      await client.query('DELETE FROM notifications WHERE user_id = $1', [userId]).catch(() => {});
+
       return NextResponse.json(
         {
           message: role ? 'User role updated successfully' : 'User status updated successfully',

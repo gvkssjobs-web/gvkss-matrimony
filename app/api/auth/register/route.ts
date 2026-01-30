@@ -137,6 +137,12 @@ export async function POST(request: NextRequest) {
         ]
       );
 
+      const newUserId = result.rows[0].id;
+      await client.query(
+        'INSERT INTO notifications (user_id) VALUES ($1)',
+        [newUserId]
+      ).catch(() => {});
+
       return NextResponse.json(
         {
           message: 'User registered successfully',

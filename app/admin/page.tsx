@@ -302,6 +302,9 @@ export default function AdminPage() {
         (() => {
           const targetUser = users.find((u) => u.id === actionsOpenForId);
           if (!targetUser) return null;
+          const status = targetUser.status?.toLowerCase() || null;
+          const showReject = status !== 'rejected';
+          const showAccept = status !== 'accepted';
           return (
             <>
               <div
@@ -322,24 +325,28 @@ export default function AdminPage() {
                     : { top: dropdownPosition.top + 4 }),
                 }}
               >
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={(e) => { e.stopPropagation(); handleAction(targetUser.id, 'reject'); }}
-                  className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors first:rounded-t-md"
-                  style={{ color: '#C7365A' }}
-                >
-                  Reject
-                </button>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={(e) => { e.stopPropagation(); handleAction(targetUser.id, 'accept'); }}
-                  className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors"
-                  style={{ color: '#15803d' }}
-                >
-                  Accept
-                </button>
+                {showReject && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={(e) => { e.stopPropagation(); handleAction(targetUser.id, 'reject'); }}
+                    className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors first:rounded-t-md"
+                    style={{ color: '#C7365A' }}
+                  >
+                    Reject
+                  </button>
+                )}
+                {showAccept && (
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={(e) => { e.stopPropagation(); handleAction(targetUser.id, 'accept'); }}
+                    className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-pink-50 transition-colors ${!showReject ? 'first:rounded-t-md' : ''}`}
+                    style={{ color: '#15803d' }}
+                  >
+                    Accept
+                  </button>
+                )}
                 <button
                   type="button"
                   role="menuitem"
