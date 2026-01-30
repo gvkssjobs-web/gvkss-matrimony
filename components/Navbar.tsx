@@ -57,11 +57,11 @@ function Navbar() {
 
   return (
     <nav className="fixed w-full z-50 bg-pink-600 transition-all duration-200" style={{ top: '30px' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex justify-between items-center">
         
-        {/* Left: Logo only */}
-        <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-          <Image src="/logo.jpg" alt="Logo" width={50} height={40} priority />
+        {/* Left: Logo - fills navbar height */}
+        <Link href="/" className="flex items-center h-full shrink-0 hover:opacity-90 transition-opacity">
+          <Image src="/logo.jpg" alt="Logo" width={120} height={56} className="object-contain object-left h-full w-auto" priority />
         </Link>
 
         {/* Right: Links + Auth */}
