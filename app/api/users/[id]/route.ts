@@ -8,9 +8,10 @@ export async function PATCH(
 ) {
   try {
     const resolvedParams = params instanceof Promise ? await params : params;
-    const userId = parseInt(resolvedParams.id);
+    const idParam = resolvedParams.id;
+    const idNum = parseInt(idParam);
 
-    if (isNaN(userId)) {
+    if (isNaN(idNum)) {
       return NextResponse.json(
         { error: 'Invalid user ID' },
         { status: 400 }
@@ -29,7 +30,15 @@ export async function PATCH(
 
     const client = await pool.connect();
     try {
-      // Verify the current user matches the profile being updated
+      const targetUserResult = await client.query(
+        'SELECT id FROM users WHERE profile_id = $1 OR id = $1 LIMIT 1',
+        [idNum]
+      );
+      if (targetUserResult.rows.length === 0) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+      const userId = targetUserResult.rows[0].id;
+
       const currentUserResult = await client.query(
         'SELECT id, role FROM users WHERE email = $1',
         [currentUserEmail]
@@ -45,7 +54,6 @@ export async function PATCH(
       const currentUser = currentUserResult.rows[0];
       const isAdmin = currentUser.role === 'admin';
 
-      // Users can only update their own profile (unless admin)
       if (!isAdmin && currentUser.id !== userId) {
         return NextResponse.json(
           { error: 'You can only update your own profile' },
@@ -183,9 +191,9 @@ export async function GET(
       );
     }
 
-    const userId = parseInt(idParam);
+    const idNum = parseInt(idParam);
 
-    if (isNaN(userId)) {
+    if (isNaN(idNum)) {
       return NextResponse.json(
         { error: 'Invalid user ID. Must be a number.' },
         { status: 400 }
@@ -196,15 +204,16 @@ export async function GET(
     try {
       const result = await client.query(
         `SELECT 
-          id, email, name, role, photo, phone_number, gender, marriage_status,
+          id, profile_id, email, name, role, photo, phone_number, gender, marriage_status,
           dob, birth_time, birth_place, height, complexion,
           star, raasi, gothram, padam, uncle_gothram,
           education_category, education_details, employed_in,
           occupation, occupation_in_details, annual_income,
           address, created_at, siblings_info, status
         FROM users 
-        WHERE id = $1`,
-        [userId]
+        WHERE profile_id = $1 OR id = $1
+        LIMIT 1`,
+        [idNum]
       );
 
       if (result.rows.length === 0) {
@@ -220,6 +229,7 @@ export async function GET(
         {
           user: {
             id: user.id,
+            profileId: user.profile_id ?? user.id,
             email: user.email,
             name: user.name,
             role: user.role || 'silver',

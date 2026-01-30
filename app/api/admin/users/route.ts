@@ -90,6 +90,18 @@ export async function PATCH(request: NextRequest) {
 
       await client.query('DELETE FROM notifications WHERE user_id = $1', [userId]).catch(() => {});
 
+      // When accepting, assign next profile_id from 5000
+      if (status === 'accepted') {
+        const nextResult = await client.query(
+          'SELECT COALESCE(MAX(profile_id), 4999) + 1 AS next_id FROM users WHERE profile_id >= 5000'
+        ).catch(() => ({ rows: [{ next_id: 5000 }] }));
+        const nextProfileId = nextResult.rows[0]?.next_id ?? 5000;
+        await client.query(
+          'UPDATE users SET profile_id = $1 WHERE id = $2',
+          [nextProfileId, userId]
+        ).catch(() => {});
+      }
+
       return NextResponse.json(
         {
           message: role ? 'User role updated successfully' : 'User status updated successfully',

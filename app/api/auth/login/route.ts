@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       const client = await pool.connect();
       try {
         const result = await client.query(
-          'SELECT id, email, password, name, role, photo, phone_number, gender, status FROM users WHERE email = $1',
+          'SELECT id, profile_id, email, password, name, role, photo, phone_number, gender, status FROM users WHERE email = $1',
           [email]
         );
 
@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
           message: 'Login successful',
           user: {
             id: user.id,
+            profileId: user.profile_id ?? user.id,
             email: user.email,
             name: user.name,
             role: user.role || 'user',
