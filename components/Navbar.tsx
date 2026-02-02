@@ -68,22 +68,36 @@ function Navbar() {
   };
 
   return (
-    <nav className="fixed w-full z-50 bg-pink-600 transition-all duration-200" style={{ top: '30px' }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex justify-between items-center">
-        
-        {/* Left: Logo - fills navbar height */}
-        <Link href="/" className="flex items-center h-full shrink-0 hover:opacity-90 transition-opacity">
-          <Image src="/logo.png" alt="Logo" width={120} height={56} className="object-contain object-left h-full w-auto" priority />
+    <nav
+      className="fixed w-full z-50 transition-all duration-200 overflow-hidden"
+      style={{
+        top: '30px',
+        background: 'linear-gradient(90deg, #FFB6C1 0%, #FF69B4 50%, #E91E8C 100%)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      }}
+    >
+      {/* Optional subtle wave at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-3 overflow-hidden pointer-events-none" aria-hidden>
+        <svg viewBox="0 0 1200 12" className="absolute bottom-0 w-full h-full" preserveAspectRatio="none">
+          <path fill="rgba(255,255,255,0.15)" d="M0,12 Q300,0 600,12 T1200,12 L1200,12 L0,12 Z" />
+        </svg>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center relative">
+        {/* Left: Logo - larger, no hover, transparent over gradient */}
+        <Link href="/" className="nav-logo flex items-center h-full shrink-0 bg-transparent [&_span]:!bg-transparent [&_img]:!bg-transparent">
+          <span className="flex items-center h-full mix-blend-multiply">
+            <Image src="/logo.png" alt="Deepthi Matrimony" width={180} height={64} className="object-contain object-left h-full w-auto min-w-[140px]" priority />
+          </span>
         </Link>
 
         {/* Right: Links + Auth */}
         <div className="flex items-center gap-4">
-
-          {/* Navigation Links */}
-          <Link href="/" className="text-white font-medium hover:opacity-80 transition-opacity">Home</Link>
+          <Link href="/" className="text-white font-medium">
+            Home
+          </Link>
           <Link
             href="#contact"
-            className="text-white font-medium hover:opacity-80 transition-opacity"
+            className="text-white font-medium"
             onClick={(e) => {
               e.preventDefault();
               document.querySelector('footer')?.scrollIntoView({ behavior: 'smooth' });
@@ -92,7 +106,6 @@ function Navbar() {
             Contact Us
           </Link>
 
-          {/* Admin: Notifications */}
           {user && isAdmin(user) && (
             <Link
               href="/admin/notification"
@@ -110,7 +123,6 @@ function Navbar() {
             </Link>
           )}
 
-          {/* User / Auth Buttons */}
           {user ? (
             <div className="relative avatar-dropdown">
               <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
@@ -131,8 +143,6 @@ function Navbar() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-
-              {/* Dropdown */}
               {showDropdown && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                   <div className="px-4 py-3 border-b border-gray-200">
@@ -161,13 +171,13 @@ function Navbar() {
             <>
               <Link
                 href="/register"
-                className="px-5 py-2 font-semibold rounded-lg bg-white text-pink-600 shadow hover:bg-gray-100 transition"
+                className="px-5 py-2 font-semibold rounded-lg bg-white text-black shadow-md hover:bg-gray-100 transition"
               >
                 Registration
               </Link>
               <Link
                 href="/login"
-                className="px-5 py-2 font-semibold rounded-lg bg-white text-pink-600 shadow hover:bg-gray-100 transition"
+                className="px-5 py-2 font-semibold rounded-lg bg-white text-black shadow hover:bg-gray-100 transition"
               >
                 Login
               </Link>

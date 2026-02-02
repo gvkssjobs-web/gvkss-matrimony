@@ -88,6 +88,44 @@ export default function Footer() {
                 </div>
               </div>
 
+              {/* Email with Mail Icon */}
+              <div className="flex items-start gap-2 group">
+                <div 
+                  className="flex-shrink-0 mt-0.5 p-1.5 rounded-lg transition-all duration-300" 
+                  style={{ 
+                    backgroundColor: '#FFE5E9',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FFD1D9';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#FFE5E9';
+                  }}
+                >
+                  <svg className="w-4 h-4 transition-colors duration-300" style={{ color: '#B22222' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <a 
+                    href="mailto:deepthimatrimony14@gmail.com" 
+                    className="text-sm font-medium transition-colors duration-200 inline-block" 
+                    style={{ color: '#1F2937' }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = '#B22222';
+                      e.currentTarget.style.textDecoration = 'underline';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = '#1F2937';
+                      e.currentTarget.style.textDecoration = 'none';
+                    }}
+                  >
+                    deepthimatrimony14@gmail.com
+                  </a>
+                </div>
+              </div>
+
               {/* Address with Location Icon */}
               <div className="flex items-start gap-2 group cursor-default">
                 <div 
