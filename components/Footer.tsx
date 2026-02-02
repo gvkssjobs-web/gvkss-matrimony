@@ -11,7 +11,7 @@ export default function Footer() {
           {/* Left: Deepthi Matrimony branding (photo) */}
           <div className="flex justify-center md:justify-start">
             <Image
-              src="/footer.jpeg"
+              src="/footer.png"
               alt="Deepthi Matrimony - Only for Arya Vysya - Established in 2010"
               width={220}
               height={92}
