@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Deepthi Matrimony",
   description: "Deepthi Matrimony - Find your life partner",
+  icons: { icon: "/svgviewer-output.svg" },
 };
 
 export default function RootLayout({
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="icon" href="/svgviewer-output.svg" type="image/svg+xml" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-200`}
@@ -35,7 +37,7 @@ export default function RootLayout({
         <div id="theme-wrapper" className="min-h-screen transition-colors duration-200 flex flex-col" style={{ background: 'linear-gradient(135deg, #FFF1F4 0%, #FFF5F7 40%, #FFFFFF 100%)' }}>
           <ScrollingHeadline />
           <Navbar />
-          <main id="theme-main" className="flex-1 flex min-h-screen flex-col items-center w-full transition-colors duration-200" style={{ backgroundColor: '#FFF1F4', paddingTop: '85px' }}>
+          <main id="theme-main" className="flex flex-col items-center w-full transition-colors duration-200" style={{ backgroundColor: '#FFF1F4', paddingTop: '85px' }}>
             {children}
           </main>
           <Footer />

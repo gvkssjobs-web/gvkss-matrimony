@@ -1,14 +1,27 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="border-t mt-auto" style={{ backgroundColor: '#FFF5F7', borderColor: '#FFE5E9' }}>
+    <footer className="border-t" style={{ backgroundColor: '#FFF5F7', borderColor: '#FFE5E9' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Contact Us */}
-          <div className="col-span-1 md:col-span-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-center">
+          {/* Left: Deepthi Matrimony branding (photo) */}
+          <div className="flex justify-center md:justify-start">
+            <Image
+              src="/estd.png"
+              alt="Deepthi Matrimony - Only for Arya Vysya - Established in 2010"
+              width={220}
+              height={92}
+              className="h-auto w-auto max-w-[220px] object-contain"
+              unoptimized
+            />
+          </div>
+
+          {/* Center: Contact Us */}
+          <div>
             <h3 className="text-base font-bold mb-3" style={{ color: '#B22222', letterSpacing: '0.5px' }}>Contact Us</h3>
             <div className="space-y-2">
               {/* Name with Person Icon */}
@@ -104,7 +117,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Right: Quick Links */}
           <div>
             <h4 className="text-sm font-semibold mb-2" style={{ color: '#111827' }}>Quick Links</h4>
             <ul className="space-y-1">
@@ -125,7 +138,6 @@ export default function Footer() {
               </li>
             </ul>
           </div>
-
         </div>
 
         {/* Bottom Bar */}
