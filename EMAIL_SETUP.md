@@ -12,7 +12,7 @@ SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 
 # Optional: "From" address (defaults to SMTP_USER)
-SMTP_FROM="GVKSS Matrimony <your-email@gmail.com>"
+SMTP_FROM="Deepthi Matrimony <your-email@gmail.com>"
 
 # Base URL for links in emails (use your real domain in production)
 NEXT_PUBLIC_APP_URL=http://localhost:3000

@@ -23,7 +23,7 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
 
   return sendEmail({
     to,
-    subject: 'Verify your email - GVKSS Matrimony',
+    subject: 'Verify your email - Deepthi Matrimony',
     html,
     text: `Verify your email: ${verifyLink}`,
   }).then((sent) => (sent ? { sent: true } : { sent: false, link: verifyLink }));
@@ -42,7 +42,7 @@ export async function sendPasswordResetEmail(to: string, token: string): Promise
 
   return sendEmail({
     to,
-    subject: 'Reset your password - GVKSS Matrimony',
+    subject: 'Reset your password - Deepthi Matrimony',
     html,
     text: `Reset password: ${resetLink}`,
   }).then((sent) => (sent ? { sent: true } : { sent: false, link: resetLink }));

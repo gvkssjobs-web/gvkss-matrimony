@@ -151,7 +151,7 @@ export default function Footer() {
             </div>
             {/* Copyright and Company Name */}
             <div className="flex flex-col md:flex-row items-center justify-center gap-1">
-              <span className="text-xs" style={{ color: '#9CA3AF', fontSize: '11px' }}>GVKSS Software Pvt. Ltd.</span>
+              <span className="text-xs" style={{ color: '#9CA3AF', fontSize: '11px' }}>Deepthi Matrimony</span>
               <span className="text-xs" style={{ color: '#9CA3AF', fontSize: '11px' }}>
                 © {new Date().getFullYear()} All rights reserved.
               </span>
