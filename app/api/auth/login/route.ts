@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       const client = await pool.connect();
       try {
         const result = await client.query(
-          'SELECT id, email, password, name, role, photo, phone_number, gender, status FROM users WHERE email = $1',
+          'SELECT id, email, password, name, role, photo, phone_number, gender, status, email_verified_at, email_verification_token FROM users WHERE email = $1',
           [email]
         );
 
@@ -30,6 +30,13 @@ export async function POST(request: NextRequest) {
       }
 
       const user = result.rows[0];
+
+      if (user.role !== 'admin' && !user.email_verified_at && user.email_verification_token) {
+        return NextResponse.json(
+          { error: 'Please verify your email first. Check your inbox for the verification link.' },
+          { status: 403 }
+        );
+      }
 
       // Verify password
       const isValidPassword = await bcrypt.compare(password, user.password);

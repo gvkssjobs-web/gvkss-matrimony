@@ -355,8 +355,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         if (mode === 'admin_add') {
           router.push('/admin');
         } else {
-          localStorage.setItem('user', JSON.stringify(data.user));
-          router.push('/status');
+          router.push('/login?message=verify_email');
         }
       } else {
         setError(data.error || 'Registration failed');

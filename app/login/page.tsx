@@ -22,7 +22,19 @@ function LoginForm() {
     password: '',
   });
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const verified = searchParams.get('verified');
+    const err = searchParams.get('error');
+    const message = searchParams.get('message');
+    if (verified === '1') setSuccessMessage('Your email has been verified. You can sign in now.');
+    if (message === 'verify_email') setSuccessMessage('Account created. Please check your email to verify your account, then sign in.');
+    if (err === 'invalid_token') setError('Invalid or expired verification link.');
+    if (err === 'missing_token') setError('Invalid verification link.');
+    if (err === 'verify_failed') setError('Verification failed. Please try again or request a new link.');
+  }, [searchParams]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -128,6 +140,17 @@ function LoginForm() {
           </div>
         )}
 
+        {/* Success Message (e.g. after email verification) */}
+        {successMessage && (
+          <div className="mb-6 p-3 rounded-lg text-sm" style={{ 
+            backgroundColor: 'rgb(220 252 231)', 
+            border: '1px solid rgb(34 197 94)', 
+            color: 'rgb(22 101 52)' 
+          }}>
+            {successMessage}
+          </div>
+        )}
+
         {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-4">
           {/* Email */}
@@ -158,6 +181,11 @@ function LoginForm() {
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             />
+            <div className="mt-2 text-right">
+              <Link href="/forgot-password" className="text-sm font-medium" style={{ color: 'var(--primary)' }}>
+                Forgot password?
+              </Link>
+            </div>
           </div>
 
           <button

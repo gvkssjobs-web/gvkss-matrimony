@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -220,10 +222,17 @@ export async function POST(request: NextRequest) {
         [newUserId]
       ).catch(() => {});
 
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      await client.query(
+        'UPDATE users SET email_verification_token = $1 WHERE id = $2',
+        [verificationToken, newUserId]
+      );
+      await sendVerificationEmail(email, verificationToken);
+
       const row = result.rows[0];
       return NextResponse.json(
         {
-          message: 'User registered successfully',
+          message: 'User registered successfully. Please check your email to verify your account before signing in.',
           user: {
             id: row.id,
             email: row.email,

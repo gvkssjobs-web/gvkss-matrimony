@@ -231,7 +231,11 @@ export async function initDatabase() {
         { name: 'father_contact', type: 'VARCHAR(20)' },
         { name: 'mother_name', type: 'VARCHAR(255)' },
         { name: 'mother_occupation', type: 'VARCHAR(255)' },
-        { name: 'mother_contact', type: 'VARCHAR(20)' }
+        { name: 'mother_contact', type: 'VARCHAR(20)' },
+        { name: 'email_verification_token', type: 'VARCHAR(255)' },
+        { name: 'email_verified_at', type: 'TIMESTAMP' },
+        { name: 'password_reset_token', type: 'VARCHAR(255)' },
+        { name: 'password_reset_expires', type: 'TIMESTAMP' }
       ];
 
       for (const column of newColumns) {
