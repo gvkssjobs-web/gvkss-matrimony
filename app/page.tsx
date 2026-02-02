@@ -16,8 +16,9 @@ export default function Home() {
   const [minHeight, setMinHeight] = useState('');
   const [maxHeight, setMaxHeight] = useState('');
   const [profileId, setProfileId] = useState('');
-  const [brides, setBrides] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null }>>([]);
-  const [grooms, setGrooms] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null }>>([]);
+  const [brides, setBrides] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null; photoCount?: number }>>([]);
+  const [grooms, setGrooms] = useState<Array<{ id: number; name: string; photo: string | null; photo_s3_url: string | null; photoCount?: number }>>([]);
+  const [photoIndices, setPhotoIndices] = useState<Record<number, number>>({});
   const [dataLoading, setDataLoading] = useState(true);
   const [profileType, setProfileType] = useState<'bride' | 'groom'>('bride');
 
@@ -64,13 +65,15 @@ export default function Home() {
             id: bride.id,
             name: bride.name || 'N/A',
             photo: bride.photo || null,
-            photo_s3_url: bride.photo_s3_url || null
+            photo_s3_url: bride.photo_s3_url || null,
+            photoCount: bride.photoCount ?? 1
           })));
           setGrooms(data.grooms.map((groom: any) => ({
             id: groom.id,
             name: groom.name || 'N/A',
             photo: groom.photo || null,
-            photo_s3_url: groom.photo_s3_url || null
+            photo_s3_url: groom.photo_s3_url || null,
+            photoCount: groom.photoCount ?? 1
           })));
         } else {
           const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
@@ -504,61 +507,27 @@ export default function Home() {
           ) : (
             <div className="profiles-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '15px' }}>
               {(profileType === 'bride' ? brides : grooms).map((profile) => {
-                const getPhotoUrl = () => {
+                const photoCount = profile.photoCount ?? 1;
+                const photoIndex = photoIndices[profile.id] ?? 0;
+
+                const getPhotoUrl = (index?: number) => {
+                  const idx = index ?? photoIndex;
                   const photoUrl = profile.photo_s3_url || profile.photo;
-                  
-                  // If no photo URL but we have user ID, use blob API
-                  if (!photoUrl && profile.id) {
-                    return `/api/photo?userId=${profile.id}`;
-                  }
-                  
-                  if (!photoUrl) return null;
-                  
-                  // Check if photo is from S3 (more robust detection)
-                  const isS3Url = photoUrl && (
-                    photoUrl.includes('s3.amazonaws.com') || 
-                    photoUrl.includes('.s3.') ||
-                    photoUrl.includes('s3-') ||
-                    photoUrl.includes('amazonaws.com')
-                  );
-                  
-                  // Use PostgreSQL blob API for S3 URLs to avoid CORS issues
-                  if (isS3Url && profile.id) {
-                    return `/api/photo?userId=${profile.id}`;
-                  }
-                  
-                  // If photo starts with "local-", it means it's stored in DB blob
-                  if (photoUrl.startsWith('local-') && profile.id) {
-                    return `/api/photo?userId=${profile.id}`;
-                  }
-                  
-                  // Normalize the photo URL
+                  if (!profile.id) return null;
+                  if (photoCount > 1) return `/api/photo?userId=${profile.id}&index=${idx}`;
+                  if (!photoUrl) return `/api/photo?userId=${profile.id}&index=0`;
+                  const isS3Url = photoUrl && (photoUrl.includes('s3.amazonaws.com') || photoUrl.includes('.s3.') || photoUrl.includes('s3-') || photoUrl.includes('amazonaws.com'));
+                  if (isS3Url || photoUrl.startsWith('local-')) return `/api/photo?userId=${profile.id}&index=0`;
                   let normalizedUrl = photoUrl.trim();
-                  
-                  // Fix malformed URLs
-                  if (normalizedUrl.startsWith('https:/') && !normalizedUrl.startsWith('https://')) {
-                    normalizedUrl = normalizedUrl.replace('https:/', 'https://');
-                  }
-                  if (normalizedUrl.startsWith('http:/') && !normalizedUrl.startsWith('http://')) {
-                    normalizedUrl = normalizedUrl.replace('http:/', 'http://');
-                  }
-                  
-                  // Handle full URLs
-                  if (normalizedUrl.startsWith('http://') || normalizedUrl.startsWith('https://')) {
-                    return normalizedUrl;
-                  }
-                  
-                  // Handle relative paths
-                  if (normalizedUrl.startsWith('/')) {
-                    return normalizedUrl;
-                  }
-                  
-                  // If we have user ID but no valid URL, use blob API
-                  if (profile.id) {
-                    return `/api/photo?userId=${profile.id}`;
-                  }
-                  
-                  return `/${normalizedUrl}`;
+                  if (normalizedUrl.startsWith('https:/') && !normalizedUrl.startsWith('https://')) normalizedUrl = normalizedUrl.replace('https:/', 'https://');
+                  if (normalizedUrl.startsWith('http:/') && !normalizedUrl.startsWith('http://')) normalizedUrl = normalizedUrl.replace('http:/', 'http://');
+                  if (normalizedUrl.startsWith('http://') || normalizedUrl.startsWith('https://')) return normalizedUrl;
+                  if (normalizedUrl.startsWith('/')) return normalizedUrl;
+                  return `/api/photo?userId=${profile.id}&index=0`;
+                };
+
+                const setPhotoIndex = (next: number) => {
+                  setPhotoIndices(prev => ({ ...prev, [profile.id]: next }));
                 };
 
                 return (
@@ -588,8 +557,31 @@ export default function Home() {
                       overflow: 'hidden',
                       background: 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%)'
                     }}>
+                      {photoCount > 1 && (
+                        <div className="absolute top-2 right-2 z-10 flex gap-1" style={{ top: 8, right: 8 }} onClick={(e) => e.stopPropagation()}>
+                          <button
+                            type="button"
+                            onClick={() => setPhotoIndex(photoIndex <= 0 ? photoCount - 1 : photoIndex - 1)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg text-white"
+                            style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+                            aria-label="Previous photo"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPhotoIndex(photoIndex >= photoCount - 1 ? 0 : photoIndex + 1)}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg text-white"
+                            style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+                            aria-label="Next photo"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                          </button>
+                        </div>
+                      )}
                       {getPhotoUrl() ? (
                         <img
+                          key={photoIndex}
                           src={getPhotoUrl() || ''}
                           alt={profile.name}
                           style={{
@@ -599,13 +591,9 @@ export default function Home() {
                           }}
                           onError={(e) => {
                             const img = e.target as HTMLImageElement;
-                            if (img.src.includes('/api/photo')) {
-                              img.style.display = 'none';
-                            } else if (profile.id && (profile.photo_s3_url || profile.photo)?.includes('s3')) {
-                              img.src = `/api/photo?userId=${profile.id}`;
-                            } else {
-                              img.style.display = 'none';
-                            }
+                            if (img.src.includes('/api/photo')) img.style.display = 'none';
+                            else if (profile.id) { img.src = `/api/photo?userId=${profile.id}&index=0`; }
+                            else img.style.display = 'none';
                           }}
                         />
                       ) : (

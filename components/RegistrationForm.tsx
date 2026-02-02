@@ -9,6 +9,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
+    surname: '',
     gender: '', // Bride/Groom
     marriageStatus: '',
     dob: '',
@@ -16,6 +17,12 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
     birthPlace: '',
     height: '',
     complexion: '',
+    fatherName: '',
+    fatherOccupation: '',
+    fatherContact: '',
+    motherName: '',
+    motherOccupation: '',
+    motherContact: '',
     sisters: [{ name: '', marriageStatus: '' }],
     brothers: [{ name: '', marriageStatus: '' }],
     star: '',
@@ -31,10 +38,11 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
     occupation: '',
     occupationInDetails: '',
     annualIncome: '',
-    photo: null as File | null,
-    photoPreview: '',
+    photos: [{ file: null as File | null, preview: '' }, { file: null as File | null, preview: '' }, { file: null as File | null, preview: '' }, { file: null as File | null, preview: '' }],
     phone: '',
     phoneCode: '+91',
+    phone2: '',
+    phoneCode2: '+91',
     email: '',
     password: '',
     confirmPassword: '',
@@ -47,6 +55,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [phoneError, setPhoneError] = useState('');
+  const [phone2Error, setPhone2Error] = useState('');
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [stepErrors, setStepErrors] = useState<Record<number, string>>({});
 
@@ -55,7 +64,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
   const stepTitles = [
     'Personal & Basic Info',
     'Birth & Physical',
-    'Family (Siblings)',
+    'Family (Father, Mother, Siblings)',
     'Horoscope',
     'Education & Employment',
     'Photo & Contact',
@@ -69,6 +78,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
     switch (currentStep) {
       case 1: // Personal & Basic Info
         if (!formData.name?.trim()) errors.push('Name is required');
+        if (!formData.surname?.trim()) errors.push('Surname is required');
         if (!formData.gender) errors.push('Gender is required');
         if (!formData.marriageStatus) errors.push('Marriage Status is required');
         break;
@@ -79,12 +89,16 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         if (!formData.height?.trim()) errors.push('Height is required');
         if (!formData.complexion) errors.push('Complexion is required');
         break;
-      case 3: // Family (Siblings) - Optional, no validation needed
+      case 3: // Family (Father, Mother, Siblings)
+        if (!formData.fatherName?.trim()) errors.push("Father's Name is required");
+        if (!formData.fatherOccupation?.trim()) errors.push("Father's Occupation is required");
+        if (!formData.motherName?.trim()) errors.push("Mother's Name is required");
+        if (!formData.motherOccupation?.trim()) errors.push("Mother's Occupation is required");
         break;
       case 4: // Horoscope
         if (!formData.star) errors.push('Star is required');
         if (!formData.raasi) errors.push('Rasi is required');
-        if (!formData.padam) errors.push('Padam is required');
+        // Padam is optional
         if (!formData.gothram) errors.push('Gothram is required');
         if (formData.gothram === 'Other' && !formData.gothramOther?.trim()) errors.push('Please enter Gothram');
         if (!formData.uncleGothram) errors.push('Uncle Gothram (Menamama) is required');
@@ -96,9 +110,12 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         if (!formData.employedIn?.trim()) errors.push('Employed In is required');
         break;
       case 6: // Photo & Contact
-        if (!formData.photo) errors.push('Photo is required');
-        if (!formData.phone?.trim()) errors.push('Phone Number is required');
+        const photoCount = formData.photos.filter(p => p.file).length;
+        if (photoCount < 2) errors.push('At least 2 photos are required');
+        if (photoCount > 4) errors.push('Maximum 4 photos allowed');
+        if (!formData.phone?.trim()) errors.push('Phone Number (1) is required');
         if (phoneError) errors.push(phoneError);
+        if (phone2Error) errors.push(phone2Error);
         if (!formData.address?.trim()) errors.push('Address is required');
         break;
       case 7: // Account (Login)
@@ -161,30 +178,48 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
     }
   };
 
-  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const checkPhone2Availability = async (phoneToCheck: string) => {
+    if (!phoneToCheck?.trim()) { setPhone2Error(''); return; }
+    const full = (formData.phoneCode2 || '') + (phoneToCheck || '').replace(/\D/g, '');
+    if (full.length < 10) { setPhone2Error(''); return; }
+    try {
+      const res = await fetch(`/api/auth/check-availability?phone=${encodeURIComponent(full)}`);
+      const data = await res.json();
+      setPhone2Error(data.phoneTaken ? 'This phone number is already registered' : '');
+    } catch {
+      setPhone2Error('');
+    }
+  };
+
+  const handlePhotoChange = (index: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file');
       return;
     }
-
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       setError('Image size must be less than 5MB');
       return;
     }
-
-    setFormData({ ...formData, photo: file });
-    
-    // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
-      setFormData(prev => ({ ...prev, photoPreview: reader.result as string }));
+      setFormData(prev => {
+        const next = [...prev.photos];
+        next[index] = { file, preview: reader.result as string };
+        return { ...prev, photos: next };
+      });
     };
     reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const removePhoto = (index: number) => {
+    setFormData(prev => {
+      const next = [...prev.photos];
+      next[index] = { file: null, preview: '' };
+      return { ...prev, photos: next };
+    });
   };
 
 
@@ -206,44 +241,45 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
       return;
     }
 
-    if (emailError || phoneError) {
-      setError(emailError || phoneError);
+    if (emailError || phoneError || phone2Error) {
+      setError(emailError || phoneError || phone2Error);
       setLoading(false);
       return;
     }
 
     try {
-      let photoPath = null;
+      const photoFiles = formData.photos.filter(p => p.file).map(p => p.file!);
+      if (photoFiles.length < 2 || photoFiles.length > 4) {
+        setError('Please add between 2 and 4 photos');
+        setLoading(false);
+        return;
+      }
 
-      // Upload photo if provided
-      if (formData.photo) {
-        setUploadingPhoto(true);
+      setUploadingPhoto(true);
+      const photoPaths: (string | null)[] = [];
+      for (let i = 0; i < photoFiles.length; i++) {
         const photoFormData = new FormData();
-        photoFormData.append('photo', formData.photo);
-
+        photoFormData.append('photo', photoFiles[i]);
         const uploadResponse = await fetch('/api/upload/photo', {
           method: 'POST',
           body: photoFormData,
         });
-
         if (!uploadResponse.ok) {
           const uploadError = await uploadResponse.json();
-          // If S3 is not configured, we can still proceed - photo will be stored in DB during registration
           if (uploadError.error?.includes('AWS S3 storage not configured')) {
-            console.warn('S3 not configured, photo will be stored in database during registration');
-            photoPath = null; // Will be handled during registration
+            photoPaths.push(null);
           } else {
-            setError(uploadError.error || 'Failed to upload photo');
+            setError(uploadError.error || 'Failed to upload photo ' + (i + 1));
             setLoading(false);
             setUploadingPhoto(false);
             return;
           }
         } else {
           const uploadData = await uploadResponse.json();
-          photoPath = uploadData.s3Url || uploadData.path || null;
+          photoPaths.push(uploadData.s3Url || uploadData.path || null);
         }
-        setUploadingPhoto(false);
       }
+      setUploadingPhoto(false);
 
       // Prepare siblings info
       const siblingsInfo = {
@@ -259,11 +295,13 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         },
         body: JSON.stringify({
           name: formData.name,
+          surname: formData.surname,
           email: formData.email,
           password: formData.password,
           phoneNumber: formData.phoneCode + formData.phone,
+          phoneNumber2: formData.phone2?.trim() ? formData.phoneCode2 + formData.phone2 : null,
           gender: formData.gender,
-          photo: photoPath,
+          photos: photoPaths,
           dob: formData.dob,
           marriageStatus: formData.marriageStatus,
           birthTime: formData.birthTime,
@@ -283,34 +321,34 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
           occupationInDetails: formData.occupationInDetails,
           annualIncome: formData.annualIncome,
           address: formData.address,
+          fatherName: formData.fatherName?.trim() || null,
+          fatherOccupation: formData.fatherOccupation?.trim() || null,
+          fatherContact: formData.fatherContact?.trim() || null,
+          motherName: formData.motherName?.trim() || null,
+          motherOccupation: formData.motherOccupation?.trim() || null,
+          motherContact: formData.motherContact?.trim() || null,
         }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // If photo was provided but not uploaded yet, upload it now with userId
-        if (formData.photo && data.user?.id) {
-          try {
-            const updatePhotoFormData = new FormData();
-            updatePhotoFormData.append('photo', formData.photo);
-            updatePhotoFormData.append('userId', data.user.id.toString());
-            
-            const photoUploadResponse = await fetch('/api/upload/photo', {
-              method: 'POST',
-              body: updatePhotoFormData,
-            });
-            
-            if (!photoUploadResponse.ok) {
-              const photoError = await photoUploadResponse.json();
-              // If S3 is not configured, that's okay - photo blob will be stored during registration
-              if (!photoError.error?.includes('AWS S3 storage not configured')) {
-                console.error('Failed to update photo blob:', photoError);
+        const photoFilesForBlob = formData.photos.filter(p => p.file).map(p => p.file!);
+        if (photoFilesForBlob.length && data.user?.id) {
+          for (let i = 0; i < photoFilesForBlob.length; i++) {
+            try {
+              const fd = new FormData();
+              fd.append('photo', photoFilesForBlob[i]);
+              fd.append('userId', data.user.id.toString());
+              fd.append('index', String(i));
+              const r = await fetch('/api/upload/photo', { method: 'POST', body: fd });
+              if (!r.ok) {
+                const err = await r.json();
+                if (!err.error?.includes('AWS S3 storage not configured')) console.error('Photo blob upload:', err);
               }
+            } catch (err) {
+              console.error('Photo blob upload:', err);
             }
-          } catch (err) {
-            console.error('Failed to update photo blob:', err);
-            // Non-critical error, continue with registration
           }
         }
         
@@ -415,10 +453,33 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Name <span style={{ color: '#dc2626' }}>*</span></label>
             <input
               type="text"
-              placeholder="Enter Your Name"
+              placeholder="Enter Your First Name"
               value={formData.name}
               onChange={(e) => {
                 setFormData({ ...formData, name: e.target.value });
+                if (stepErrors[1]) {
+                  const newErrors = { ...stepErrors };
+                  delete newErrors[1];
+                  setStepErrors(newErrors);
+                }
+              }}
+              required
+              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
+          </div>
+
+          {/* Surname */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Surname <span style={{ color: '#dc2626' }}>*</span></label>
+            <input
+              type="text"
+              placeholder="Enter Your Surname"
+              value={formData.surname}
+              onChange={(e) => {
+                setFormData({ ...formData, surname: e.target.value });
                 if (stepErrors[1]) {
                   const newErrors = { ...stepErrors };
                   delete newErrors[1];
@@ -576,9 +637,72 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             </>
           )}
 
-          {/* Step 3: Family (Siblings) */}
+          {/* Step 3: Family (Father, Mother, Siblings) */}
           {currentStep === 3 && (
             <>
+          <p style={{ marginBottom: '12px', color: 'var(--muted)', fontSize: '13px' }}>Father & Mother details are required. Contact numbers are optional. Then add siblings below.</p>
+          {/* Father & Mother */}
+          <div className="mb-4 p-3 rounded-xl border-2" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--card)' }}>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text)', marginBottom: '10px' }}>Father <span style={{ color: '#dc2626' }}>*</span></h3>
+            <div className="space-y-2 mb-3">
+              <input
+                type="text"
+                placeholder="Father's Name *"
+                value={formData.fatherName}
+                onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
+                required
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              />
+              <input
+                type="text"
+                placeholder="Father's Occupation *"
+                value={formData.fatherOccupation}
+                onChange={(e) => setFormData({ ...formData, fatherOccupation: e.target.value })}
+                required
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              />
+              <input
+                type="tel"
+                placeholder="Father's Contact (optional)"
+                value={formData.fatherContact}
+                onChange={(e) => setFormData({ ...formData, fatherContact: e.target.value })}
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              />
+            </div>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text)', marginTop: '14px', marginBottom: '10px' }}>Mother <span style={{ color: '#dc2626' }}>*</span></h3>
+            <div className="space-y-2">
+              <input
+                type="text"
+                placeholder="Mother's Name *"
+                value={formData.motherName}
+                onChange={(e) => setFormData({ ...formData, motherName: e.target.value })}
+                required
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              />
+              <input
+                type="text"
+                placeholder="Mother's Occupation *"
+                value={formData.motherOccupation}
+                onChange={(e) => setFormData({ ...formData, motherOccupation: e.target.value })}
+                required
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              />
+              <input
+                type="tel"
+                placeholder="Mother's Contact (optional)"
+                value={formData.motherContact}
+                onChange={(e) => setFormData({ ...formData, motherContact: e.target.value })}
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+              />
+            </div>
+          </div>
+
           {/* Siblings - Sisters */}
           <div>
             <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>
@@ -710,19 +834,18 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             </select>
           </div>
 
-          {/* Padam */}
+          {/* Padam - Optional */}
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Padam <span style={{ color: '#dc2626' }}>*</span></label>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Padam</label>
             <select
               value={formData.padam}
               onChange={(e) => setFormData({ ...formData, padam: e.target.value })}
-              required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: formData.padam ? 'var(--text)' : '#9CA3AF' }}
               onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
               onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             >
-              <option value="">Select Padam</option>
+              <option value="">Select Padam (Optional)</option>
               {padamOptions.map((padam) => (
                 <option key={padam} value={padam}>{padam}</option>
               ))}
@@ -898,7 +1021,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
           {/* Step 6: Photo & Contact */}
           {currentStep === 6 && (
             <>
-          {/* Photo */}
+          {/* Photos: 2–4 required */}
           <div>
             <label style={{ 
               display: 'block', 
@@ -907,38 +1030,50 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               fontWeight: 600,
               fontSize: '14px'
             }}>
-              Photo <span style={{ color: '#dc2626' }}>*</span>
+              Photos <span style={{ color: '#dc2626' }}>*</span> <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '12px' }}>(2–4 required)</span>
             </label>
-            {formData.photoPreview && (
-              <div className="mb-3" style={{ textAlign: 'center' }}>
-                <img 
-                  src={formData.photoPreview} 
-                  alt="Preview" 
-                  style={{ 
-                    maxWidth: '150px', 
-                    maxHeight: '150px', 
-                    borderRadius: '12px',
-                    objectFit: 'cover',
-                    border: '2px solid var(--border)'
-                  }} 
-                />
-              </div>
-            )}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoChange}
-              required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+            <div className="grid grid-cols-2 gap-3 mb-2">
+              {formData.photos.map((slot, index) => (
+                <div key={index} className="relative rounded-xl border-2 overflow-hidden" style={{ borderColor: 'var(--border)', aspectRatio: '1', backgroundColor: 'var(--secondary)' }}>
+                  {slot.preview ? (
+                    <>
+                      <img
+                        src={slot.preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(index)}
+                        className="absolute top-1 right-1 w-7 h-7 rounded-full bg-red-500/90 text-white flex items-center justify-center text-sm font-bold hover:bg-red-600"
+                        aria-label="Remove photo"
+                      >
+                        ×
+                      </button>
+                    </>
+                  ) : (
+                    <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-2">
+                      <span className="text-2xl text-zinc-400 mb-1">+</span>
+                      <span className="text-xs text-center" style={{ color: 'var(--muted)' }}>Add photo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange(index)}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-xs mb-3" style={{ color: 'var(--muted)' }}>
+              {formData.photos.filter(p => p.file).length} of 4 photos. Minimum 2 required.
+            </p>
           </div>
 
-          {/* Phone */}
+          {/* Phone 1 (mandatory) */}
           <div>
-            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Phone Number <span style={{ color: '#dc2626' }}>*</span></label>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Phone Number 1 <span style={{ color: '#dc2626' }}>*</span></label>
             <div className="flex gap-2">
               <select
                 value={formData.phoneCode}
@@ -964,6 +1099,35 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               />
             </div>
             {phoneError && <p className="text-sm mt-1" style={{ color: '#dc2626' }}>{phoneError}</p>}
+          </div>
+
+          {/* Phone 2 (optional) */}
+          <div>
+            <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Phone Number 2 <span style={{ color: 'var(--muted)', fontWeight: 400, fontSize: '12px' }}>(optional)</span></label>
+            <div className="flex gap-2">
+              <select
+                value={formData.phoneCode2}
+                onChange={(e) => setFormData({ ...formData, phoneCode2: e.target.value })}
+                className="w-24 px-3 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: phone2Error ? '#dc2626' : 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+              >
+                <option value="+91">+91</option>
+                <option value="+1">+1</option>
+              </select>
+              <input
+                type="tel"
+                placeholder="Optional second number"
+                value={formData.phone2}
+                onChange={(e) => { setFormData({ ...formData, phone2: e.target.value }); setPhone2Error(''); }}
+                onBlur={() => checkPhone2Availability(formData.phone2)}
+                className="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: phone2Error ? '#dc2626' : 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; setPhone2Error(''); }}
+              />
+            </div>
+            {phone2Error && <p className="text-sm mt-1" style={{ color: '#dc2626' }}>{phone2Error}</p>}
           </div>
 
           {/* Address (For Admin) */}

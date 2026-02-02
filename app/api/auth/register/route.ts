@@ -5,11 +5,47 @@ import bcrypt from 'bcryptjs';
 export async function POST(request: NextRequest) {
   try {
       const { 
-      email, password, name, role, photo, phoneNumber, gender, dob,
+      email, password, name, surname, role, photo, photo2, photo3, photo4, photos, phoneNumber, phoneNumber2, gender, dob,
       marriageStatus, birthTime, birthPlace, height, complexion, siblingsInfo,
+      fatherName, fatherOccupation, fatherContact, motherName, motherOccupation, motherContact,
       star, raasi, gothram, padam, uncleGothram,
       educationCategory, educationDetails, employedIn, occupation, occupationInDetails, annualIncome, address
     } = await request.json();
+
+    const photoList = Array.isArray(photos) && photos.length >= 2
+      ? photos.slice(0, 4)
+      : [photo, photo2, photo3, photo4].filter(Boolean);
+    if (photoList.length < 2 || photoList.length > 4) {
+      return NextResponse.json(
+        { error: 'Between 2 and 4 photos are required' },
+        { status: 400 }
+      );
+    }
+
+    if (!fatherName?.trim()) {
+      return NextResponse.json(
+        { error: "Father's name is required" },
+        { status: 400 }
+      );
+    }
+    if (!fatherOccupation?.trim()) {
+      return NextResponse.json(
+        { error: "Father's occupation is required" },
+        { status: 400 }
+      );
+    }
+    if (!motherName?.trim()) {
+      return NextResponse.json(
+        { error: "Mother's name is required" },
+        { status: 400 }
+      );
+    }
+    if (!motherOccupation?.trim()) {
+      return NextResponse.json(
+        { error: "Mother's occupation is required" },
+        { status: 400 }
+      );
+    }
 
     // Validation
     if (!email || !password) {
@@ -78,6 +114,19 @@ export async function POST(request: NextRequest) {
           );
         }
       }
+      const phone2 = phoneNumber2 ?? null;
+      if (phone2 && phone2 !== phone) {
+        const existingPhone2 = await client.query(
+          'SELECT id FROM users WHERE phone_number = $1 OR phone_number_2 = $1',
+          [phone2]
+        );
+        if (existingPhone2.rows.length > 0) {
+          return NextResponse.json(
+            { error: 'Second phone number is already registered' },
+            { status: 409 }
+          );
+        }
+      }
 
       // Set default role to 'user' for all registrations (admin can only be created manually)
       // Always set to 'user' regardless of what's passed in
@@ -103,17 +152,24 @@ export async function POST(request: NextRequest) {
       }
       const finalId = newId!;
 
+      const photo1 = photoList[0] || null;
+      const photo2Val = photoList[1] || null;
+      const photo3Val = photoList[2] || null;
+      const photo4Val = photoList[3] || null;
+
       // Insert new user with explicit id (status NULL until admin accepts)
       const result = await client.query(
         `INSERT INTO users (
-          id, email, password, name, role, photo, phone_number, gender, dob,
+          id, email, password, name, surname, role, photo, photo_2, photo_3, photo_4, phone_number, phone_number_2, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
+          father_name, father_occupation, father_contact, mother_name, mother_occupation, mother_contact,
           star, raasi, gothram, padam, uncle_gothram,
           education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, status
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, NULL
-        ) RETURNING id, email, name, role, photo, phone_number, gender, dob,
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, NULL
+        ) RETURNING id, email, name, surname, role, photo, phone_number, phone_number_2, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
+          father_name, father_occupation, father_contact, mother_name, mother_occupation, mother_contact,
           star, raasi, gothram, padam, uncle_gothram,
           education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, status`,
         [
@@ -121,9 +177,14 @@ export async function POST(request: NextRequest) {
           email,
           hashedPassword,
           name || null,
+          surname || null,
           userRole,
-          photo || null,
+          photo1,
+          photo2Val,
+          photo3Val,
+          photo4Val,
           phoneNumber || null,
+          phoneNumber2 || null,
           gender || null,
           dob || null,
           marriageStatus || null,
@@ -132,6 +193,12 @@ export async function POST(request: NextRequest) {
           height || null,
           complexion || null,
           siblingsInfo ? JSON.stringify(siblingsInfo) : null,
+          fatherName || null,
+          fatherOccupation || null,
+          fatherContact || null,
+          motherName || null,
+          motherOccupation || null,
+          motherContact || null,
           star || null,
           raasi || null,
           gothram || null,
@@ -161,9 +228,11 @@ export async function POST(request: NextRequest) {
             id: row.id,
             email: row.email,
             name: row.name,
+            surname: row.surname,
             role: row.role,
             photo: row.photo,
             phoneNumber: row.phone_number,
+            phoneNumber2: row.phone_number_2 || null,
             gender: row.gender,
             dob: row.dob,
             marriageStatus: row.marriage_status,
@@ -184,6 +253,12 @@ export async function POST(request: NextRequest) {
             occupationInDetails: row.occupation_in_details,
             annualIncome: row.annual_income,
             address: row.address,
+            fatherName: row.father_name || null,
+            fatherOccupation: row.father_occupation || null,
+            fatherContact: row.father_contact || null,
+            motherName: row.mother_name || null,
+            motherOccupation: row.mother_occupation || null,
+            motherContact: row.mother_contact || null,
             status: row.status,
           },
         },

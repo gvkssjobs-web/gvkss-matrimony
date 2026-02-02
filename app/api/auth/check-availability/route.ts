@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
       if (phone) {
         const phoneResult = await client.query(
-          'SELECT id FROM users WHERE phone_number = $1',
+          'SELECT id FROM users WHERE phone_number = $1 OR phone_number_2 = $1',
           [phone]
         );
         results.phoneTaken = phoneResult.rows.length > 0;

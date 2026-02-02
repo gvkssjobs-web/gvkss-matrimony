@@ -9,6 +9,7 @@ interface SearchResult {
   name: string;
   photo: string | null;
   photo_s3_url: string | null;
+  photoCount?: number;
   gender: string | null;
   dob: string | null;
   height: string | null;
@@ -20,6 +21,7 @@ function SearchResultsContent() {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [photoIndices, setPhotoIndices] = useState<Record<number, number>>({});
 
   const searchType = searchParams.get('type') || 'bride';
   const minAge = searchParams.get('minAge') || '';
@@ -92,52 +94,21 @@ function SearchResultsContent() {
     fetchResults();
   }, [searchType, minAge, maxAge, minHeight, maxHeight]);
 
-  const getPhotoUrl = (user: SearchResult) => {
+  const getPhotoUrl = (user: SearchResult, index?: number) => {
+    const photoCount = user.photoCount ?? 1;
+    const photoIndex = index ?? (photoIndices[user.id] ?? 0);
     const photoUrl = user.photo_s3_url || user.photo;
-    
-    if (!photoUrl && user.id) {
-      return `/api/photo?userId=${user.id}`;
-    }
-    
-    if (!photoUrl) return null;
-    
-    const isS3Url = photoUrl && (
-      photoUrl.includes('s3.amazonaws.com') || 
-      photoUrl.includes('.s3.') ||
-      photoUrl.includes('s3-') ||
-      photoUrl.includes('amazonaws.com')
-    );
-    
-    if (isS3Url && user.id) {
-      return `/api/photo?userId=${user.id}`;
-    }
-    
-    if (photoUrl.startsWith('local-') && user.id) {
-      return `/api/photo?userId=${user.id}`;
-    }
-    
+    if (!user.id) return null;
+    if (photoCount > 1) return `/api/photo?userId=${user.id}&index=${photoIndex}`;
+    if (!photoUrl) return `/api/photo?userId=${user.id}&index=0`;
+    const isS3Url = photoUrl && (photoUrl.includes('s3.amazonaws.com') || photoUrl.includes('.s3.') || photoUrl.includes('s3-') || photoUrl.includes('amazonaws.com'));
+    if (isS3Url || photoUrl.startsWith('local-')) return `/api/photo?userId=${user.id}&index=0`;
     let normalizedUrl = photoUrl.trim();
-    
-    if (normalizedUrl.startsWith('https:/') && !normalizedUrl.startsWith('https://')) {
-      normalizedUrl = normalizedUrl.replace('https:/', 'https://');
-    }
-    if (normalizedUrl.startsWith('http:/') && !normalizedUrl.startsWith('http://')) {
-      normalizedUrl = normalizedUrl.replace('http:/', 'http://');
-    }
-    
-    if (normalizedUrl.startsWith('http://') || normalizedUrl.startsWith('https://')) {
-      return normalizedUrl;
-    }
-    
-    if (normalizedUrl.startsWith('/')) {
-      return normalizedUrl;
-    }
-    
-    if (user.id) {
-      return `/api/photo?userId=${user.id}`;
-    }
-    
-    return `/${normalizedUrl}`;
+    if (normalizedUrl.startsWith('https:/') && !normalizedUrl.startsWith('https://')) normalizedUrl = normalizedUrl.replace('https:/', 'https://');
+    if (normalizedUrl.startsWith('http:/') && !normalizedUrl.startsWith('http://')) normalizedUrl = normalizedUrl.replace('http:/', 'http://');
+    if (normalizedUrl.startsWith('http://') || normalizedUrl.startsWith('https://')) return normalizedUrl;
+    if (normalizedUrl.startsWith('/')) return normalizedUrl;
+    return `/api/photo?userId=${user.id}&index=0`;
   };
 
   const calculateAge = (dob: string | null) => {
@@ -215,8 +186,14 @@ function SearchResultsContent() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {results.map((user) => {
+                  const photoCount = user.photoCount ?? 1;
+                  const photoIndex = photoIndices[user.id] ?? 0;
                   const photoUrl = getPhotoUrl(user);
                   const age = calculateAge(user.dob);
+
+                  const setPhotoIndex = (next: number) => {
+                    setPhotoIndices(prev => ({ ...prev, [user.id]: next }));
+                  };
 
                   return (
                     <div
@@ -248,8 +225,29 @@ function SearchResultsContent() {
                         overflow: 'hidden',
                         background: 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%)'
                       }}>
+                        {photoCount > 1 && (
+                          <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, display: 'flex', gap: 4 }} onClick={(e) => e.stopPropagation()}>
+                            <button
+                              type="button"
+                              onClick={() => setPhotoIndex(photoIndex <= 0 ? photoCount - 1 : photoIndex - 1)}
+                              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer' }}
+                              aria-label="Previous photo"
+                            >
+                              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPhotoIndex(photoIndex >= photoCount - 1 ? 0 : photoIndex + 1)}
+                              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer' }}
+                              aria-label="Next photo"
+                            >
+                              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                          </div>
+                        )}
                         {photoUrl ? (
                           <img
+                            key={photoIndex}
                             src={photoUrl}
                             alt={user.name}
                             style={{
@@ -259,13 +257,9 @@ function SearchResultsContent() {
                             }}
                             onError={(e) => {
                               const img = e.target as HTMLImageElement;
-                              if (img.src.includes('/api/photo')) {
-                                img.style.display = 'none';
-                              } else if (user.id && (user.photo_s3_url || user.photo)?.includes('s3')) {
-                                img.src = `/api/photo?userId=${user.id}`;
-                              } else {
-                                img.style.display = 'none';
-                              }
+                              if (img.src.includes('/api/photo')) img.style.display = 'none';
+                              else if (user.id) img.src = `/api/photo?userId=${user.id}&index=0`;
+                              else img.style.display = 'none';
                             }}
                           />
                         ) : (

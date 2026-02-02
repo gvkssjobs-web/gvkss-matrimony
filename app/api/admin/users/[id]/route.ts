@@ -22,7 +22,15 @@ export async function PATCH(
     const allowedFields: Record<string, string> = {
       email: 'email',
       name: 'name',
+      surname: 'surname',
       phoneNumber: 'phone_number',
+      phoneNumber2: 'phone_number_2',
+      fatherName: 'father_name',
+      fatherOccupation: 'father_occupation',
+      fatherContact: 'father_contact',
+      motherName: 'mother_name',
+      motherOccupation: 'mother_occupation',
+      motherContact: 'mother_contact',
       gender: 'gender',
       dob: 'dob',
       marriageStatus: 'marriage_status',
@@ -46,6 +54,7 @@ export async function PATCH(
     };
 
     const siblingsInfo = body.siblingsInfo;
+    const clearPhotoIndex = body.clearPhotoIndex;
     const setParts: string[] = [];
     const values: any[] = [];
     let idx = 1;
@@ -64,6 +73,15 @@ export async function PATCH(
       idx++;
     }
 
+    if (clearPhotoIndex !== undefined && Number.isInteger(clearPhotoIndex) && clearPhotoIndex >= 0 && clearPhotoIndex <= 3) {
+      const cols = [['photo', 'photo_blob', 'photo_s3_url'], ['photo_2', 'photo_2_blob', 'photo_2_s3_url'], ['photo_3', 'photo_3_blob', 'photo_3_s3_url'], ['photo_4', 'photo_4_blob', 'photo_4_s3_url']][clearPhotoIndex];
+      cols.forEach((c) => {
+        setParts.push(`${c} = $${idx}`);
+        values.push(null);
+        idx++;
+      });
+    }
+
     if (setParts.length === 0) {
       return NextResponse.json(
         { error: 'No valid fields to update' },
@@ -75,7 +93,7 @@ export async function PATCH(
     const client = await pool.connect();
     try {
       const result = await client.query(
-        `UPDATE users SET ${setParts.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${idx} RETURNING id, email, name, role, phone_number, gender, dob, marriage_status, birth_time, birth_place, height, complexion, star, raasi, gothram, padam, uncle_gothram, education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, siblings_info, status`,
+        `UPDATE users SET ${setParts.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${idx} RETURNING id, email, name, surname, role, phone_number, phone_number_2, gender, dob, marriage_status, birth_time, birth_place, height, complexion, father_name, father_occupation, father_contact, mother_name, mother_occupation, mother_contact, star, raasi, gothram, padam, uncle_gothram, education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, siblings_info, status`,
         values
       );
 
@@ -93,8 +111,16 @@ export async function PATCH(
           id: u.id,
           email: u.email,
           name: u.name,
+          surname: u.surname || null,
           role: u.role,
           phoneNumber: u.phone_number || null,
+          phoneNumber2: u.phone_number_2 || null,
+          fatherName: u.father_name || null,
+          fatherOccupation: u.father_occupation || null,
+          fatherContact: u.father_contact || null,
+          motherName: u.mother_name || null,
+          motherOccupation: u.mother_occupation || null,
+          motherContact: u.mother_contact || null,
           gender: u.gender || null,
           dob: u.dob || null,
           marriageStatus: u.marriage_status || null,

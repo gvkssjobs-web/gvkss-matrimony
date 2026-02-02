@@ -7,6 +7,8 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get('photo') as File;
     const userId = formData.get('userId') as string | null;
+    const indexParam = formData.get('index') as string | null;
+    const index = indexParam != null ? Math.max(0, Math.min(3, parseInt(indexParam, 10) || 0)) : 0;
 
     if (!file) {
       return NextResponse.json(
@@ -62,10 +64,14 @@ export async function POST(request: NextRequest) {
     if (userId) {
       const client = await pool.connect();
       try {
-        // Only set photo to S3 URL if it exists, otherwise set to null
-        // The frontend will use /api/photo?userId= to fetch from blob
+        const cols = [
+          ['photo_blob', 'photo_s3_url', 'photo'],
+          ['photo_2_blob', 'photo_2_s3_url', 'photo_2'],
+          ['photo_3_blob', 'photo_3_s3_url', 'photo_3'],
+          ['photo_4_blob', 'photo_4_s3_url', 'photo_4'],
+        ][index];
         await client.query(
-          'UPDATE users SET photo_blob = $1, photo_s3_url = $2, photo = $3 WHERE id = $4',
+          `UPDATE users SET ${cols[0]} = $1, ${cols[1]} = $2, ${cols[2]} = $3 WHERE id = $4`,
           [buffer, s3Url, s3Url || null, parseInt(userId)]
         );
       } finally {

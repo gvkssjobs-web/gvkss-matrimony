@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 
 export default function ScrollingHeadline() {
   const [isHovering, setIsHovering] = useState(false);
-  const welcomeText = "Formerly Known as Manikanta Marriage Bureau-9573166450";
+  const welcomeText = "Formerly Manikanta Marriage Bureau-9573166450 ESTD-2010";
 
   return (
     <>

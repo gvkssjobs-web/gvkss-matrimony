@@ -65,7 +65,9 @@ export async function PATCH(
       const allowedFields: Record<string, string> = {
         email: 'email',
         name: 'name',
+        surname: 'surname',
         phoneNumber: 'phone_number',
+        phoneNumber2: 'phone_number_2',
         gender: 'gender',
         dob: 'dob',
         marriageStatus: 'marriage_status',
@@ -93,6 +95,7 @@ export async function PATCH(
       }
 
       const siblingsInfo = body.siblingsInfo;
+      const clearPhotoIndex = body.clearPhotoIndex;
       const setParts: string[] = [];
       const values: any[] = [];
       let idx = 1;
@@ -111,6 +114,15 @@ export async function PATCH(
         idx++;
       }
 
+      if (clearPhotoIndex !== undefined && Number.isInteger(clearPhotoIndex) && clearPhotoIndex >= 0 && clearPhotoIndex <= 3) {
+        const cols = [['photo', 'photo_blob', 'photo_s3_url'], ['photo_2', 'photo_2_blob', 'photo_2_s3_url'], ['photo_3', 'photo_3_blob', 'photo_3_s3_url'], ['photo_4', 'photo_4_blob', 'photo_4_s3_url']][clearPhotoIndex];
+        cols.forEach((c) => {
+          setParts.push(`${c} = $${idx}`);
+          values.push(null);
+          idx++;
+        });
+      }
+
       if (setParts.length === 0) {
         return NextResponse.json(
           { error: 'No valid fields to update' },
@@ -120,7 +132,7 @@ export async function PATCH(
 
       values.push(userId);
       const result = await client.query(
-        `UPDATE users SET ${setParts.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${idx} RETURNING id, email, name, role, phone_number, gender, dob, marriage_status, birth_time, birth_place, height, complexion, star, raasi, gothram, padam, uncle_gothram, education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, siblings_info, status`,
+        `UPDATE users SET ${setParts.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = $${idx} RETURNING id, email, name, surname, role, phone_number, phone_number_2, gender, dob, marriage_status, birth_time, birth_place, height, complexion, star, raasi, gothram, padam, uncle_gothram, education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, siblings_info, status`,
         values
       );
 
@@ -138,8 +150,10 @@ export async function PATCH(
           id: u.id,
           email: u.email,
           name: u.name,
+          surname: u.surname || null,
           role: u.role,
           phoneNumber: u.phone_number || null,
+          phoneNumber2: u.phone_number_2 || null,
           gender: u.gender || null,
           dob: u.dob || null,
           marriageStatus: u.marriage_status || null,
@@ -200,12 +214,19 @@ export async function GET(
       );
     }
 
+    // Get viewer email from query params to determine if they can see surname
+    const { searchParams } = new URL(request.url);
+    const viewerEmail = searchParams.get('viewerEmail');
+
     const client = await pool.connect();
     try {
       const result = await client.query(
         `SELECT 
-          id, email, name, role, photo, phone_number, gender, marriage_status,
+          id, email, name, surname, role, photo, photo_2, photo_3, photo_4,
+          photo_blob, photo_2_blob, photo_3_blob, photo_4_blob,
+          phone_number, phone_number_2, gender, marriage_status,
           dob, birth_time, birth_place, height, complexion,
+          father_name, father_occupation, father_contact, mother_name, mother_occupation, mother_contact,
           star, raasi, gothram, padam, uncle_gothram,
           education_category, education_details, employed_in,
           occupation, occupation_in_details, annual_income,
@@ -224,6 +245,26 @@ export async function GET(
       }
 
       const user = result.rows[0];
+      const hasPhoto = (i: number) => {
+        const blob = user[['photo_blob', 'photo_2_blob', 'photo_3_blob', 'photo_4_blob'][i]];
+        const url = user[['photo', 'photo_2', 'photo_3', 'photo_4'][i]];
+        return blob != null || (url != null && url !== '');
+      };
+      const photoIndices = [0, 1, 2, 3].filter(i => hasPhoto(i));
+      const photoCount = photoIndices.length || 1;
+
+      // Check if viewer is admin or viewing their own profile
+      let canSeeSurname = false;
+      if (viewerEmail) {
+        const viewerResult = await client.query(
+          'SELECT id, role FROM users WHERE email = $1',
+          [viewerEmail]
+        );
+        if (viewerResult.rows.length > 0) {
+          const viewer = viewerResult.rows[0];
+          canSeeSurname = viewer.role === 'admin' || viewer.id === user.id;
+        }
+      }
 
       return NextResponse.json(
         {
@@ -231,11 +272,21 @@ export async function GET(
             id: user.id,
             email: user.email,
             name: user.name,
+            surname: canSeeSurname ? (user.surname || null) : null,
             role: user.role || 'silver',
             photo: user.photo || null,
+            photoCount,
+            photoIndices,
             phoneNumber: user.phone_number || null,
+            phoneNumber2: user.phone_number_2 || null,
             gender: user.gender || null,
             marriageStatus: user.marriage_status || null,
+            fatherName: user.father_name || null,
+            fatherOccupation: user.father_occupation || null,
+            fatherContact: user.father_contact || null,
+            motherName: user.mother_name || null,
+            motherOccupation: user.mother_occupation || null,
+            motherContact: user.mother_contact || null,
             dob: user.dob || null,
             birthTime: user.birth_time || null,
             birthPlace: user.birth_place || null,

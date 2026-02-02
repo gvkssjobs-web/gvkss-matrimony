@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     try {
       let query = `
         SELECT 
-          id, email, name, role, photo, photo_s3_url, phone_number, gender, 
+          id, email, name, role, photo, photo_s3_url, photo_2, photo_2_s3_url, photo_3, photo_3_s3_url, photo_4, photo_4_s3_url, photo_blob, photo_2_blob, photo_3_blob, photo_4_blob, phone_number, gender, 
           dob, height, created_at
         FROM users 
         WHERE role != 'admin'
@@ -72,8 +72,33 @@ export async function GET(request: NextRequest) {
       
       console.log('Search results count:', result.rows.length);
 
+      const photoCountFromRow = (row: any) => {
+        const hasPhoto = (i: number) => {
+          const blob = row[['photo_blob', 'photo_2_blob', 'photo_3_blob', 'photo_4_blob'][i]];
+          const url = row[['photo', 'photo_2', 'photo_3', 'photo_4'][i]];
+          const s3 = row[['photo_s3_url', 'photo_2_s3_url', 'photo_3_s3_url', 'photo_4_s3_url'][i]];
+          return !!(blob || (url != null && url !== '' && !String(url).startsWith('local-')) || (s3 != null && s3 !== '' && !String(s3).startsWith('local-')));
+        };
+        return Math.max(1, [0, 1, 2, 3].filter(i => hasPhoto(i)).length);
+      };
+
+      const users = (result.rows || []).map((row: any) => ({
+        id: row.id,
+        email: row.email,
+        name: row.name,
+        role: row.role,
+        photo: row.photo,
+        photo_s3_url: row.photo_s3_url,
+        phone_number: row.phone_number,
+        gender: row.gender,
+        dob: row.dob,
+        height: row.height,
+        created_at: row.created_at,
+        photoCount: photoCountFromRow(row)
+      }));
+
       return NextResponse.json(
-        { users: result.rows },
+        { users },
         { status: 200 }
       );
     } finally {

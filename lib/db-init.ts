@@ -137,6 +137,22 @@ export async function initDatabase() {
         console.log('Photo S3 URL column added successfully');
       }
 
+      // Add photo_2, photo_3, photo_4 columns (2–4 images per user)
+      for (const i of [2, 3, 4]) {
+        const col = `photo_${i}`;
+        const blobCol = `photo_${i}_blob`;
+        const s3Col = `photo_${i}_s3_url`;
+        for (const [colName, colType] of [[col, 'VARCHAR(500)'], [blobCol, 'BYTEA'], [s3Col, 'VARCHAR(500)']]) {
+          const exists = await client.query(`
+            SELECT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'users' AND column_name = $1)
+          `, [colName]);
+          if (!exists.rows[0].exists) {
+            await client.query(`ALTER TABLE users ADD COLUMN ${colName} ${colType}`);
+            console.log(`Column ${colName} added successfully`);
+          }
+        }
+      }
+
       // Check and add phone_number column if it doesn't exist
       const phoneColumnExists = await client.query(`
         SELECT EXISTS (
@@ -150,6 +166,14 @@ export async function initDatabase() {
           ALTER TABLE users ADD COLUMN phone_number VARCHAR(20);
         `);
         console.log('Phone number column added successfully');
+      }
+
+      const phone2ColumnExists = await client.query(`
+        SELECT EXISTS (SELECT FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'phone_number_2');
+      `);
+      if (!phone2ColumnExists.rows[0].exists) {
+        await client.query(`ALTER TABLE users ADD COLUMN phone_number_2 VARCHAR(20);`);
+        console.log('Phone number 2 column added successfully');
       }
 
       // Check and add gender column if it doesn't exist
@@ -201,7 +225,13 @@ export async function initDatabase() {
         { name: 'occupation', type: 'VARCHAR(255)' },
         { name: 'occupation_in_details', type: 'TEXT' },
         { name: 'annual_income', type: 'VARCHAR(100)' },
-        { name: 'address', type: 'TEXT' }
+        { name: 'address', type: 'TEXT' },
+        { name: 'father_name', type: 'VARCHAR(255)' },
+        { name: 'father_occupation', type: 'VARCHAR(255)' },
+        { name: 'father_contact', type: 'VARCHAR(20)' },
+        { name: 'mother_name', type: 'VARCHAR(255)' },
+        { name: 'mother_occupation', type: 'VARCHAR(255)' },
+        { name: 'mother_contact', type: 'VARCHAR(20)' }
       ];
 
       for (const column of newColumns) {

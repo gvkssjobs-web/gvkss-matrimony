@@ -1,2 +1,0 @@
--- DEPRECATED: Do not use. We use the main id column only (random on register, 5000+ on accept).
--- If you previously ran this and added profile_id, run revert_profile_id_use_id_migration.sql instead.

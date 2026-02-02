@@ -12,9 +12,17 @@ interface UserProfile {
   id: number;
   email: string;
   name: string;
+  surname: string | null;
   role: string;
   photo: string | null;
   phoneNumber: string | null;
+  phoneNumber2: string | null;
+  fatherName: string | null;
+  fatherOccupation: string | null;
+  fatherContact: string | null;
+  motherName: string | null;
+  motherOccupation: string | null;
+  motherContact: string | null;
   gender: string | null;
   dob: string | null;
   birthTime: string | null;
@@ -37,9 +45,11 @@ interface UserProfile {
   siblingsInfo: any;
   status: string | null;
   marriageStatus?: string | null;
+  photoCount?: number;
+  photoIndices?: number[];
 }
 
-type EditFormState = { [K in keyof UserProfile]?: UserProfile[K] | null } & { gothramOther?: string | null; uncleGothramOther?: string | null };
+type EditFormState = { [K in keyof UserProfile]?: UserProfile[K] | null } & { gothramOther?: string | null; uncleGothramOther?: string | null; surname?: string | null };
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -58,6 +68,8 @@ export default function UserProfilePage() {
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; openUp: boolean } | null>(null);
   const [deleteConfirmFor, setDeleteConfirmFor] = useState<{ id: number; name: string | null } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
+  const [uploadingPhotoIndex, setUploadingPhotoIndex] = useState<number | null>(null);
 
   useEffect(() => {
     // Require login to view any profile
@@ -72,7 +84,9 @@ export default function UserProfilePage() {
       try {
         setLoading(true);
         const userId = params.id as string;
-        const response = await fetch(`/api/users/${userId}`);
+        const viewer = getCurrentUser();
+        const viewerEmail = viewer?.email ? encodeURIComponent(viewer.email) : '';
+        const response = await fetch(`/api/users/${userId}?viewerEmail=${viewerEmail}`);
         
         if (!response.ok) {
           if (response.status === 404) {
@@ -86,7 +100,6 @@ export default function UserProfilePage() {
 
         const data = await response.json();
         // Admin can view every record; users can view their own profile or accepted profiles
-        const viewer = getCurrentUser();
         const isViewingOwnProfile = viewer && viewer.id && viewer.id === parseInt(params.id as string);
         if (!isAdmin(viewer) && !isViewingOwnProfile && data.status && data.status !== 'accepted') {
           router.push('/status');
@@ -114,8 +127,16 @@ export default function UserProfilePage() {
     if (editing && user) {
       setEditForm({
         name: user.name ?? '',
+        surname: user.surname ?? '',
         email: user.email ?? '',
         phoneNumber: user.phoneNumber ?? '',
+        phoneNumber2: user.phoneNumber2 ?? '',
+        fatherName: user.fatherName ?? '',
+        fatherOccupation: user.fatherOccupation ?? '',
+        fatherContact: user.fatherContact ?? '',
+        motherName: user.motherName ?? '',
+        motherOccupation: user.motherOccupation ?? '',
+        motherContact: user.motherContact ?? '',
         address: user.address ?? '',
         gender: user.gender ?? '',
         marriageStatus: user.marriageStatus ?? '',
@@ -141,6 +162,10 @@ export default function UserProfilePage() {
       });
     }
   }, [editing, user]);
+
+  useEffect(() => {
+    if (user?.id) setPhotoIndex(0);
+  }, [user?.id]);
 
   useEffect(() => {
     if (!actionsOpen || !actionsButtonRef.current) {
@@ -203,14 +228,46 @@ export default function UserProfilePage() {
     }
   };
 
+  const validateEditForm = (): string | null => {
+    if (!editForm.name?.trim()) return 'Name is required';
+    if (!editForm.surname?.trim()) return 'Surname is required';
+    if (!editForm.phoneNumber?.trim()) return 'Phone Number 1 is required';
+    if (!editForm.gender) return 'Gender is required';
+    if (!editForm.marriageStatus) return 'Marriage Status is required';
+    if (!editForm.dob) return 'Date of Birth is required';
+    if (!editForm.birthTime) return 'Birth Time is required';
+    if (!editForm.birthPlace?.trim()) return 'Birth Place is required';
+    if (!editForm.height?.trim()) return 'Height is required';
+    if (!editForm.complexion) return 'Complexion is required';
+    if (!editForm.star) return 'Star is required';
+    if (!editForm.raasi) return 'Rasi is required';
+    if (!editForm.gothram) return 'Gothram is required';
+    if (editForm.gothram === 'Other' && !editForm.gothramOther?.trim()) return 'Please enter Gothram';
+    if (!editForm.uncleGothram) return 'Uncle Gothram (Menamama) is required';
+    if (editForm.uncleGothram === 'Other' && !editForm.uncleGothramOther?.trim()) return 'Please enter Uncle Gothram (Menamama)';
+    if (!editForm.educationCategory) return 'Education Category is required';
+    if (!editForm.educationDetails?.trim()) return 'Education Details is required';
+    if (!editForm.employedIn?.trim()) return 'Employed In is required';
+    return null;
+  };
+
   const handleSave = async () => {
     if (!user || !currentUser) return;
+    const validationError = validateEditForm();
+    if (validationError) {
+      setSaveError(validationError);
+      return;
+    }
+    if ((user.photoCount ?? 1) < 2) {
+      setSaveError('At least 2 photos are required');
+      return;
+    }
     setSaving(true);
     setSaveError('');
     setSaveSuccess('');
     try {
       const payload: Record<string, unknown> = {};
-      const keys = ['name', 'email', 'phoneNumber', 'address', 'gender', 'marriageStatus', 'dob', 'birthTime', 'birthPlace', 'height', 'complexion', 'star', 'raasi', 'padam', 'educationCategory', 'educationDetails', 'employedIn', 'occupation', 'occupationInDetails', 'annualIncome', 'siblingsInfo'] as const;
+      const keys = ['name', 'email', 'phoneNumber', 'phoneNumber2', 'address', 'gender', 'marriageStatus', 'dob', 'birthTime', 'birthPlace', 'height', 'complexion', 'star', 'raasi', 'padam', 'educationCategory', 'educationDetails', 'employedIn', 'occupation', 'occupationInDetails', 'annualIncome', 'siblingsInfo', 'fatherName', 'fatherOccupation', 'fatherContact', 'motherName', 'motherOccupation', 'motherContact'] as const;
       keys.forEach((k) => {
         if (k in editForm) payload[k] = (editForm as Record<string, unknown>)[k];
       });
@@ -247,52 +304,73 @@ export default function UserProfilePage() {
     }
   };
 
-  const getPhotoUrl = () => {
-    if (!user) return null;
-    
-    if (!user.photo && user.id) {
-      return `/api/photo?userId=${user.id}`;
+  const photoCount = user?.photoCount ?? 1;
+  const photoIndices = user?.photoIndices ?? (photoCount >= 1 ? Array.from({ length: photoCount }, (_, i) => i) : [0]);
+  const getPhotoUrl = (index?: number) => {
+    if (!user?.id) return null;
+    const i = index ?? photoIndex;
+    return `/api/photo?userId=${user.id}&index=${i}`;
+  };
+
+  const refetchUser = async () => {
+    if (!params.id || !user?.id) return;
+    const viewer = getCurrentUser();
+    const viewerEmail = viewer?.email ? encodeURIComponent(viewer.email) : '';
+    const response = await fetch(`/api/users/${params.id}?viewerEmail=${viewerEmail}`);
+    if (response.ok) {
+      const data = await response.json();
+      setUser(data.user);
     }
-    
-    if (!user.photo) return null;
-    
-    const isS3Url = user.photo && (
-      user.photo.includes('s3.amazonaws.com') || 
-      user.photo.includes('.s3.') ||
-      user.photo.includes('s3-') ||
-      user.photo.includes('amazonaws.com')
-    );
-    
-    if (isS3Url && user.id) {
-      return `/api/photo?userId=${user.id}`;
+  };
+
+  const handleRemovePhoto = async (index: number) => {
+    if (!user || !currentUser || (user.photoCount ?? 1) <= 2) return;
+    setSaveError('');
+    try {
+      const isAdminUser = isAdmin(currentUser);
+      const apiUrl = isAdminUser ? `/api/admin/users/${user.id}` : `/api/users/${user.id}`;
+      const response = await fetch(apiUrl, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentUserEmail: currentUser.email,
+          clearPhotoIndex: index,
+        }),
+      });
+      if (response.ok) await refetchUser();
+      else {
+        const data = await response.json();
+        setSaveError(data.error || 'Failed to remove photo');
+      }
+    } catch {
+      setSaveError('Failed to remove photo');
     }
-    
-    if (user.photo.startsWith('local-') && user.id) {
-      return `/api/photo?userId=${user.id}`;
+  };
+
+  const handleAddPhoto = async (index: number, file: File) => {
+    if (!user || !currentUser || (user.photoCount ?? 0) >= 4) return;
+    if (!file.type.startsWith('image/') || file.size > 5 * 1024 * 1024) {
+      setSaveError('Please select an image under 5MB');
+      return;
     }
-    
-    let photoUrl = user.photo.trim();
-    
-    if (photoUrl.startsWith('https:/') && !photoUrl.startsWith('https://')) {
-      photoUrl = photoUrl.replace('https:/', 'https://');
+    setUploadingPhotoIndex(index);
+    setSaveError('');
+    try {
+      const fd = new FormData();
+      fd.append('photo', file);
+      fd.append('userId', user.id.toString());
+      fd.append('index', String(index));
+      const response = await fetch('/api/upload/photo', { method: 'POST', body: fd });
+      if (response.ok) await refetchUser();
+      else {
+        const data = await response.json();
+        setSaveError(data.error || 'Failed to upload photo');
+      }
+    } catch {
+      setSaveError('Failed to upload photo');
+    } finally {
+      setUploadingPhotoIndex(null);
     }
-    if (photoUrl.startsWith('http:/') && !photoUrl.startsWith('http://')) {
-      photoUrl = photoUrl.replace('http:/', 'http://');
-    }
-    
-    if (photoUrl.startsWith('http://') || photoUrl.startsWith('https://')) {
-      return photoUrl;
-    }
-    
-    if (photoUrl.startsWith('/')) {
-      return photoUrl;
-    }
-    
-    if (user.id) {
-      return `/api/photo?userId=${user.id}`;
-    }
-    
-    return `/${photoUrl}`;
   };
 
   // Format 24-hour time (e.g. "14:30" or "14:30:00") to 12-hour format (e.g. "2:30 PM")
@@ -357,32 +435,65 @@ export default function UserProfilePage() {
         {/* Profile Card */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
           <div className="flex flex-col md:flex-row">
-            {/* Left Side - Profile Photo (Full Height) */}
-            <div className="w-full md:w-1/3 flex-shrink-0" style={{ minHeight: '600px', backgroundColor: '#f5f5f5' }}>
+            {/* Left Side - Profile Photo Carousel (Full Height) */}
+            <div className="w-full md:w-1/3 flex-shrink-0 relative" style={{ minHeight: '600px', backgroundColor: '#f5f5f5' }}>
+              {/* Prev/Next at top-right */}
+              {photoCount > 1 && (
+                <div className="absolute top-3 right-3 z-10 flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setPhotoIndex((i) => (i <= 0 ? photoCount - 1 : i - 1))}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-zinc-800/90 text-white hover:bg-zinc-700 shadow-md"
+                    aria-label="Previous photo"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPhotoIndex((i) => (i >= photoCount - 1 ? 0 : i + 1))}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-zinc-800/90 text-white hover:bg-zinc-700 shadow-md"
+                    aria-label="Next photo"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                  </button>
+                </div>
+              )}
               <div className="w-full h-full relative flex items-center justify-center">
-                {getPhotoUrl() ? (
-                  <img
-                    src={getPhotoUrl() || ''}
-                    alt={user.name}
-                    className="w-full h-full object-contain"
-                    style={{ minHeight: '600px', maxWidth: '100%', maxHeight: '100%' }}
-                    onError={(e) => {
-                      const img = e.target as HTMLImageElement;
-                      if (img.src.includes('/api/photo')) {
-                        img.style.display = 'none';
-                      } else if (user.id && user.photo?.includes('s3')) {
-                        img.src = `/api/photo?userId=${user.id}`;
-                      } else {
-                        img.style.display = 'none';
-                      }
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-6xl font-bold" style={{ backgroundColor: 'var(--secondary)', color: 'var(--muted)', minHeight: '600px' }}>
-                    {user.name ? user.name[0].toUpperCase() : '?'}
-                  </div>
-                )}
+                <img
+                  key={photoIndex}
+                  src={getPhotoUrl() || ''}
+                  alt={`${user.name} – photo ${photoIndex + 1}`}
+                  className="w-full h-full object-contain"
+                  style={{ minHeight: '600px', maxWidth: '100%', maxHeight: '100%' }}
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    img.style.display = 'none';
+                    const parent = img.parentElement;
+                    if (parent && !parent.querySelector('.photo-placeholder')) {
+                      const placeholder = document.createElement('div');
+                      placeholder.className = 'photo-placeholder w-full h-full flex items-center justify-center text-6xl font-bold';
+                      placeholder.style.minHeight = '600px';
+                      placeholder.style.backgroundColor = 'var(--secondary)';
+                      placeholder.style.color = 'var(--muted)';
+                      placeholder.textContent = user.name ? user.name[0].toUpperCase() : '?';
+                      parent.appendChild(placeholder);
+                    }
+                  }}
+                />
               </div>
+              {photoCount > 1 && (
+                <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1.5">
+                  {Array.from({ length: photoCount }).map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setPhotoIndex(i)}
+                      className={`w-2 h-2 rounded-full transition-colors ${i === photoIndex ? 'bg-zinc-800' : 'bg-zinc-400'}`}
+                      aria-label={`Go to photo ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Right Side - Content */}
@@ -391,7 +502,7 @@ export default function UserProfilePage() {
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-4xl font-bold" style={{ color: 'var(--text)' }}>
-                    {user.name || 'N/A'}
+                    {user.name || 'N/A'}{user.surname ? ` ${user.surname}` : ''}
                   </h1>
                 </div>
                 <div className="flex items-center gap-4 mb-2">
@@ -467,6 +578,67 @@ export default function UserProfilePage() {
                     {saveError || saveSuccess}
                   </div>
                 )}
+
+                {/* Photos (edit): add/remove, 2–4 required; carousel on left scrolls with prev/next */}
+                {editing && (isAdmin(currentUser) || (currentUser?.id && user && currentUser.id === user.id)) && (
+                  <div className="mb-6">
+                    <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '6px' }}>
+                      Photos <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '14px' }}>(2–4 required; use arrows on left to scroll)</span>
+                    </h2>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      {[0, 1, 2, 3].map((i) => {
+                        const hasPhoto = photoIndices.includes(i);
+                        return (
+                          <div key={i} className="relative rounded-xl border-2 overflow-hidden aspect-square" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--secondary)' }}>
+                            {hasPhoto ? (
+                              <>
+                                <img
+                                  src={getPhotoUrl(i) || ''}
+                                  alt={`Photo ${i + 1}`}
+                                  className="w-full h-full object-cover"
+                                />
+                                {(photoCount ?? 1) > 2 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemovePhoto(i)}
+                                    className="absolute top-1 right-1 w-7 h-7 rounded-full bg-red-500/90 text-white flex items-center justify-center text-sm font-bold hover:bg-red-600"
+                                    aria-label="Remove photo"
+                                  >
+                                    ×
+                                  </button>
+                                )}
+                              </>
+                            ) : (photoCount ?? 0) < 4 ? (
+                              <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer p-2">
+                                {uploadingPhotoIndex === i ? (
+                                  <span className="text-sm" style={{ color: 'var(--muted)' }}>Uploading...</span>
+                                ) : (
+                                  <>
+                                    <span className="text-2xl text-zinc-400 mb-1">+</span>
+                                    <span className="text-xs text-center" style={{ color: 'var(--muted)' }}>Add photo</span>
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      className="hidden"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) handleAddPhoto(i, file);
+                                        e.target.value = '';
+                                      }}
+                                    />
+                                  </>
+                                )}
+                              </label>
+                            ) : null}
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <p className="text-sm mt-2" style={{ color: 'var(--muted)' }}>
+                      {photoCount ?? 0} of 4 photos. Minimum 2 required. Use the arrows on the left image to scroll through photos.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* User Details (admin only) */}
@@ -480,7 +652,7 @@ export default function UserProfilePage() {
                   </h2>
                   <div className="grid grid-cols-1 gap-3">
                     <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Phone Number:</span>
+                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Phone Number 1:</span>
                       {editing ? (
                         <input
                           type="text"
@@ -491,6 +663,21 @@ export default function UserProfilePage() {
                         />
                       ) : (
                         <span style={{ color: 'var(--text)' }}>{user.phoneNumber || '-'}</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 text-base items-center">
+                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Phone Number 2 (optional):</span>
+                      {editing ? (
+                        <input
+                          type="text"
+                          value={editForm.phoneNumber2 ?? ''}
+                          onChange={(e) => setEditForm((f) => ({ ...f, phoneNumber2: e.target.value || null }))}
+                          className="flex-1 px-3 py-2 border-2 rounded-lg"
+                          style={{ borderColor: 'var(--border)' }}
+                          placeholder="Optional"
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--text)' }}>{user.phoneNumber2 || '-'}</span>
                       )}
                     </div>
                     <div className="flex gap-2 text-base items-center">
@@ -525,6 +712,110 @@ export default function UserProfilePage() {
                 </div>
               )}
 
+              {/* Father & Mother (admin only) */}
+              {currentUser && isAdmin(currentUser) && user && (
+                <div className="space-y-4 mb-6">
+                  <h2
+                    className="text-2xl font-bold mb-4"
+                    style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}
+                  >
+                    Father & Mother
+                  </h2>
+                  <div className="grid grid-cols-1 gap-3">
+                    <div className="flex gap-2 text-base items-center">
+                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Father Name:</span>
+                      {editing ? (
+                        <input
+                          type="text"
+                          value={editForm.fatherName ?? ''}
+                          onChange={(e) => setEditForm((f) => ({ ...f, fatherName: e.target.value || null }))}
+                          className="flex-1 px-3 py-2 border-2 rounded-lg"
+                          style={{ borderColor: 'var(--border)' }}
+                          placeholder="Optional"
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--text)' }}>{user.fatherName || '-'}</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 text-base items-center">
+                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Father Occupation:</span>
+                      {editing ? (
+                        <input
+                          type="text"
+                          value={editForm.fatherOccupation ?? ''}
+                          onChange={(e) => setEditForm((f) => ({ ...f, fatherOccupation: e.target.value || null }))}
+                          className="flex-1 px-3 py-2 border-2 rounded-lg"
+                          style={{ borderColor: 'var(--border)' }}
+                          placeholder="Optional"
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--text)' }}>{user.fatherOccupation || '-'}</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 text-base items-center">
+                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Father Contact (optional):</span>
+                      {editing ? (
+                        <input
+                          type="tel"
+                          value={editForm.fatherContact ?? ''}
+                          onChange={(e) => setEditForm((f) => ({ ...f, fatherContact: e.target.value || null }))}
+                          className="flex-1 px-3 py-2 border-2 rounded-lg"
+                          style={{ borderColor: 'var(--border)' }}
+                          placeholder="Optional"
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--text)' }}>{user.fatherContact || '-'}</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 text-base items-center">
+                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Mother Name:</span>
+                      {editing ? (
+                        <input
+                          type="text"
+                          value={editForm.motherName ?? ''}
+                          onChange={(e) => setEditForm((f) => ({ ...f, motherName: e.target.value || null }))}
+                          className="flex-1 px-3 py-2 border-2 rounded-lg"
+                          style={{ borderColor: 'var(--border)' }}
+                          placeholder="Optional"
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--text)' }}>{user.motherName || '-'}</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 text-base items-center">
+                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Mother Occupation:</span>
+                      {editing ? (
+                        <input
+                          type="text"
+                          value={editForm.motherOccupation ?? ''}
+                          onChange={(e) => setEditForm((f) => ({ ...f, motherOccupation: e.target.value || null }))}
+                          className="flex-1 px-3 py-2 border-2 rounded-lg"
+                          style={{ borderColor: 'var(--border)' }}
+                          placeholder="Optional"
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--text)' }}>{user.motherOccupation || '-'}</span>
+                      )}
+                    </div>
+                    <div className="flex gap-2 text-base items-center">
+                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Mother Contact (optional):</span>
+                      {editing ? (
+                        <input
+                          type="tel"
+                          value={editForm.motherContact ?? ''}
+                          onChange={(e) => setEditForm((f) => ({ ...f, motherContact: e.target.value || null }))}
+                          className="flex-1 px-3 py-2 border-2 rounded-lg"
+                          style={{ borderColor: 'var(--border)' }}
+                          placeholder="Optional"
+                        />
+                      ) : (
+                        <span style={{ color: 'var(--text)' }}>{user.motherContact || '-'}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Details Sections */}
               <div className="space-y-6">
                 {/* Personal Information (all personal + astrological) */}
@@ -544,6 +835,16 @@ export default function UserProfilePage() {
                             type="text"
                             value={editForm.name ?? ''}
                             onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value || null }))}
+                            className="flex-1 px-3 py-2 border-2 rounded-lg"
+                            style={{ borderColor: 'var(--border)' }}
+                          />
+                        </div>
+                        <div className="flex gap-2 text-base items-center">
+                          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Surname:</span>
+                          <input
+                            type="text"
+                            value={editForm.surname ?? ''}
+                            onChange={(e) => setEditForm((f) => ({ ...f, surname: e.target.value || null }))}
                             className="flex-1 px-3 py-2 border-2 rounded-lg"
                             style={{ borderColor: 'var(--border)' }}
                           />
