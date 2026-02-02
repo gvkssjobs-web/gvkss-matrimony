@@ -168,7 +168,7 @@ export async function POST(request: NextRequest) {
           star, raasi, gothram, padam, uncle_gothram,
           education_category, education_details, employed_in, occupation, occupation_in_details, annual_income, address, status
         ) VALUES (
-          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, NULL
+          $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38, $39
         ) RETURNING id, email, name, surname, role, photo, phone_number, phone_number_2, gender, dob,
           marriage_status, birth_time, birth_place, height, complexion, siblings_info,
           father_name, father_occupation, father_contact, mother_name, mother_occupation, mother_contact,
@@ -212,7 +212,8 @@ export async function POST(request: NextRequest) {
           occupation || null,
           occupationInDetails || null,
           annualIncome || null,
-          address || null
+          address || null,
+          null
         ]
       );
 
