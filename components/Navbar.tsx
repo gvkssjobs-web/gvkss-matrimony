@@ -73,7 +73,7 @@ function Navbar() {
         
         {/* Left: Logo - fills navbar height */}
         <Link href="/" className="flex items-center h-full shrink-0 hover:opacity-90 transition-opacity">
-          <Image src="/logo.jpg" alt="Logo" width={120} height={56} className="object-contain object-left h-full w-auto" priority />
+          <Image src="/logo.png" alt="Logo" width={120} height={56} className="object-contain object-left h-full w-auto" priority />
         </Link>
 
         {/* Right: Links + Auth */}
