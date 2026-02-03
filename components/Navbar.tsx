@@ -69,35 +69,38 @@ function Navbar() {
 
   return (
     <nav
-      className="fixed w-full z-50 transition-all duration-200 overflow-hidden"
+      className="fixed w-full z-50 transition-all duration-200"
       style={{
         top: '30px',
-        background: 'linear-gradient(90deg, #FFB6C1 0%, #FF69B4 50%, #E91E8C 100%)',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        background: 'linear-gradient(90deg, #A41644 0%, #8A1C3F 35%, #7A0F2E 70%, #5A071F 100%)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
       }}
     >
-      {/* Optional subtle wave at bottom */}
+      {/* Subtle wave at bottom */}
       <div className="absolute bottom-0 left-0 right-0 h-3 overflow-hidden pointer-events-none" aria-hidden>
         <svg viewBox="0 0 1200 12" className="absolute bottom-0 w-full h-full" preserveAspectRatio="none">
-          <path fill="rgba(255,255,255,0.15)" d="M0,12 Q300,0 600,12 T1200,12 L1200,12 L0,12 Z" />
+          <path fill="rgba(255,255,255,0.12)" d="M0,12 Q300,0 600,12 T1200,12 L1200,12 L0,12 Z" />
         </svg>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center relative">
-        {/* Left: Logo - larger, no hover, transparent over gradient */}
-        <Link href="/" className="nav-logo flex items-center h-full shrink-0 bg-transparent [&_span]:!bg-transparent [&_img]:!bg-transparent">
-          <span className="flex items-center h-full mix-blend-multiply">
-            <Image src="/logo.png" alt="Deepthi Matrimony" width={180} height={64} className="object-contain object-left h-full w-auto min-w-[140px]" priority />
+        {/* Left: Logo - white drop-shadow on outer wrapper (no blend) so it stays visible */}
+        <Link href="/" className="flex items-center h-full max-h-16 shrink-0 overflow-visible bg-transparent [&_span]:!bg-transparent [&_img]:!bg-transparent">
+          <span className="flex items-center h-full max-h-16 overflow-visible" style={{ filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.35)) drop-shadow(0 0 8px rgba(255,255,255,0.15))' }}>
+            <span className="flex items-center h-full max-h-16 mix-blend-multiply">
+              <Image src="/logo.png" alt="Deepthi Matrimony" width={160} height={56} className="object-contain object-left max-h-full h-auto w-auto max-w-[200px]" priority />
+            </span>
           </span>
         </Link>
 
         {/* Right: Links + Auth */}
         <div className="flex items-center gap-4">
-          <Link href="/" className="text-white font-medium">
+          <Link href="/" className="font-medium text-white" style={{ color: '#FFF1F4' }}>
             Home
           </Link>
           <Link
             href="#contact"
-            className="text-white font-medium"
+            className="font-medium text-white"
+            style={{ color: '#FFF1F4' }}
             onClick={(e) => {
               e.preventDefault();
               document.querySelector('footer')?.scrollIntoView({ behavior: 'smooth' });
@@ -112,7 +115,7 @@ function Navbar() {
               className="relative p-2.5 rounded-lg hover:bg-white/20 transition"
               aria-label="Notifications"
             >
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+              <svg className="w-5 h-5" style={{ color: '#FFF1F4' }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
               {notificationCount > 0 && (
@@ -125,7 +128,7 @@ function Navbar() {
 
           {user ? (
             <div className="relative avatar-dropdown">
-              <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+              <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-2 hover:opacity-90 transition-opacity text-white" style={{ color: '#FFF1F4' }}>
                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white font-semibold overflow-hidden border-2 border-white shadow-md">
                   {user.photo && !photoError ? (
                     <img
@@ -138,13 +141,13 @@ function Navbar() {
                     <span className="text-lg text-pink-600">{getInitials(user.name, user.email)}</span>
                   )}
                 </div>
-                <span className="text-sm font-semibold text-white">{user.name || 'User'}</span>
-                <svg className={`w-4 h-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <span className="text-sm font-semibold text-white" style={{ color: '#FFF1F4' }}>{user.name || 'User'}</span>
+                <svg className={`w-4 h-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: '#FFF1F4' }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               {showDropdown && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-[100]" style={{ isolation: 'isolate' }}>
                   <div className="px-4 py-3 border-b border-gray-200">
                     <p className="text-sm font-semibold text-gray-800">{user.name || 'User'}</p>
                     <p className="text-xs text-gray-500">ID: {user.id || 'N/A'}</p>
@@ -171,13 +174,15 @@ function Navbar() {
             <>
               <Link
                 href="/register"
-                className="px-5 py-2 font-semibold rounded-lg bg-white text-black shadow-md hover:bg-gray-100 transition"
+                className="px-5 py-2 font-semibold rounded-lg shadow-md border transition hover:opacity-90"
+                style={{ backgroundColor: '#F7E2DC', color: '#7A0F2E', borderColor: '#E6B8C3' }}
               >
                 Registration
               </Link>
               <Link
                 href="/login"
-                className="px-5 py-2 font-semibold rounded-lg bg-white text-black shadow hover:bg-gray-100 transition"
+                className="px-5 py-2 font-semibold rounded-lg shadow border transition hover:opacity-90"
+                style={{ backgroundColor: '#F7E2DC', color: '#7A0F2E', borderColor: '#E6B8C3' }}
               >
                 Login
               </Link>

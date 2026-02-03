@@ -136,7 +136,7 @@ export default function Home() {
     <div style={{ width: '100%', margin: '0 auto'}}>
       {/* Quick Search with Background Image */}
       <div style={{
-        background: '#fff',
+        background: '#FBF0F2',
         borderRadius: '8px',
         padding: '0',
         overflow: 'hidden',
@@ -363,7 +363,7 @@ export default function Home() {
 
       {/* Unified Section: Profile ID Search, Brides, and Grooms */}
       <div style={{
-        background: '#fff',
+        background: '#FBF0F2',
         borderRadius: '8px',
         padding: '30px',
         marginBottom: '30px'
@@ -405,7 +405,7 @@ export default function Home() {
               onClick={handleProfileIdSearch}
               style={{
                 padding: '10px 25px',
-                background: 'linear-gradient(135deg, var(--primary), var(--primary-2))',
+                background: 'linear-gradient(135deg, #7A0F2E, #A41644)',
                 color: '#fff',
                 border: 'none',
                 borderRadius: '10px',
@@ -421,7 +421,7 @@ export default function Home() {
 
         {/* Toggle Button and Profiles Section */}
         <div style={{
-          background: '#fff',
+          background: '#FBF0F2',
           borderRadius: '8px'
         }}>
           {/* Toggle Button */}
@@ -435,7 +435,7 @@ export default function Home() {
               borderRadius: '25px',
               border: '2px solid #9333EA',
               overflow: 'hidden',
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#FBF0F2',
               width: 'fit-content'
             }}>
               <button
@@ -444,7 +444,7 @@ export default function Home() {
                   padding: '10px 30px',
                   border: 'none',
                   borderRadius: profileType === 'bride' ? '23px 0 0 23px' : '0',
-                  backgroundColor: profileType === 'bride' ? '#3B82F6' : '#FFFFFF',
+                  backgroundColor: profileType === 'bride' ? '#7A0F2E' : '#FBF0F2',
                   color: profileType === 'bride' ? '#FFFFFF' : '#9333EA',
                   fontSize: '16px',
                   fontWeight: '600',
@@ -454,12 +454,12 @@ export default function Home() {
                 }}
                 onMouseEnter={(e) => {
                   if (profileType !== 'bride') {
-                    e.currentTarget.style.backgroundColor = '#F9FAFB';
+                    e.currentTarget.style.backgroundColor = '#FDF3F5';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (profileType !== 'bride') {
-                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                    e.currentTarget.style.backgroundColor = '#FBF0F2';
                   }
                 }}
               >
@@ -471,7 +471,7 @@ export default function Home() {
                   padding: '10px 30px',
                   border: 'none',
                   borderRadius: profileType === 'groom' ? '0 23px 23px 0' : '0',
-                  backgroundColor: profileType === 'groom' ? '#3B82F6' : '#FFFFFF',
+                  backgroundColor: profileType === 'groom' ? '#7A0F2E' : '#FBF0F2',
                   color: profileType === 'groom' ? '#FFFFFF' : '#9333EA',
                   fontSize: '16px',
                   fontWeight: '600',
@@ -481,12 +481,12 @@ export default function Home() {
                 }}
                 onMouseEnter={(e) => {
                   if (profileType !== 'groom') {
-                    e.currentTarget.style.backgroundColor = '#F9FAFB';
+                    e.currentTarget.style.backgroundColor = '#FDF3F5';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (profileType !== 'groom') {
-                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                    e.currentTarget.style.backgroundColor = '#FBF0F2';
                   }
                 }}
               >
@@ -497,11 +497,11 @@ export default function Home() {
 
           {/* Profiles Grid */}
           {dataLoading ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+            <div style={{ textAlign: 'center', padding: '40px', color: '#3A3A3A' }}>
               Loading {profileType === 'bride' ? 'brides' : 'grooms'}...
             </div>
           ) : (profileType === 'bride' ? brides : grooms).length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: '#666' }}>
+            <div style={{ textAlign: 'center', padding: '40px', color: '#3A3A3A' }}>
               No {profileType === 'bride' ? 'brides' : 'grooms'} found
             </div>
           ) : (
@@ -536,7 +536,7 @@ export default function Home() {
                     onClick={() => router.push(`/${profile.id}`)}
                     style={{
                       borderRadius: '6px',
-                      background: '#fff',
+                      background: '#FBF0F2',
                       transition: 'all 0.2s',
                       cursor: 'pointer',
                       overflow: 'hidden',
@@ -616,7 +616,7 @@ export default function Home() {
                       <div style={{ fontWeight: '600', color: '#E94B6A', marginBottom: '5px', fontSize: '14px' }}>
                         ID: {profile.id}
                       </div>
-                      <div style={{ color: '#333', fontSize: '15px', fontWeight: '500' }}>
+                      <div style={{ color: '#3A3A3A', fontSize: '15px', fontWeight: '500' }}>
                         {profile.name}
                       </div>
                     </div>
