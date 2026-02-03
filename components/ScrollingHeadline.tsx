@@ -9,8 +9,8 @@ export default function ScrollingHeadline() {
   return (
     <>
       <div 
-        className="fixed top-0 left-0 right-0 z-[60] text-white overflow-hidden flex items-center cursor-default"
-        style={{ height: '30px', backgroundColor: '#16a34a' }}
+        className="fixed top-0 left-0 right-0 z-[60] overflow-hidden flex items-center cursor-default"
+        style={{ height: '30px', background: 'linear-gradient(90deg, #3D0515 0%, #4A0820 50%, #3D0515 100%)', color: '#F8E9ED', borderBottom: '1px solid rgba(201,163,106,0.3)' }}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >

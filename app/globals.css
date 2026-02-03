@@ -1,25 +1,35 @@
 @import "tailwindcss";
 
 :root {
-  /* OPTION 1: Soft Rose & Cream */
-  --primary: #E94B6A;
-  --primary-2: #ff8aa2;
-  --secondary: #FFF1F4;
-  --accent: #F7C873;
-  --bg: #FAFAFA;
-  --card: #FFFFFF;
-  --text: #2E2E2E;
+  /* Deepthi Matrimony palette */
+  --primary-wine: #7A0F2E;
+  --dark-wine: #5A071F;
+  --highlight-wine: #A41644;
+  --footer-wine: #6A0E2A;
+  --blush-bg: #FDF3F5;
+  --card-bg: #FBF0F2;
+  --accent-pink: #E94B6A;
+  --soft-pink-text: #F3C2CF;
+  --gold-accent: #C9A36A;
+  --cream-button: #F7E2DC;
+  --text-dark: #3A3A3A;
+  --border-rose: #E7C9D1;
+
+  --primary: var(--accent-pink);
+  --secondary: var(--blush-bg);
+  --bg: var(--blush-bg);
+  --card: var(--card-bg);
+  --text: var(--text-dark);
   --muted: #6b6b6b;
-  --border: #EDEDED;
-  --shadow: 0 12px 30px rgba(0,0,0,.08);
+  --border: var(--border-rose);
+  --shadow: 0 12px 30px rgba(0,0,0,.06);
   --radius: 18px;
   --max: 1100px;
 
-  /* Legacy variables for compatibility */
   --background: var(--bg);
   --foreground: var(--text);
-  --navbar-bg: rgba(255,255,255,.78);
-  --navbar-text: var(--text);
+  --navbar-bg: var(--primary-wine);
+  --navbar-text: #FFF1F4;
   --navbar-border: var(--border);
 }
 
@@ -36,10 +46,7 @@ html {
 
 body {
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  background:
-    radial-gradient(900px 380px at 12% 0%, rgba(233,75,106,.12), transparent 60%),
-    radial-gradient(900px 420px at 88% 10%, rgba(247,200,115,.16), transparent 60%),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
   transition: background-color 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
@@ -52,12 +59,9 @@ nav#theme-navbar.fixed,
 nav#theme-navbar[style],
 body nav#theme-navbar,
 html body nav#theme-navbar {
-  background-color: #e95353 !important;
-  background: #e95353!important;
+  background: linear-gradient(90deg, #5A071F 0%, #A41644 50%, #5A071F 100%) !important;
   opacity: 1 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
 }
 
 .dark nav#theme-navbar,
@@ -65,21 +69,26 @@ html body nav#theme-navbar {
 .dark nav#theme-navbar[style],
 .dark body nav#theme-navbar,
 .dark html body nav#theme-navbar {
-  background-color : #e95353 !important;
-  background: #e95353 !important;
+  background: linear-gradient(90deg, #5A071F 0%, #A41644 50%, #5A071F 100%) !important;
   opacity: 1 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
 }
 
-/* Ensure text is visible in light mode */
+/* Ensure text is visible in light mode (excludes navbar links with text-* class) */
 nav a:not([class*="bg-"]):not([class*="text-"]) {
   color: #18181b !important;
 }
 
 .dark nav a:not([class*="bg-"]):not([class*="text-"]) {
   color: #fafafa !important;
+}
+
+/* Navbar: keep link, text, and button elements white (override any conflicting rules) */
+nav a.text-white,
+nav span.text-white,
+nav button.text-white,
+nav button.text-white svg {
+  color: #FFF1F4 !important;
 }
 
 /* Search input styling */

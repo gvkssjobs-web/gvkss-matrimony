@@ -34,10 +34,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-200`}
       >
-        <div id="theme-wrapper" className="min-h-screen transition-colors duration-200 flex flex-col" style={{ background: 'linear-gradient(135deg, #FFF1F4 0%, #FFF5F7 40%, #FFFFFF 100%)' }}>
+        <div id="theme-wrapper" className="min-h-screen transition-colors duration-200 flex flex-col" style={{ backgroundColor: '#FDF3F5' }}>
           <ScrollingHeadline />
           <Navbar />
-          <main id="theme-main" className="flex flex-col items-center w-full transition-colors duration-200" style={{ backgroundColor: '#FFF1F4', paddingTop: '85px' }}>
+          <main id="theme-main" className="flex flex-col items-center w-full transition-colors duration-200" style={{ backgroundColor: '#FDF3F5', paddingTop: '85px' }}>
             {children}
           </main>
           <Footer />
