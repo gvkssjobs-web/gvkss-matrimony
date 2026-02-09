@@ -255,6 +255,7 @@ export async function GET(
 
       // Check if viewer is admin or viewing their own profile
       let canSeeSurname = false;
+      let canSeePrivate = false;
       if (viewerEmail) {
         const viewerResult = await client.query(
           'SELECT id, role FROM users WHERE email = $1',
@@ -263,6 +264,7 @@ export async function GET(
         if (viewerResult.rows.length > 0) {
           const viewer = viewerResult.rows[0];
           canSeeSurname = viewer.role === 'admin' || viewer.id === user.id;
+          canSeePrivate = viewer.role === 'admin' || viewer.id === user.id;
         }
       }
 
@@ -270,23 +272,23 @@ export async function GET(
         {
           user: {
             id: user.id,
-            email: user.email,
+            email: canSeePrivate ? (user.email || null) : null,
             name: user.name,
             surname: canSeeSurname ? (user.surname || null) : null,
             role: user.role || 'silver',
             photo: user.photo || null,
             photoCount,
             photoIndices,
-            phoneNumber: user.phone_number || null,
-            phoneNumber2: user.phone_number_2 || null,
+            phoneNumber: canSeePrivate ? (user.phone_number || null) : null,
+            phoneNumber2: canSeePrivate ? (user.phone_number_2 || null) : null,
             gender: user.gender || null,
             marriageStatus: user.marriage_status || null,
-            fatherName: user.father_name || null,
-            fatherOccupation: user.father_occupation || null,
-            fatherContact: user.father_contact || null,
-            motherName: user.mother_name || null,
-            motherOccupation: user.mother_occupation || null,
-            motherContact: user.mother_contact || null,
+            fatherName: canSeePrivate ? (user.father_name || null) : null,
+            fatherOccupation: canSeePrivate ? (user.father_occupation || null) : null,
+            fatherContact: canSeePrivate ? (user.father_contact || null) : null,
+            motherName: canSeePrivate ? (user.mother_name || null) : null,
+            motherOccupation: canSeePrivate ? (user.mother_occupation || null) : null,
+            motherContact: canSeePrivate ? (user.mother_contact || null) : null,
             dob: user.dob || null,
             birthTime: user.birth_time || null,
             birthPlace: user.birth_place || null,
@@ -303,7 +305,7 @@ export async function GET(
             occupation: user.occupation || null,
             occupationInDetails: user.occupation_in_details || null,
             annualIncome: user.annual_income || null,
-            address: user.address || null,
+            address: canSeePrivate ? (user.address || null) : null,
             createdAt: user.created_at,
             siblingsInfo: user.siblings_info || null,
             status: user.status || null,

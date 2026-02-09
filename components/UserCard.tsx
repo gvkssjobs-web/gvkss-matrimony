@@ -30,7 +30,7 @@ export default function UserCard({ user }: UserCardProps) {
   };
 
   return (
-    <div className="group relative rounded-2xl overflow-hidden border border-zinc-200 h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style={{ backgroundColor: '#FFFFFF' }} onMouseEnter={(e) => e.currentTarget.style.borderColor = '#FF8AA2'} onMouseLeave={(e) => e.currentTarget.style.borderColor = '#E5E7EB'}>
+    <div className="group relative rounded-2xl overflow-hidden border-2 h-full transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style={{ backgroundColor: '#FBF0F2', borderColor: '#E7C9D1' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#E94B6A'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#E7C9D1'; }}>
       {/* Photo Section with Role Badge */}
       <div className="relative h-72 overflow-hidden">
         {user.photo ? (
@@ -117,22 +117,22 @@ export default function UserCard({ user }: UserCardProps) {
       </div>
 
       {/* User Info Section */}
-      <div className="p-6" style={{ backgroundColor: '#FFFFFF' }}>
+      <div className="p-6" style={{ backgroundColor: '#FBF0F2' }}>
         <div className="space-y-3">
           {/* Name and Role */}
           <div>
-            <h3 className="text-xl font-bold text-zinc-900 mb-1">
+            <h3 className="text-xl font-bold mb-1" style={{ color: '#3A3A3A' }}>
               {user.name || 'User'}
             </h3>
           </div>
           
           {/* Email */}
-          <p className="text-sm text-zinc-600 truncate">
+          <p className="text-sm truncate" style={{ color: '#3A3A3A' }}>
             {user.email}
           </p>
           
           {/* Details Grid */}
-          <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-zinc-600 pt-2 border-t border-zinc-200">
+          <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs pt-2 border-t" style={{ color: '#3A3A3A', borderColor: '#E7C9D1' }}>
             {user.gender && (
               <div className="flex items-center gap-1.5">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +152,7 @@ export default function UserCard({ user }: UserCardProps) {
           </div>
           
           {/* View Profile Button */}
-          <button className="mt-5 w-full px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:shadow-zinc-200/50 group/btn">
+          <button className="mt-5 w-full px-4 py-2.5 font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg group/btn" style={{ backgroundColor: '#F7E2DC', color: '#7A0F2E' }} onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#E6B8C3'; }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#F7E2DC'; }}>
             <span>View Profile</span>
             <svg className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

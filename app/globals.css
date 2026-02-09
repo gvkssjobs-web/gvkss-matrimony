@@ -16,6 +16,7 @@
   --border-rose: #E7C9D1;
 
   --primary: var(--accent-pink);
+  --primary-2: var(--highlight-wine);
   --secondary: var(--blush-bg);
   --bg: var(--blush-bg);
   --card: var(--card-bg);
@@ -197,16 +198,16 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f4f4f5;
+  background: #FDF3F5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
+  background: #E7C9D1;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
+  background: #E94B6A;
 }
 
 /* Glass Morphism Effect */
@@ -219,7 +220,7 @@ html {
 
 /* Gradient Text */
 .gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #7A0F2E 0%, #A41644 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

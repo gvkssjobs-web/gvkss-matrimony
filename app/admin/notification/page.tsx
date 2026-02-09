@@ -84,7 +84,7 @@ export default function AdminNotificationPage() {
         body: JSON.stringify({ userId, status: 'rejected' }),
       });
       if (response.ok) {
-        setSuccess('User rejected');
+        setSuccess('User rejected and deleted');
         setTimeout(() => setSuccess(''), 2000);
         fetchNotifications();
       } else {

@@ -69,6 +69,24 @@ export async function PATCH(request: NextRequest) {
             { status: 400 }
           );
         }
+        // Reject = delete user (auto-delete on reject)
+        if (status === 'rejected') {
+          await client.query('DELETE FROM notifications WHERE user_id = $1', [userId]).catch(() => {});
+          const delResult = await client.query(
+            'DELETE FROM users WHERE id = $1 RETURNING id, email, name',
+            [userId]
+          );
+          if (delResult.rows.length === 0) {
+            return NextResponse.json(
+              { error: 'User not found' },
+              { status: 404 }
+            );
+          }
+          return NextResponse.json(
+            { message: 'User rejected and deleted successfully', user: delResult.rows[0], deleted: true },
+            { status: 200 }
+          );
+        }
         updateQuery = `UPDATE users SET status = $${updateIndex}, updated_at = CURRENT_TIMESTAMP WHERE id = $${updateIndex + 1}`;
         updateValues = [status, userId];
       } else {
