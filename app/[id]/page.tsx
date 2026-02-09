@@ -432,7 +432,7 @@ export default function UserProfilePage() {
     <div className="profile-page-root">
     <div className="w-full min-h-screen" style={{ 
       backgroundColor: 'var(--bg)',
-      padding: '20px 0',
+      padding: '20px 10px',
       paddingTop: 'calc(20px + 10px)'
     }}>
       <div style={{ width: '100%', margin: '0 auto'}}>
@@ -441,7 +441,7 @@ export default function UserProfilePage() {
             <div className="rounded-2xl shadow-lg overflow-hidden border-2" style={{ borderColor: '#E7C9D1', backgroundColor: '#FBF0F2' }}>
           <div className="flex flex-col md:flex-row">
             {/* Left Side - Profile Photo Carousel (Full Height) */}
-            <div className="w-full md:w-1/3 flex-shrink-0 relative" style={{ minHeight: '600px', backgroundColor: '#FBF0F2' }}>
+            <div className="w-full md:w-1/3 flex-shrink-0 relative pt-5 pl-2 pr-2" style={{ minHeight: '600px', backgroundColor: '#FBF0F2' }}>
               {/* Prev/Next at top-right */}
               {photoCount > 1 && (
                 <div className="absolute top-3 right-3 z-10 flex gap-1">
@@ -502,20 +502,22 @@ export default function UserProfilePage() {
             </div>
 
             {/* Right Side - Content */}
-            <div className="flex-1 p-8 flex flex-col" style={{ backgroundColor: '#FBF0F2' }}>
-              {/* Header: Profile ID, Name, Edit, Actions - must stay at top */}
-              <div className="mb-4">
-                <p className="text-xl font-bold mb-1" style={{ color: '#15803d' }}>Profile ID: {user.id}</p>
-                <p className="text-base mb-3" style={{ color: '#3A3A3A' }}>
-                  {user.name || 'N/A'}{user.surname ? ` ${user.surname}` : ''}
-                  {user.gender && (
-                    <span className="capitalize">, {user.gender === 'bride' ? 'female' : user.gender === 'groom' ? 'male' : user.gender}</span>
-                  )}
-                  {user.marriageStatus && <span> - {user.marriageStatus}</span>}
-                </p>
-                {/* Edit / Actions buttons */}
+            <div className="flex-1 p-2 flex flex-col" style={{ backgroundColor: '#FBF0F2' }}>
+              {/* Header: Profile ID left, Edit/Actions right */}
+              <div className="mb-4 flex flex-row items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-xl font-bold mb-1" style={{ color: '#15803d' }}>Profile ID: {user.id}</p>
+                  <p className="text-base" style={{ color: '#3A3A3A' }}>
+                    {user.name || 'N/A'}{user.surname ? ` ${user.surname}` : ''}
+                    {user.gender && (
+                      <span className="capitalize">, {user.gender === 'bride' ? 'female' : user.gender === 'groom' ? 'male' : user.gender}</span>
+                    )}
+                    {user.marriageStatus && <span> - {user.marriageStatus}</span>}
+                  </p>
+                </div>
+                {/* Edit / Actions buttons - right corner */}
                 {currentUser && !editing && (isAdmin(currentUser) || (currentUser.id && user && currentUser.id === user.id)) && (
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => setEditing(true)}
@@ -546,7 +548,7 @@ export default function UserProfilePage() {
                   </div>
                 )}
                 {editing && (
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={handleSave}
@@ -566,41 +568,30 @@ export default function UserProfilePage() {
                     </button>
                   </div>
                 )}
-
-                {(saveError || saveSuccess) && (
-                  <div className={`mt-3 px-4 py-3 rounded-lg ${saveError ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
-                    {saveError || saveSuccess}
-                  </div>
-                )}
               </div>
+              {(saveError || saveSuccess) && (
+                <div className={`mb-4 px-4 py-3 rounded-lg ${saveError ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
+                  {saveError || saveSuccess}
+                </div>
+              )}
 
               {/* Personal Information - directly under header */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Personal Information - ALL personal/contact/family details, empty fields hidden in view mode */}
                 <div>
-                  <h2 className="text-xl font-bold mb-3 pb-2" style={{ color: '#7A0F2E', borderBottom: '2px solid #E7C9D1' }}>
+                  <h2 className="text-xl font-bold mb-2 pb-1.5" style={{ color: '#7A0F2E', borderBottom: '2px solid #E7C9D1' }}>
                     Personal Information
                   </h2>
-                  <div className="bg-white rounded-lg border" style={{ borderColor: '#E7C9D1' }}>
+                  <div>
                     {(() => {
                       const hasVal = (v: unknown) => v != null && String(v).trim() !== '' && String(v).trim() !== '-';
                       const isOwner = currentUser?.id && user && currentUser.id === user.id;
                       const canSeePrivate = currentUser && (editing || isAdmin(currentUser) || isOwner);
                       const rows: Array<{ label: string; show: boolean; input?: string; type?: string; render?: React.ReactNode }> = [];
                       if (editing || hasVal(user.name)) rows.push({ label: 'Name', show: true, input: 'name', type: 'text', render: editing ? undefined : (user.name || '') + (user.surname ? ` ${user.surname}` : '') });
-                      if (editing || hasVal(user.surname)) rows.push({ label: 'Surname', show: true, input: 'surname', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.surname))) rows.push({ label: 'Surname', show: true, input: 'surname', type: 'text' });
                       if (editing || hasVal(user.gender)) rows.push({ label: 'Gender', show: true, input: 'gender', render: editing ? undefined : (user.gender === 'bride' ? 'Bride' : user.gender === 'groom' ? 'Groom' : user.gender || '') });
-                      if (editing || hasVal(user.marriageStatus)) rows.push({ label: 'Marriage Status', show: true, input: 'marriageStatus', type: 'text' });
-                      if (canSeePrivate && (editing || hasVal(user.phoneNumber))) rows.push({ label: 'Phone Number 1', show: true, input: 'phoneNumber', type: 'text' });
-                      if (canSeePrivate && (editing || hasVal(user.phoneNumber2))) rows.push({ label: 'Phone Number 2', show: true, input: 'phoneNumber2', type: 'text' });
-                      if (canSeePrivate && (editing || hasVal(user.address))) rows.push({ label: 'Address', show: true, input: 'address', type: 'text' });
-                      if (canSeePrivate && (editing || hasVal(user.email))) rows.push({ label: 'Email', show: true, input: 'email', type: 'email' });
-                      if (canSeePrivate && (editing || hasVal(user.fatherName))) rows.push({ label: 'Father Name', show: true, input: 'fatherName', type: 'text' });
-                      if (canSeePrivate && (editing || hasVal(user.fatherOccupation))) rows.push({ label: 'Father Occupation', show: true, input: 'fatherOccupation', type: 'text' });
-                      if (canSeePrivate && (editing || hasVal(user.fatherContact))) rows.push({ label: 'Father Contact', show: true, input: 'fatherContact', type: 'text' });
-                      if (canSeePrivate && (editing || hasVal(user.motherName))) rows.push({ label: 'Mother Name', show: true, input: 'motherName', type: 'text' });
-                      if (canSeePrivate && (editing || hasVal(user.motherOccupation))) rows.push({ label: 'Mother Occupation', show: true, input: 'motherOccupation', type: 'text' });
-                      if (canSeePrivate && (editing || hasVal(user.motherContact))) rows.push({ label: 'Mother Contact', show: true, input: 'motherContact', type: 'text' });
+                      if (editing || hasVal(user.marriageStatus)) rows.push({ label: 'Marital Status', show: true, input: 'marriageStatus', type: 'text' });
                       if (editing || hasVal(user.dob)) rows.push({ label: 'Date of Birth', show: true, input: 'dob', render: editing ? undefined : (user.dob ? new Date(user.dob).toLocaleDateString() : '') });
                       if (editing || hasVal(user.birthTime)) rows.push({ label: 'Birth Time', show: true, input: 'birthTime', render: editing ? undefined : (user.birthTime ? formatBirthTime(user.birthTime) : '') });
                       if (editing || hasVal(user.birthPlace)) rows.push({ label: 'Birth Place', show: true, input: 'birthPlace', type: 'text' });
@@ -611,11 +602,21 @@ export default function UserProfilePage() {
                       if (editing || hasVal(user.padam)) rows.push({ label: 'Padam', show: true, input: 'padam', render: editing ? undefined : (user.padam || '') });
                       if (editing || hasVal(user.gothram)) rows.push({ label: 'Gothram', show: true, input: 'gothram', render: editing ? undefined : (user.gothram || '') });
                       if (editing || hasVal(user.uncleGothram)) rows.push({ label: 'Uncle Gothram (Menamama)', show: true, input: 'uncleGothram', render: editing ? undefined : (user.uncleGothram || '') });
-                      if (editing || user.siblingsInfo) rows.push({ label: 'No of Siblings', show: true, input: 'siblingsInfo', render: editing ? undefined : (user.siblingsInfo && typeof user.siblingsInfo === 'object' ? (() => { const s = user.siblingsInfo as Record<string, number>; return `Total Brother(s): ${s.brothers ?? 0}, Married: ${s.brothersMarried ?? 0}. Total Sister(s): ${s.sisters ?? 0}, Married: ${s.sistersMarried ?? 0}`; })() : String(user.siblingsInfo || '')) });
+                      if (canSeePrivate && (editing || hasVal(user.phoneNumber))) rows.push({ label: 'Phone Number', show: true, input: 'phoneNumber', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.phoneNumber2))) rows.push({ label: 'Alternate Number', show: true, input: 'phoneNumber2', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.address))) rows.push({ label: 'Address', show: true, input: 'address', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.email))) rows.push({ label: 'Email', show: true, input: 'email', type: 'email' });
+                      if (editing || user.siblingsInfo) rows.push({ label: 'Siblings', show: true, input: 'siblingsInfo', render: editing ? undefined : (user.siblingsInfo && typeof user.siblingsInfo === 'object' ? (() => { const s = user.siblingsInfo as Record<string, number>; return `Total Brother(s): ${s.brothers ?? 0}, Married: ${s.brothersMarried ?? 0}. Total Sister(s): ${s.sisters ?? 0}, Married: ${s.sistersMarried ?? 0}`; })() : String(user.siblingsInfo || '')) });
+                      if (editing || hasVal(user.fatherName)) rows.push({ label: 'Father Name', show: true, input: 'fatherName', type: 'text' });
+                      if (editing || hasVal(user.fatherOccupation)) rows.push({ label: 'Father Occupation', show: true, input: 'fatherOccupation', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.fatherContact))) rows.push({ label: 'Father Contact', show: true, input: 'fatherContact', type: 'text' });
+                      if (editing || hasVal(user.motherName)) rows.push({ label: 'Mother Name', show: true, input: 'motherName', type: 'text' });
+                      if (editing || hasVal(user.motherOccupation)) rows.push({ label: 'Mother Occupation', show: true, input: 'motherOccupation', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.motherContact))) rows.push({ label: 'Mother Contact', show: true, input: 'motherContact', type: 'text' });
                       if (rows.length === 0 && !editing) return <p className="py-4 px-4 text-sm" style={{ color: '#3A3A3A' }}>No personal information added yet.</p>;
                       return rows.map((row, i) => (
-                        <div key={row.label} className="flex items-center py-3 px-4" style={{ borderBottom: i < rows.length - 1 ? '1px solid #E7C9D1' : 'none' }}>
-                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}:</span>
+                        <div key={row.label} className="flex items-center py-1.5 px-0">
+                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}</span>
                           {editing && row.input ? (
                             row.input === 'gender' ? (
                               <select value={editForm.gender ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, gender: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}>
@@ -660,10 +661,10 @@ export default function UserProfilePage() {
 
                 {/* Educational & Professional Information - empty fields hidden in view mode */}
                 <div>
-                  <h2 className="text-xl font-bold mb-3 pb-2" style={{ color: '#7A0F2E', borderBottom: '2px solid #E7C9D1' }}>
+                  <h2 className="text-xl font-bold mb-2 pb-1.5" style={{ color: '#7A0F2E', borderBottom: '2px solid #E7C9D1' }}>
                     Educational & Professional Information
                   </h2>
-                  <div className="bg-white rounded-lg border" style={{ borderColor: '#E7C9D1' }}>
+                  <div>
                     {(() => {
                       const hasVal = (v: unknown) => v != null && String(v).trim() !== '' && String(v).trim() !== '-';
                       const eduRows = [
@@ -676,8 +677,8 @@ export default function UserProfilePage() {
                       ].filter(r => editing || hasVal(r.val));
                       if (eduRows.length === 0 && !editing) return <p className="py-4 px-4 text-sm" style={{ color: '#3A3A3A' }}>No educational information added yet.</p>;
                       return eduRows.map((row, i) => (
-                        <div key={row.key} className="flex items-center py-3 px-4" style={{ borderBottom: i < eduRows.length - 1 ? '1px solid #E7C9D1' : 'none' }}>
-                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}:</span>
+                        <div key={row.key} className="flex items-center py-1.5 px-0">
+                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}</span>
                           {editing ? (
                             row.isSelect ? (
                               <select value={editForm.educationCategory ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, educationCategory: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}>
