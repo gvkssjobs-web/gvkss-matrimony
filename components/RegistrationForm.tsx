@@ -71,6 +71,21 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
     'Account (Login)'
   ];
 
+  const isLate = (v: string | null | undefined) => {
+    const s = (v || '').toLowerCase().trim();
+    return s === 'late' || s.startsWith('late ');
+  };
+
+  const getAge = (dobStr: string | null | undefined): number | null => {
+    if (!dobStr) return null;
+    const birth = new Date(dobStr);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    return age;
+  };
+
   // Validate mandatory fields for current step
   const validateCurrentStep = (): boolean => {
     const errors: string[] = [];
@@ -84,6 +99,10 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         break;
       case 2: // Birth & Physical
         if (!formData.dob) errors.push('Date of Birth is required');
+        else {
+          const age = getAge(formData.dob);
+          if (age !== null && age <= 21) errors.push('Age must be greater than 21');
+        }
         if (!formData.birthTime) errors.push('Birth Time is required');
         if (!formData.birthPlace?.trim()) errors.push('Birth Place is required');
         if (!formData.height?.trim()) errors.push('Height is required');
@@ -91,9 +110,15 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         break;
       case 3: // Family (Father, Mother, Siblings)
         if (!formData.fatherName?.trim()) errors.push("Father's Name is required");
-        if (!formData.fatherOccupation?.trim()) errors.push("Father's Occupation is required");
+        if (formData.fatherName?.trim() && !isLate(formData.fatherName)) {
+          if (!formData.fatherOccupation?.trim()) errors.push("Father's Occupation is required");
+          if (!formData.fatherContact?.trim()) errors.push("Father's Contact is required");
+        }
         if (!formData.motherName?.trim()) errors.push("Mother's Name is required");
-        if (!formData.motherOccupation?.trim()) errors.push("Mother's Occupation is required");
+        if (formData.motherName?.trim() && !isLate(formData.motherName)) {
+          if (!formData.motherOccupation?.trim()) errors.push("Mother's Occupation is required");
+          if (!formData.motherContact?.trim()) errors.push("Mother's Contact is required");
+        }
         break;
       case 4: // Horoscope
         if (!formData.star) errors.push('Star is required');
@@ -322,11 +347,11 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
           annualIncome: formData.annualIncome,
           address: formData.address,
           fatherName: formData.fatherName?.trim() || null,
-          fatherOccupation: formData.fatherOccupation?.trim() || null,
-          fatherContact: formData.fatherContact?.trim() || null,
+          fatherOccupation: isLate(formData.fatherName) ? null : (formData.fatherOccupation?.trim() || null),
+          fatherContact: isLate(formData.fatherName) ? null : (formData.fatherContact?.trim() || null),
           motherName: formData.motherName?.trim() || null,
-          motherOccupation: formData.motherOccupation?.trim() || null,
-          motherContact: formData.motherContact?.trim() || null,
+          motherOccupation: isLate(formData.motherName) ? null : (formData.motherOccupation?.trim() || null),
+          motherContact: isLate(formData.motherName) ? null : (formData.motherContact?.trim() || null),
         }),
       });
 
@@ -639,35 +664,39 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
           {/* Step 3: Family (Father, Mother, Siblings) */}
           {currentStep === 3 && (
             <>
-          <p style={{ marginBottom: '12px', color: 'var(--muted)', fontSize: '13px' }}>Father & Mother details are required. Contact numbers are optional. Then add siblings below.</p>
+          <p style={{ marginBottom: '12px', color: 'var(--muted)', fontSize: '13px' }}>Father & Mother details are required. Type &quot;Late&quot; if deceased — occupation and contact will be disabled. Otherwise occupation and contact are required. Then add siblings below.</p>
           {/* Father & Mother */}
           <div className="mb-4 p-3 rounded-xl border-2" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--card)' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text)', marginBottom: '10px' }}>Father <span style={{ color: '#dc2626' }}>*</span></h3>
             <div className="space-y-2 mb-3">
               <input
                 type="text"
-                placeholder="Father's Name *"
+                placeholder="Father's Name * (type 'Late' if deceased)"
                 value={formData.fatherName}
-                onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setFormData({ ...formData, fatherName: v, ...(isLate(v) ? { fatherOccupation: '', fatherContact: '' } : {}) });
+                }}
                 required
                 className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
                 style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               />
               <input
                 type="text"
-                placeholder="Father's Occupation *"
+                placeholder={isLate(formData.fatherName) ? "Father's Occupation (disabled)" : "Father's Occupation *"}
                 value={formData.fatherOccupation}
                 onChange={(e) => setFormData({ ...formData, fatherOccupation: e.target.value })}
-                required
-                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                disabled={isLate(formData.fatherName)}
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               />
               <input
                 type="tel"
-                placeholder="Father's Contact (optional)"
+                placeholder={isLate(formData.fatherName) ? "Father's Contact (disabled)" : "Father's Contact *"}
                 value={formData.fatherContact}
                 onChange={(e) => setFormData({ ...formData, fatherContact: e.target.value })}
-                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                disabled={isLate(formData.fatherName)}
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               />
             </div>
@@ -675,28 +704,32 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             <div className="space-y-2">
               <input
                 type="text"
-                placeholder="Mother's Name *"
+                placeholder="Mother's Name * (type 'Late' if deceased)"
                 value={formData.motherName}
-                onChange={(e) => setFormData({ ...formData, motherName: e.target.value })}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setFormData({ ...formData, motherName: v, ...(isLate(v) ? { motherOccupation: '', motherContact: '' } : {}) });
+                }}
                 required
                 className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
                 style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               />
               <input
                 type="text"
-                placeholder="Mother's Occupation *"
+                placeholder={isLate(formData.motherName) ? "Mother's Occupation (disabled)" : "Mother's Occupation *"}
                 value={formData.motherOccupation}
                 onChange={(e) => setFormData({ ...formData, motherOccupation: e.target.value })}
-                required
-                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                disabled={isLate(formData.motherName)}
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               />
               <input
                 type="tel"
-                placeholder="Mother's Contact (optional)"
+                placeholder={isLate(formData.motherName) ? "Mother's Contact (disabled)" : "Mother's Contact *"}
                 value={formData.motherContact}
                 onChange={(e) => setFormData({ ...formData, motherContact: e.target.value })}
-                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                disabled={isLate(formData.motherName)}
+                className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
               />
             </div>

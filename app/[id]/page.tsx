@@ -232,6 +232,21 @@ export default function UserProfilePage() {
     }
   };
 
+  const isLate = (v: string | null | undefined) => {
+    const s = (v || '').toLowerCase().trim();
+    return s === 'late' || s.startsWith('late ');
+  };
+
+  const getAge = (dobStr: string | null | undefined): number | null => {
+    if (!dobStr) return null;
+    const birth = new Date(dobStr);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    return age;
+  };
+
   const validateEditForm = (): string | null => {
     if (!editForm.name?.trim()) return 'Name is required';
     if (!editForm.surname?.trim()) return 'Surname is required';
@@ -239,6 +254,8 @@ export default function UserProfilePage() {
     if (!editForm.gender) return 'Gender is required';
     if (!editForm.marriageStatus) return 'Marriage Status is required';
     if (!editForm.dob) return 'Date of Birth is required';
+    const age = getAge(editForm.dob);
+    if (age !== null && age <= 21) return 'Age must be greater than 21';
     if (!editForm.birthTime) return 'Birth Time is required';
     if (!editForm.birthPlace?.trim()) return 'Birth Place is required';
     if (!editForm.height?.trim()) return 'Height is required';
@@ -252,6 +269,14 @@ export default function UserProfilePage() {
     if (!editForm.educationCategory) return 'Education Category is required';
     if (!editForm.educationDetails?.trim()) return 'Education Details is required';
     if (!editForm.employedIn?.trim()) return 'Employed In is required';
+    if (editForm.fatherName?.trim() && !isLate(editForm.fatherName)) {
+      if (!editForm.fatherOccupation?.trim()) return 'Father Occupation is required';
+      if (!editForm.fatherContact?.trim()) return 'Father Contact is required';
+    }
+    if (editForm.motherName?.trim() && !isLate(editForm.motherName)) {
+      if (!editForm.motherOccupation?.trim()) return 'Mother Occupation is required';
+      if (!editForm.motherContact?.trim()) return 'Mother Contact is required';
+    }
     return null;
   };
 
@@ -275,6 +300,14 @@ export default function UserProfilePage() {
       keys.forEach((k) => {
         if (k in editForm) payload[k] = (editForm as Record<string, unknown>)[k];
       });
+      if (isLate(editForm.fatherName)) {
+        payload.fatherOccupation = null;
+        payload.fatherContact = null;
+      }
+      if (isLate(editForm.motherName)) {
+        payload.motherOccupation = null;
+        payload.motherContact = null;
+      }
       payload.gothram = editForm.gothram === 'Other' ? (editForm.gothramOther ?? '') : (editForm.gothram ?? '');
       payload.uncleGothram = editForm.uncleGothram === 'Other' ? (editForm.uncleGothramOther ?? '') : (editForm.uncleGothram ?? '');
 
@@ -647,6 +680,18 @@ export default function UserProfilePage() {
                               <div className="flex-1 flex gap-2"><select value={editForm.uncleGothram ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, uncleGothram: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}><option value="">Select</option>{gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}<option value="Other">Other</option></select>{editForm.uncleGothram === 'Other' && <input type="text" placeholder="Enter Uncle Gothram" value={editForm.uncleGothramOther ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, uncleGothramOther: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />}</div>
                             ) : row.input === 'siblingsInfo' ? (
                               <textarea value={editForm.siblingsInfo != null ? (typeof editForm.siblingsInfo === 'string' ? editForm.siblingsInfo : JSON.stringify(editForm.siblingsInfo, null, 2)) : ''} onChange={(e) => { const v = e.target.value.trim(); if (!v) { setEditForm((f) => ({ ...f, siblingsInfo: null })); return; } try { setEditForm((f) => ({ ...f, siblingsInfo: JSON.parse(v) })); } catch {} }} className="flex-1 px-3 py-2 border-2 rounded-lg text-sm min-h-[60px]" style={{ borderColor: 'var(--border)' }} placeholder='{"brothers": 0, "sisters": 1}' />
+                            ) : row.input === 'fatherName' ? (
+                              <input type="text" value={editForm.fatherName ?? ''} onChange={(e) => { const v = e.target.value || null; setEditForm((f) => ({ ...f, fatherName: v, ...(isLate(v) ? { fatherOccupation: null, fatherContact: null } : {}) })); }} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'fatherOccupation' ? (
+                              <input type="text" value={editForm.fatherOccupation ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, fatherOccupation: e.target.value || null }))} disabled={isLate(editForm.fatherName)} className="flex-1 px-3 py-2 border-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'fatherContact' ? (
+                              <input type="tel" value={editForm.fatherContact ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, fatherContact: e.target.value || null }))} disabled={isLate(editForm.fatherName)} className="flex-1 px-3 py-2 border-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'motherName' ? (
+                              <input type="text" value={editForm.motherName ?? ''} onChange={(e) => { const v = e.target.value || null; setEditForm((f) => ({ ...f, motherName: v, ...(isLate(v) ? { motherOccupation: null, motherContact: null } : {}) })); }} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'motherOccupation' ? (
+                              <input type="text" value={editForm.motherOccupation ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, motherOccupation: e.target.value || null }))} disabled={isLate(editForm.motherName)} className="flex-1 px-3 py-2 border-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'motherContact' ? (
+                              <input type="tel" value={editForm.motherContact ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, motherContact: e.target.value || null }))} disabled={isLate(editForm.motherName)} className="flex-1 px-3 py-2 border-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--border)' }} />
                             ) : (
                               <input type={(row.type as 'text'|'email'|'tel') || 'text'} value={String((editForm as Record<string, unknown>)[row.input!] ?? '')} onChange={(e) => setEditForm((f) => ({ ...f, [row.input!]: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
                             )
