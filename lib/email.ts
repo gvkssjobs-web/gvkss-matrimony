@@ -7,7 +7,13 @@
 
 export function getAppUrl(): string {
   if (typeof window !== 'undefined') return window.location.origin;
-  return process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || 'http://localhost:3000';
+  // Explicit config (set these in production!)
+  const explicit = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL;
+  if (explicit) return explicit.replace(/\/$/, ''); // trim trailing slash
+  // Vercel provides VERCEL_URL (hostname only, no protocol)
+  const vercelUrl = process.env.VERCEL_URL;
+  if (vercelUrl) return `https://${vercelUrl}`;
+  return 'http://localhost:3000';
 }
 
 export async function sendVerificationEmail(to: string, token: string): Promise<{ sent: boolean; link?: string }> {

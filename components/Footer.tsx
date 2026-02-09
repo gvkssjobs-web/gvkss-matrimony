@@ -13,21 +13,9 @@ export default function Footer() {
       }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-center">
-          {/* Left: Deepthi Matrimony branding (photo) */}
-          <div className="flex justify-center md:justify-start">
-            <Image
-              src="/footer.png"
-              alt="Deepthi Matrimony - Only for Arya Vysya - Established in 2010"
-              width={220}
-              height={92}
-              className="h-auto w-auto max-w-[220px] object-contain"
-              unoptimized
-            />
-          </div>
-
-          {/* Center: Contact Us */}
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-start">
+          {/* Contact Us */}
+          <div className="flex flex-col items-center md:items-start">
             <h3 className="text-base font-bold mb-3" style={{ color: '#F3C2CF', letterSpacing: '0.5px' }}>Contact Us</h3>
             <div className="space-y-2">
               {/* Name with Person Icon */}
@@ -161,10 +149,22 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Right: Quick Links */}
-          <div>
+          {/* Logo - between Contact Us and Quick Links */}
+          <div className="flex justify-center">
+            <Image
+              src="/footer.png"
+              alt="Deepthi Matrimony - Only for Arya Vysya - Established in 2010"
+              width={220}
+              height={92}
+              className="h-auto w-auto max-w-[220px] object-contain"
+              unoptimized
+            />
+          </div>
+
+          {/* Quick Links */}
+          <div className="flex flex-col items-center md:items-start">
             <h4 className="text-sm font-semibold mb-2" style={{ color: '#F3C2CF' }}>Quick Links</h4>
-            <ul className="space-y-1">
+            <ul className="space-y-1 flex flex-col items-center md:items-start">
               <li>
                 <Link href="/" className="text-sm transition-colors" style={{ color: '#F8E9ED' }} onMouseEnter={(e) => e.currentTarget.style.color = '#F6DADF'} onMouseLeave={(e) => e.currentTarget.style.color = '#F8E9ED'}>
                   Home

@@ -72,20 +72,20 @@ function Navbar() {
       className="fixed w-full z-50 transition-all duration-200"
       style={{
         top: '30px',
-        background: 'linear-gradient(90deg, #A41644 0%, #8A1C3F 35%, #7A0F2E 70%, #5A071F 100%)',
+        background: 'linear-gradient(90deg, #5A071F 0%, #A41644 50%, #5A071F 100%)',
         boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
       }}
     >
-      {/* Subtle wave at bottom */}
+      {/* Subtle wave at bottom - dark to match maroon, no light band */}
       <div className="absolute bottom-0 left-0 right-0 h-3 overflow-hidden pointer-events-none" aria-hidden>
         <svg viewBox="0 0 1200 12" className="absolute bottom-0 w-full h-full" preserveAspectRatio="none">
-          <path fill="rgba(255,255,255,0.12)" d="M0,12 Q300,0 600,12 T1200,12 L1200,12 L0,12 Z" />
+          <path fill="rgba(90,7,31,0.5)" d="M0,12 Q300,0 600,12 T1200,12 L1200,12 L0,12 Z" />
         </svg>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center relative">
         {/* Left: Logo - white drop-shadow on outer wrapper (no blend) so it stays visible */}
         <Link href="/" className="flex items-center h-full max-h-16 shrink-0 overflow-visible bg-transparent [&_span]:!bg-transparent [&_img]:!bg-transparent">
-          <span className="flex items-center h-full max-h-16 overflow-visible" style={{ filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.35)) drop-shadow(0 0 8px rgba(255,255,255,0.15))' }}>
+          <span className="flex items-center h-full max-h-16 overflow-visible" style={{ filter: 'drop-shadow(0 0 4px rgba(253, 8, 8, 0.35)) drop-shadow(0 0 8px rgba(255,255,255,0.15))' }}>
             <span className="flex items-center h-full max-h-16 mix-blend-multiply">
               <Image src="/logo.png" alt="Deepthi Matrimony" width={160} height={56} className="object-contain object-left max-h-full h-auto w-auto max-w-[200px]" priority />
             </span>
@@ -119,7 +119,7 @@ function Navbar() {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
               {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-white text-pink-600 text-xs font-bold rounded-full flex items-center justify-center border-2 border-pink-600">
+                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 text-xs font-bold rounded-full flex items-center justify-center border-2" style={{ backgroundColor: '#FFF1F4', color: '#E94B6A', borderColor: '#E94B6A' }}>
                   {notificationCount > 99 ? '99+' : notificationCount}
                 </span>
               )}
@@ -138,7 +138,7 @@ function Navbar() {
                       onError={() => setPhotoError(true)}
                     />
                   ) : (
-                    <span className="text-lg text-pink-600">{getInitials(user.name, user.email)}</span>
+                    <span className="text-lg" style={{ color: '#E94B6A' }}>{getInitials(user.name, user.email)}</span>
                   )}
                 </div>
                 <span className="text-sm font-semibold text-white" style={{ color: '#FFF1F4' }}>{user.name || 'User'}</span>
@@ -163,7 +163,8 @@ function Navbar() {
                       setUser(null);
                       window.location.href = '/';
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-pink-600 hover:bg-gray-100"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                    style={{ color: '#E94B6A' }}
                   >
                     Logout
                   </button>

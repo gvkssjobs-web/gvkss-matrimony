@@ -101,7 +101,7 @@ export default function AdminPage() {
         });
 
         if (response.ok) {
-          setSuccess(`User ${action === 'reject' ? 'rejected' : 'accepted'} successfully`);
+          setSuccess(`User ${action === 'reject' ? 'rejected and deleted' : 'accepted'} successfully`);
           setTimeout(() => setSuccess(''), 3000);
           fetchUsers(); // Refresh the list
         } else {

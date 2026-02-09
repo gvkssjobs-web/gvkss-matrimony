@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
@@ -195,12 +195,16 @@ export default function UserProfilePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, status }),
       });
+      const data = await response.json();
       if (response.ok) {
+        if (action === 'reject' && data.deleted) {
+          router.push('/admin');
+          return;
+        }
         setUser((prev) => (prev ? { ...prev, status } : null));
         setSaveSuccess(`User ${action === 'reject' ? 'rejected' : 'accepted'}`);
         setTimeout(() => setSaveSuccess(''), 3000);
       } else {
-        const data = await response.json();
         setError(data.error || `Failed to ${action} user`);
       }
     } catch (err) {
@@ -425,6 +429,7 @@ export default function UserProfilePage() {
   }
 
   return (
+    <div className="profile-page-root">
     <div className="w-full min-h-screen" style={{ 
       backgroundColor: 'var(--bg)',
       padding: '20px 0',
@@ -433,10 +438,10 @@ export default function UserProfilePage() {
       <div style={{ width: '100%', margin: '0 auto'}}>
        
         {/* Profile Card */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border" style={{ borderColor: 'var(--border)' }}>
+            <div className="rounded-2xl shadow-lg overflow-hidden border-2" style={{ borderColor: '#E7C9D1', backgroundColor: '#FBF0F2' }}>
           <div className="flex flex-col md:flex-row">
             {/* Left Side - Profile Photo Carousel (Full Height) */}
-            <div className="w-full md:w-1/3 flex-shrink-0 relative" style={{ minHeight: '600px', backgroundColor: '#f5f5f5' }}>
+            <div className="w-full md:w-1/3 flex-shrink-0 relative" style={{ minHeight: '600px', backgroundColor: '#FBF0F2' }}>
               {/* Prev/Next at top-right */}
               {photoCount > 1 && (
                 <div className="absolute top-3 right-3 z-10 flex gap-1">
@@ -458,12 +463,12 @@ export default function UserProfilePage() {
                   </button>
                 </div>
               )}
-              <div className="w-full h-full relative flex items-center justify-center">
+              <div className="w-full h-full relative flex items-start justify-center">
                 <img
                   key={photoIndex}
                   src={getPhotoUrl() || ''}
                   alt={`${user.name} – photo ${photoIndex + 1}`}
-                  className="w-full h-full object-contain"
+                  className="w-full h-full object-contain object-top"
                   style={{ minHeight: '600px', maxWidth: '100%', maxHeight: '100%' }}
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
@@ -497,30 +502,20 @@ export default function UserProfilePage() {
             </div>
 
             {/* Right Side - Content */}
-            <div className="flex-1 p-8">
-              {/* Heading Section */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-4xl font-bold" style={{ color: 'var(--text)' }}>
-                    {user.name || 'N/A'}{user.surname ? ` ${user.surname}` : ''}
-                  </h1>
-                </div>
-                <div className="flex items-center gap-4 mb-2">
-                  <p className="text-lg" style={{ color: 'var(--muted)' }}>Profile ID: {user.id}</p>
+            <div className="flex-1 p-8 flex flex-col" style={{ backgroundColor: '#FBF0F2' }}>
+              {/* Header: Profile ID, Name, Edit, Actions - must stay at top */}
+              <div className="mb-4">
+                <p className="text-xl font-bold mb-1" style={{ color: '#15803d' }}>Profile ID: {user.id}</p>
+                <p className="text-base mb-3" style={{ color: '#3A3A3A' }}>
+                  {user.name || 'N/A'}{user.surname ? ` ${user.surname}` : ''}
                   {user.gender && (
-                    <span className="px-3 py-1 rounded-full text-sm font-semibold text-white capitalize"
-                      style={{
-                        backgroundColor: user.gender === 'bride' ? '#E94B6A' : '#3B82F6'
-                      }}
-                    >
-                      {user.gender === 'bride' ? 'Bride' : user.gender === 'groom' ? 'Groom' : user.gender}
-                    </span>
+                    <span className="capitalize">, {user.gender === 'bride' ? 'female' : user.gender === 'groom' ? 'male' : user.gender}</span>
                   )}
-                </div>
-
-                {/* Edit button: Show for admin or user viewing their own profile */}
+                  {user.marriageStatus && <span> - {user.marriageStatus}</span>}
+                </p>
+                {/* Edit / Actions buttons */}
                 {currentUser && !editing && (isAdmin(currentUser) || (currentUser.id && user && currentUser.id === user.id)) && (
-                  <div className="flex flex-wrap items-center gap-3 mb-6">
+                  <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={() => setEditing(true)}
@@ -550,9 +545,8 @@ export default function UserProfilePage() {
                     )}
                   </div>
                 )}
-
                 {editing && (
-                  <div className="flex flex-wrap items-center gap-3 mb-6">
+                  <div className="flex flex-wrap items-center gap-3">
                     <button
                       type="button"
                       onClick={handleSave}
@@ -574,15 +568,142 @@ export default function UserProfilePage() {
                 )}
 
                 {(saveError || saveSuccess) && (
-                  <div className={`mb-4 px-4 py-3 rounded-lg ${saveError ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
+                  <div className={`mt-3 px-4 py-3 rounded-lg ${saveError ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
                     {saveError || saveSuccess}
                   </div>
                 )}
+              </div>
 
-                {/* Photos (edit): add/remove, 2–4 required; carousel on left scrolls with prev/next */}
+              {/* Personal Information - directly under header */}
+              <div className="space-y-6">
+                {/* Personal Information - ALL personal/contact/family details, empty fields hidden in view mode */}
+                <div>
+                  <h2 className="text-xl font-bold mb-3 pb-2" style={{ color: '#7A0F2E', borderBottom: '2px solid #E7C9D1' }}>
+                    Personal Information
+                  </h2>
+                  <div className="bg-white rounded-lg border" style={{ borderColor: '#E7C9D1' }}>
+                    {(() => {
+                      const hasVal = (v: unknown) => v != null && String(v).trim() !== '' && String(v).trim() !== '-';
+                      const isOwner = currentUser?.id && user && currentUser.id === user.id;
+                      const canSeePrivate = currentUser && (editing || isAdmin(currentUser) || isOwner);
+                      const rows: Array<{ label: string; show: boolean; input?: string; type?: string; render?: React.ReactNode }> = [];
+                      if (editing || hasVal(user.name)) rows.push({ label: 'Name', show: true, input: 'name', type: 'text', render: editing ? undefined : (user.name || '') + (user.surname ? ` ${user.surname}` : '') });
+                      if (editing || hasVal(user.surname)) rows.push({ label: 'Surname', show: true, input: 'surname', type: 'text' });
+                      if (editing || hasVal(user.gender)) rows.push({ label: 'Gender', show: true, input: 'gender', render: editing ? undefined : (user.gender === 'bride' ? 'Bride' : user.gender === 'groom' ? 'Groom' : user.gender || '') });
+                      if (editing || hasVal(user.marriageStatus)) rows.push({ label: 'Marriage Status', show: true, input: 'marriageStatus', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.phoneNumber))) rows.push({ label: 'Phone Number 1', show: true, input: 'phoneNumber', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.phoneNumber2))) rows.push({ label: 'Phone Number 2', show: true, input: 'phoneNumber2', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.address))) rows.push({ label: 'Address', show: true, input: 'address', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.email))) rows.push({ label: 'Email', show: true, input: 'email', type: 'email' });
+                      if (canSeePrivate && (editing || hasVal(user.fatherName))) rows.push({ label: 'Father Name', show: true, input: 'fatherName', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.fatherOccupation))) rows.push({ label: 'Father Occupation', show: true, input: 'fatherOccupation', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.fatherContact))) rows.push({ label: 'Father Contact', show: true, input: 'fatherContact', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.motherName))) rows.push({ label: 'Mother Name', show: true, input: 'motherName', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.motherOccupation))) rows.push({ label: 'Mother Occupation', show: true, input: 'motherOccupation', type: 'text' });
+                      if (canSeePrivate && (editing || hasVal(user.motherContact))) rows.push({ label: 'Mother Contact', show: true, input: 'motherContact', type: 'text' });
+                      if (editing || hasVal(user.dob)) rows.push({ label: 'Date of Birth', show: true, input: 'dob', render: editing ? undefined : (user.dob ? new Date(user.dob).toLocaleDateString() : '') });
+                      if (editing || hasVal(user.birthTime)) rows.push({ label: 'Birth Time', show: true, input: 'birthTime', render: editing ? undefined : (user.birthTime ? formatBirthTime(user.birthTime) : '') });
+                      if (editing || hasVal(user.birthPlace)) rows.push({ label: 'Birth Place', show: true, input: 'birthPlace', type: 'text' });
+                      if (editing || hasVal(user.height)) rows.push({ label: 'Height', show: true, input: 'height', type: 'text' });
+                      if (editing || hasVal(user.complexion)) rows.push({ label: 'Complexion', show: true, input: 'complexion', render: editing ? undefined : (user.complexion ? String(user.complexion) : '') });
+                      if (editing || hasVal(user.star)) rows.push({ label: 'Star', show: true, input: 'star', render: editing ? undefined : (user.star || '') });
+                      if (editing || hasVal(user.raasi)) rows.push({ label: 'Rasi', show: true, input: 'raasi', render: editing ? undefined : (user.raasi || '') });
+                      if (editing || hasVal(user.padam)) rows.push({ label: 'Padam', show: true, input: 'padam', render: editing ? undefined : (user.padam || '') });
+                      if (editing || hasVal(user.gothram)) rows.push({ label: 'Gothram', show: true, input: 'gothram', render: editing ? undefined : (user.gothram || '') });
+                      if (editing || hasVal(user.uncleGothram)) rows.push({ label: 'Uncle Gothram (Menamama)', show: true, input: 'uncleGothram', render: editing ? undefined : (user.uncleGothram || '') });
+                      if (editing || user.siblingsInfo) rows.push({ label: 'No of Siblings', show: true, input: 'siblingsInfo', render: editing ? undefined : (user.siblingsInfo && typeof user.siblingsInfo === 'object' ? (() => { const s = user.siblingsInfo as Record<string, number>; return `Total Brother(s): ${s.brothers ?? 0}, Married: ${s.brothersMarried ?? 0}. Total Sister(s): ${s.sisters ?? 0}, Married: ${s.sistersMarried ?? 0}`; })() : String(user.siblingsInfo || '')) });
+                      if (rows.length === 0 && !editing) return <p className="py-4 px-4 text-sm" style={{ color: '#3A3A3A' }}>No personal information added yet.</p>;
+                      return rows.map((row, i) => (
+                        <div key={row.label} className="flex items-center py-3 px-4" style={{ borderBottom: i < rows.length - 1 ? '1px solid #E7C9D1' : 'none' }}>
+                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}:</span>
+                          {editing && row.input ? (
+                            row.input === 'gender' ? (
+                              <select value={editForm.gender ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, gender: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}>
+                                <option value="">Select</option>
+                                <option value="bride">Bride</option>
+                                <option value="groom">Groom</option>
+                              </select>
+                            ) : row.input === 'complexion' ? (
+                              <select value={editForm.complexion ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, complexion: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}>
+                                <option value="">Select</option>
+                                <option value="fair">Fair</option>
+                                <option value="wheatish">Wheatish</option>
+                                <option value="dark">Dark</option>
+                              </select>
+                            ) : row.input === 'dob' ? (
+                              <input type="date" value={editForm.dob ? String(editForm.dob).slice(0, 10) : ''} onChange={(e) => setEditForm((f) => ({ ...f, dob: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'birthTime' ? (
+                              <input type="text" placeholder="e.g. 14:30" value={editForm.birthTime ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, birthTime: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'star' ? (
+                              <select value={editForm.star ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, star: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}><option value="">Select</option>{starOptions.map((o) => <option key={o} value={o}>{o}</option>)}</select>
+                            ) : row.input === 'raasi' ? (
+                              <select value={editForm.raasi ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, raasi: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}><option value="">Select</option>{raasiOptions.map((o) => <option key={o} value={o}>{o}</option>)}</select>
+                            ) : row.input === 'padam' ? (
+                              <select value={editForm.padam ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, padam: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}><option value="">Select</option>{padamOptions.map((o) => <option key={o} value={o}>{o}</option>)}</select>
+                            ) : row.input === 'gothram' ? (
+                              <div className="flex-1 flex gap-2"><select value={editForm.gothram ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, gothram: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}><option value="">Select</option>{gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}<option value="Other">Other</option></select>{editForm.gothram === 'Other' && <input type="text" placeholder="Enter Gothram" value={editForm.gothramOther ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, gothramOther: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />}</div>
+                            ) : row.input === 'uncleGothram' ? (
+                              <div className="flex-1 flex gap-2"><select value={editForm.uncleGothram ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, uncleGothram: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}><option value="">Select</option>{gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}<option value="Other">Other</option></select>{editForm.uncleGothram === 'Other' && <input type="text" placeholder="Enter Uncle Gothram" value={editForm.uncleGothramOther ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, uncleGothramOther: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />}</div>
+                            ) : row.input === 'siblingsInfo' ? (
+                              <textarea value={editForm.siblingsInfo != null ? (typeof editForm.siblingsInfo === 'string' ? editForm.siblingsInfo : JSON.stringify(editForm.siblingsInfo, null, 2)) : ''} onChange={(e) => { const v = e.target.value.trim(); if (!v) { setEditForm((f) => ({ ...f, siblingsInfo: null })); return; } try { setEditForm((f) => ({ ...f, siblingsInfo: JSON.parse(v) })); } catch {} }} className="flex-1 px-3 py-2 border-2 rounded-lg text-sm min-h-[60px]" style={{ borderColor: 'var(--border)' }} placeholder='{"brothers": 0, "sisters": 1}' />
+                            ) : (
+                              <input type={(row.type as 'text'|'email'|'tel') || 'text'} value={String((editForm as Record<string, unknown>)[row.input!] ?? '')} onChange={(e) => setEditForm((f) => ({ ...f, [row.input!]: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
+                            )
+                          ) : (
+                            <span className="text-sm flex-1" style={{ color: '#3A3A3A' }}>{row.render ?? String((user as unknown as Record<string, unknown>)[row.input!] ?? '-')}</span>
+                          )}
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </div>
+
+                {/* Educational & Professional Information - empty fields hidden in view mode */}
+                <div>
+                  <h2 className="text-xl font-bold mb-3 pb-2" style={{ color: '#7A0F2E', borderBottom: '2px solid #E7C9D1' }}>
+                    Educational & Professional Information
+                  </h2>
+                  <div className="bg-white rounded-lg border" style={{ borderColor: '#E7C9D1' }}>
+                    {(() => {
+                      const hasVal = (v: unknown) => v != null && String(v).trim() !== '' && String(v).trim() !== '-';
+                      const eduRows = [
+                        { label: 'Education Category', key: 'educationCategory', val: user.educationCategory ? String(user.educationCategory).replace('-', ' ') : '', isSelect: true },
+                        { label: 'Education in Detail', key: 'educationDetails', val: user.educationDetails || '', isSelect: false },
+                        { label: 'Employed In', key: 'employedIn', val: user.employedIn || '', isSelect: false },
+                        { label: 'Occupation', key: 'occupation', val: user.occupation || '', isSelect: false },
+                        { label: 'Occupation in Details', key: 'occupationInDetails', val: user.occupationInDetails || '', isSelect: false },
+                        { label: 'Annual Income', key: 'annualIncome', val: user.annualIncome || '', isSelect: false },
+                      ].filter(r => editing || hasVal(r.val));
+                      if (eduRows.length === 0 && !editing) return <p className="py-4 px-4 text-sm" style={{ color: '#3A3A3A' }}>No educational information added yet.</p>;
+                      return eduRows.map((row, i) => (
+                        <div key={row.key} className="flex items-center py-3 px-4" style={{ borderBottom: i < eduRows.length - 1 ? '1px solid #E7C9D1' : 'none' }}>
+                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}:</span>
+                          {editing ? (
+                            row.isSelect ? (
+                              <select value={editForm.educationCategory ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, educationCategory: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}>
+                                <option value="">Select</option>
+                                <option value="school">School</option>
+                                <option value="diploma">Diploma</option>
+                                <option value="graduate">Graduate</option>
+                                <option value="post-graduate">Post Graduate</option>
+                                <option value="doctorate">Doctorate</option>
+                              </select>
+                            ) : (
+                              <input type="text" value={String((editForm as Record<string, unknown>)[row.key] ?? '')} onChange={(e) => setEditForm((f) => ({ ...f, [row.key]: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
+                            )
+                          ) : (
+                            <span className="text-sm flex-1 capitalize" style={{ color: '#3A3A3A' }}>{row.val || '-'}</span>
+                          )}
+                        </div>
+                      ));
+                    })()}
+                  </div>
+                </div>
+
+                {/* Photos (edit): add/remove, 2–4 required - shown when editing, below Educational */}
                 {editing && (isAdmin(currentUser) || (currentUser?.id && user && currentUser.id === user.id)) && (
                   <div className="mb-6">
-                    <h2 className="text-xl font-bold mb-3" style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '6px' }}>
+                    <h2 className="text-xl font-bold mb-3 pb-2" style={{ color: '#7A0F2E', borderBottom: '2px solid #E7C9D1' }}>
                       Photos <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '14px' }}>(2–4 required; use arrows on left to scroll)</span>
                     </h2>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -640,570 +761,13 @@ export default function UserProfilePage() {
                   </div>
                 )}
               </div>
-
-              {/* User Details (admin only) */}
-              {currentUser && isAdmin(currentUser) && user && (
-                <div className="space-y-4 mb-6">
-                  <h2
-                    className="text-2xl font-bold mb-4"
-                    style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}
-                  >
-                    User Details
-                  </h2>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Phone Number 1:</span>
-                      {editing ? (
-                        <input
-                          type="text"
-                          value={editForm.phoneNumber ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, phoneNumber: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.phoneNumber || '-'}</span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Phone Number 2 (optional):</span>
-                      {editing ? (
-                        <input
-                          type="text"
-                          value={editForm.phoneNumber2 ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, phoneNumber2: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                          placeholder="Optional"
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.phoneNumber2 || '-'}</span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Address:</span>
-                      {editing ? (
-                        <input
-                          type="text"
-                          value={editForm.address ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, address: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.address || '-'}</span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Email:</span>
-                      {editing ? (
-                        <input
-                          type="email"
-                          value={editForm.email ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.email || '-'}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Father & Mother (admin only) */}
-              {currentUser && isAdmin(currentUser) && user && (
-                <div className="space-y-4 mb-6">
-                  <h2
-                    className="text-2xl font-bold mb-4"
-                    style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}
-                  >
-                    Father & Mother
-                  </h2>
-                  <div className="grid grid-cols-1 gap-3">
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Father Name:</span>
-                      {editing ? (
-                        <input
-                          type="text"
-                          value={editForm.fatherName ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, fatherName: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                          placeholder="Optional"
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.fatherName || '-'}</span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Father Occupation:</span>
-                      {editing ? (
-                        <input
-                          type="text"
-                          value={editForm.fatherOccupation ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, fatherOccupation: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                          placeholder="Optional"
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.fatherOccupation || '-'}</span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Father Contact (optional):</span>
-                      {editing ? (
-                        <input
-                          type="tel"
-                          value={editForm.fatherContact ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, fatherContact: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                          placeholder="Optional"
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.fatherContact || '-'}</span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Mother Name:</span>
-                      {editing ? (
-                        <input
-                          type="text"
-                          value={editForm.motherName ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, motherName: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                          placeholder="Optional"
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.motherName || '-'}</span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Mother Occupation:</span>
-                      {editing ? (
-                        <input
-                          type="text"
-                          value={editForm.motherOccupation ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, motherOccupation: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                          placeholder="Optional"
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.motherOccupation || '-'}</span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 text-base items-center">
-                      <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '140px' }}>Mother Contact (optional):</span>
-                      {editing ? (
-                        <input
-                          type="tel"
-                          value={editForm.motherContact ?? ''}
-                          onChange={(e) => setEditForm((f) => ({ ...f, motherContact: e.target.value || null }))}
-                          className="flex-1 px-3 py-2 border-2 rounded-lg"
-                          style={{ borderColor: 'var(--border)' }}
-                          placeholder="Optional"
-                        />
-                      ) : (
-                        <span style={{ color: 'var(--text)' }}>{user.motherContact || '-'}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Details Sections */}
-              <div className="space-y-6">
-                {/* Personal Information (all personal + astrological) */}
-                <div className="space-y-4">
-                  <h2
-                    className="text-2xl font-bold mb-4"
-                    style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}
-                  >
-                    Personal Information
-                  </h2>
-                  <div className="grid grid-cols-1 gap-3">
-                    {editing && (
-                      <>
-                        <div className="flex gap-2 text-base items-center">
-                          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Name:</span>
-                          <input
-                            type="text"
-                            value={editForm.name ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        </div>
-                        <div className="flex gap-2 text-base items-center">
-                          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Surname:</span>
-                          <input
-                            type="text"
-                            value={editForm.surname ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, surname: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        </div>
-                        <div className="flex gap-2 text-base items-center">
-                          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Gender:</span>
-                          <select
-                            value={editForm.gender ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, gender: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <option value="">Select</option>
-                            <option value="bride">Bride</option>
-                            <option value="groom">Groom</option>
-                          </select>
-                        </div>
-                        <div className="flex gap-2 text-base items-center">
-                          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Marriage Status:</span>
-                          <input
-                            type="text"
-                            value={editForm.marriageStatus ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, marriageStatus: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        </div>
-                      </>
-                    )}
-                    {(editing || user.dob) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Date of Birth:</span>
-                        {editing ? (
-                          <input
-                            type="date"
-                            value={editForm.dob ? String(editForm.dob).slice(0, 10) : ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, dob: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.dob ? new Date(user.dob).toLocaleDateString() : '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.birthTime) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Birth Time:</span>
-                        {editing ? (
-                          <input
-                            type="text"
-                            placeholder="e.g. 14:30"
-                            value={editForm.birthTime ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, birthTime: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.birthTime ? formatBirthTime(user.birthTime) : '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.birthPlace) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Birth Place:</span>
-                        {editing ? (
-                          <input
-                            type="text"
-                            value={editForm.birthPlace ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, birthPlace: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.birthPlace || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.height) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Height:</span>
-                        {editing ? (
-                          <input
-                            type="text"
-                            value={editForm.height ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, height: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.height || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.complexion) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Complexion:</span>
-                        {editing ? (
-                          <select
-                            value={editForm.complexion ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, complexion: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <option value="">Select</option>
-                            <option value="fair">Fair</option>
-                            <option value="wheatish">Wheatish</option>
-                            <option value="dark">Dark</option>
-                          </select>
-                        ) : (
-                          <span className="capitalize" style={{ color: 'var(--text)' }}>{user.complexion || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.star) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Star:</span>
-                        {editing ? (
-                          <select
-                            value={editForm.star ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, star: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <option value="">Select</option>
-                            {starOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-                          </select>
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.star || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.raasi) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Rasi:</span>
-                        {editing ? (
-                          <select
-                            value={editForm.raasi ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, raasi: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <option value="">Select</option>
-                            {raasiOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-                          </select>
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.raasi || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.padam) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Padam:</span>
-                        {editing ? (
-                          <select
-                            value={editForm.padam ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, padam: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <option value="">Select</option>
-                            {padamOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-                          </select>
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.padam || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.gothram) && (
-                      <div className="flex flex-col gap-2 text-base">
-                        <div className="flex gap-2 items-center">
-                          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Gothram:</span>
-                          {editing ? (
-                            <>
-                              <select
-                                value={editForm.gothram ?? ''}
-                                onChange={(e) => setEditForm((f) => ({ ...f, gothram: e.target.value || null }))}
-                                className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                                style={{ borderColor: 'var(--border)' }}
-                              >
-                                <option value="">Select</option>
-                                {gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-                                <option value="Other">Other</option>
-                              </select>
-                              {editForm.gothram === 'Other' && (
-                                <input
-                                  type="text"
-                                  placeholder="Enter Gothram"
-                                  value={editForm.gothramOther ?? ''}
-                                  onChange={(e) => setEditForm((f) => ({ ...f, gothramOther: e.target.value || null }))}
-                                  className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                                  style={{ borderColor: 'var(--border)' }}
-                                />
-                              )}
-                            </>
-                          ) : (
-                            <span style={{ color: 'var(--text)' }}>{user.gothram || '-'}</span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    {(editing || user.uncleGothram) && (
-                      <div className="flex flex-col gap-2 text-base">
-                        <div className="flex gap-2 items-center">
-                          <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '120px' }}>Uncle Gothram (Menamama):</span>
-                          {editing ? (
-                            <>
-                              <select
-                                value={editForm.uncleGothram ?? ''}
-                                onChange={(e) => setEditForm((f) => ({ ...f, uncleGothram: e.target.value || null }))}
-                                className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                                style={{ borderColor: 'var(--border)' }}
-                              >
-                                <option value="">Select</option>
-                                {gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-                                <option value="Other">Other</option>
-                              </select>
-                              {editForm.uncleGothram === 'Other' && (
-                                <input
-                                  type="text"
-                                  placeholder="Enter Uncle Gothram (Menamama)"
-                                  value={editForm.uncleGothramOther ?? ''}
-                                  onChange={(e) => setEditForm((f) => ({ ...f, uncleGothramOther: e.target.value || null }))}
-                                  className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                                  style={{ borderColor: 'var(--border)' }}
-                                />
-                              )}
-                            </>
-                          ) : (
-                            <span style={{ color: 'var(--text)' }}>{user.uncleGothram || '-'}</span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Educational & Professional Information */}
-                <div className="space-y-4">
-                  <h2
-                    className="text-2xl font-bold mb-4"
-                    style={{ color: 'var(--text)', borderBottom: '2px solid var(--primary)', paddingBottom: '8px' }}
-                  >
-                    Educational & Professional Information
-                  </h2>
-                  <div className="grid grid-cols-1 gap-3">
-                    {(editing || user.educationCategory) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '160px' }}>Education Category:</span>
-                        {editing ? (
-                          <select
-                            value={editForm.educationCategory ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, educationCategory: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg bg-white"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <option value="">Select</option>
-                            <option value="school">School</option>
-                            <option value="diploma">Diploma</option>
-                            <option value="graduate">Graduate</option>
-                            <option value="post-graduate">Post Graduate</option>
-                            <option value="doctorate">Doctorate</option>
-                          </select>
-                        ) : (
-                          <span className="capitalize" style={{ color: 'var(--text)' }}>{user.educationCategory ? user.educationCategory.replace('-', ' ') : '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.educationDetails) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '160px' }}>Education Details:</span>
-                        {editing ? (
-                          <input
-                            type="text"
-                            value={editForm.educationDetails ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, educationDetails: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.educationDetails || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.employedIn) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '160px' }}>Employed In:</span>
-                        {editing ? (
-                          <input
-                            type="text"
-                            value={editForm.employedIn ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, employedIn: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.employedIn || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.occupation) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '160px' }}>Occupation:</span>
-                        {editing ? (
-                          <input
-                            type="text"
-                            value={editForm.occupation ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, occupation: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.occupation || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.occupationInDetails) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '160px' }}>Occupation in Details:</span>
-                        {editing ? (
-                          <input
-                            type="text"
-                            value={editForm.occupationInDetails ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, occupationInDetails: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.occupationInDetails || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                    {(editing || user.annualIncome) && (
-                      <div className="flex gap-2 text-base items-center">
-                        <span className="text-sm font-semibold shrink-0" style={{ color: 'var(--muted)', minWidth: '160px' }}>Annual Income:</span>
-                        {editing ? (
-                          <input
-                            type="text"
-                            value={editForm.annualIncome ?? ''}
-                            onChange={(e) => setEditForm((f) => ({ ...f, annualIncome: e.target.value || null }))}
-                            className="flex-1 px-3 py-2 border-2 rounded-lg"
-                            style={{ borderColor: 'var(--border)' }}
-                          />
-                        ) : (
-                          <span style={{ color: 'var(--text)' }}>{user.annualIncome || '-'}</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Actions dropdown (admin) - portal */}
+    </div>
       {actionsOpen && dropdownPosition && user && currentUser && isAdmin(currentUser) && typeof document !== 'undefined' && createPortal(
-        <>
+        <div style={{ display: 'contents' }}>
           <div
             className="fixed inset-0"
             style={{ zIndex: 1000 }}
@@ -1252,7 +816,7 @@ export default function UserProfilePage() {
               Delete
             </button>
           </div>
-        </>,
+        </div>,
         document.body
       )}
 

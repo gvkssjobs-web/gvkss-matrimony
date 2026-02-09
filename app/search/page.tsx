@@ -200,12 +200,12 @@ function SearchResultsContent() {
                       key={user.id}
                       onClick={() => router.push(`/${user.id}`)}
                       style={{
-                        border: '1px solid #eee',
+                        border: '2px solid #E7C9D1',
                         borderRadius: '6px',
-                        background: '#fff',
+                        background: '#FBF0F2',
                         transition: 'all 0.2s',
                         cursor: 'pointer',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                         overflow: 'hidden'
                       }}
                       onMouseEnter={(e) => {
@@ -223,7 +223,7 @@ function SearchResultsContent() {
                         height: '200px', 
                         position: 'relative',
                         overflow: 'hidden',
-                        background: 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%)'
+                        background: 'linear-gradient(135deg, #FBF0F2 0%, #FDF3F5 100%)'
                       }}>
                         {photoCount > 1 && (
                           <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, display: 'flex', gap: 4 }} onClick={(e) => e.stopPropagation()}>
@@ -282,16 +282,16 @@ function SearchResultsContent() {
                         <div style={{ fontWeight: '600', color: '#E94B6A', marginBottom: '5px', fontSize: '14px' }}>
                           ID: {user.id}
                         </div>
-                        <div style={{ color: '#333', fontSize: '15px', fontWeight: '500', marginBottom: '4px' }}>
+                        <div style={{ color: '#3A3A3A', fontSize: '15px', fontWeight: '500', marginBottom: '4px' }}>
                           {user.name}
                         </div>
                         {age && (
-                          <div style={{ color: '#666', fontSize: '13px' }}>
+                          <div style={{ color: '#3A3A3A', fontSize: '13px' }}>
                             Age: {age} years
                           </div>
                         )}
                         {user.height && (
-                          <div style={{ color: '#666', fontSize: '13px' }}>
+                          <div style={{ color: '#3A3A3A', fontSize: '13px' }}>
                             Height: {user.height}
                           </div>
                         )}

@@ -540,7 +540,7 @@ export default function Home() {
                       transition: 'all 0.2s',
                       cursor: 'pointer',
                       overflow: 'hidden',
-                      border: 'none'
+                      border: '2px solid #E7C9D1'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.transform = 'translateY(-2px)';
@@ -550,12 +550,12 @@ export default function Home() {
                     }}
                   >
                     {/* Photo Section */}
-                    <div style={{ 
-                      width: '100%', 
-                      height: '200px', 
+                    <div                     style={{
+                      width: '100%',
+                      height: '200px',
                       position: 'relative',
                       overflow: 'hidden',
-                      background: 'linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%)'
+                      background: 'linear-gradient(135deg, #FBF0F2 0%, #FDF3F5 100%)'
                     }}>
                       {photoCount > 1 && (
                         <div className="absolute top-2 right-2 z-10 flex gap-1" style={{ top: 8, right: 8 }} onClick={(e) => e.stopPropagation()}>
