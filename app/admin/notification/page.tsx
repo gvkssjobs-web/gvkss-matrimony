@@ -134,10 +134,10 @@ export default function AdminNotificationPage() {
 
   return (
     <ProtectedRoute requiredRole="admin">
-      <div className="w-full max-w-3xl mx-auto mt-20 px-4">
-        <div className="p-8 rounded-3xl shadow-2xl border border-pink-100 bg-white">
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-bold" style={{ color: '#111827' }}>
+      <div className="w-full max-w-3xl mx-auto mt-3 sm:mt-3 px-3 sm:px-4 pb-10">
+        <div className="p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-2xl border border-pink-100 bg-white">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold" style={{ color: '#111827' }}>
               Notifications
             </h1>
             <Link
@@ -190,7 +190,7 @@ export default function AdminNotificationPage() {
                     <p className="text-sm text-gray-500 mt-1">{n.email}</p>
                   </div>
 
-                  <div className="flex items-center gap-3 mt-3">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-3">
                     <button
                       type="button"
                       onClick={() => handleReject(n.user_id)}

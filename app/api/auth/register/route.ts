@@ -24,15 +24,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!dob) {
+      return NextResponse.json(
+        { error: 'Date of Birth is required' },
+        { status: 400 }
+      );
+    }
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+    if (age <= 21) {
+      return NextResponse.json(
+        { error: 'Age must be greater than 21' },
+        { status: 400 }
+      );
+    }
+
+    const isLate = (v: string | null | undefined) => {
+      const s = (v || '').toLowerCase().trim();
+      return s === 'late' || s.startsWith('late ');
+    };
     if (!fatherName?.trim()) {
       return NextResponse.json(
         { error: "Father's name is required" },
         { status: 400 }
       );
     }
-    if (!fatherOccupation?.trim()) {
+    if (!isLate(fatherName) && (!fatherOccupation?.trim() || !fatherContact?.trim())) {
       return NextResponse.json(
-        { error: "Father's occupation is required" },
+        { error: "Father's occupation and contact are required when father is not deceased" },
         { status: 400 }
       );
     }
@@ -42,9 +64,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    if (!motherOccupation?.trim()) {
+    if (!isLate(motherName) && (!motherOccupation?.trim() || !motherContact?.trim())) {
       return NextResponse.json(
-        { error: "Mother's occupation is required" },
+        { error: "Mother's occupation and contact are required when mother is not deceased" },
         { status: 400 }
       );
     }

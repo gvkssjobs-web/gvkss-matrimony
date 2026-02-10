@@ -38,7 +38,7 @@ export default function RootLayout({
         <div id="theme-wrapper" className="min-h-screen transition-colors duration-200 flex flex-col" style={{ backgroundColor: '#FDF3F5' }}>
           <ScrollingHeadline />
           <Navbar />
-          <main id="theme-main" className="flex flex-col items-center w-full transition-colors duration-200" style={{ backgroundColor: '#FDF3F5', paddingTop: '85px' }}>
+          <main id="theme-main" className="flex flex-col items-center w-full transition-colors duration-200 px-0 sm:px-4 pt-[84px] sm:pt-[92px]" style={{ backgroundColor: '#FDF3F5' }}>
             {children}
           </main>
           <Footer />

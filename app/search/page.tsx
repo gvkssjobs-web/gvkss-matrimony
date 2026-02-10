@@ -124,12 +124,8 @@ function SearchResultsContent() {
   };
 
   return (
-    <div className="w-full min-h-screen" style={{ 
-      backgroundColor: 'var(--bg)',
-      padding: '20px 0',
-      paddingTop: 'calc(20px + 10px)'
-    }}>
-      <div className="max-w-7xl mx-auto">
+    <div className="w-full min-h-screen px-3 sm:px-4 py-4 sm:py-6 overflow-x-hidden" style={{ backgroundColor: 'var(--bg)' }}>
+      <div className="max-w-7xl mx-auto w-full min-w-0">
       
 
         {/* Search Results Header */}

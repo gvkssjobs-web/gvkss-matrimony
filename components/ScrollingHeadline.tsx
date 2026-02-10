@@ -10,7 +10,7 @@ export default function ScrollingHeadline() {
     <>
       <div 
         className="fixed top-0 left-0 right-0 z-[60] overflow-hidden flex items-center cursor-default"
-        style={{ height: '30px', background: '#7A0F2E', color: '#FFF1F4', borderBottom: '1px solid rgba(201,163,106,0.3)' }}
+        style={{ height: '28px', background: '#7A0F2E', color: '#FFF1F4', borderBottom: '1px solid rgba(201,163,106,0.3)' }}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
@@ -23,7 +23,7 @@ export default function ScrollingHeadline() {
           }}
         >
           {/* Three repetitions per half; minimal gap between last and first */}
-          <span className="font-semibold text-sm" style={{ paddingLeft: '8vw', paddingRight: '15vw' }}>
+          <span className="font-semibold text-xs sm:text-sm" style={{ paddingLeft: '8vw', paddingRight: '15vw' }}>
             {welcomeText}
           </span>
           <span className="font-semibold text-sm" style={{ paddingRight: '15vw' }}>

@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, User } from '@/lib/auth';
-import Navbar from '@/components/Navbar';
 
 export default function StatusPage() {
   const router = useRouter();
@@ -43,12 +42,9 @@ export default function StatusPage() {
 
   if (loading) {
     return (
-      <>
-        <Navbar />
-        <div className="flex-1 flex min-h-screen flex-col items-center justify-center">
-          <div className="text-center">Loading...</div>
-        </div>
-      </>
+      <div className="flex-1 flex min-h-[60vh] flex-col items-center justify-center">
+        <div className="text-center">Loading...</div>
+      </div>
     );
   }
 
@@ -56,10 +52,8 @@ export default function StatusPage() {
   const isRejected = status === 'rejected';
 
   return (
-    <>
-      <Navbar />
-      <div className="flex-1 flex min-h-screen flex-col items-center justify-center w-full" style={{ paddingTop: '82px', paddingLeft: '0', paddingRight: '0' }}>
-        <div className="w-full max-w-2xl mx-auto py-12" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
+    <div className="flex-1 flex min-h-[60vh] flex-col items-center justify-center w-full px-3 sm:px-4 py-8 sm:py-12">
+      <div className="w-full max-w-2xl mx-auto">
           <div className="bg-white rounded-lg p-8 text-center" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
             {isPending && (
               <>
@@ -131,6 +125,5 @@ export default function StatusPage() {
           </div>
         </div>
       </div>
-    </>
   );
 }

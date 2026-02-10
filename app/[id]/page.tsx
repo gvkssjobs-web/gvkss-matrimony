@@ -232,6 +232,21 @@ export default function UserProfilePage() {
     }
   };
 
+  const isLate = (v: string | null | undefined) => {
+    const s = (v || '').toLowerCase().trim();
+    return s === 'late' || s.startsWith('late ');
+  };
+
+  const getAge = (dobStr: string | null | undefined): number | null => {
+    if (!dobStr) return null;
+    const birth = new Date(dobStr);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const m = today.getMonth() - birth.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+    return age;
+  };
+
   const validateEditForm = (): string | null => {
     if (!editForm.name?.trim()) return 'Name is required';
     if (!editForm.surname?.trim()) return 'Surname is required';
@@ -239,6 +254,8 @@ export default function UserProfilePage() {
     if (!editForm.gender) return 'Gender is required';
     if (!editForm.marriageStatus) return 'Marriage Status is required';
     if (!editForm.dob) return 'Date of Birth is required';
+    const age = getAge(editForm.dob);
+    if (age !== null && age <= 21) return 'Age must be greater than 21';
     if (!editForm.birthTime) return 'Birth Time is required';
     if (!editForm.birthPlace?.trim()) return 'Birth Place is required';
     if (!editForm.height?.trim()) return 'Height is required';
@@ -252,6 +269,14 @@ export default function UserProfilePage() {
     if (!editForm.educationCategory) return 'Education Category is required';
     if (!editForm.educationDetails?.trim()) return 'Education Details is required';
     if (!editForm.employedIn?.trim()) return 'Employed In is required';
+    if (editForm.fatherName?.trim() && !isLate(editForm.fatherName)) {
+      if (!editForm.fatherOccupation?.trim()) return 'Father Occupation is required';
+      if (!editForm.fatherContact?.trim()) return 'Father Contact is required';
+    }
+    if (editForm.motherName?.trim() && !isLate(editForm.motherName)) {
+      if (!editForm.motherOccupation?.trim()) return 'Mother Occupation is required';
+      if (!editForm.motherContact?.trim()) return 'Mother Contact is required';
+    }
     return null;
   };
 
@@ -275,6 +300,14 @@ export default function UserProfilePage() {
       keys.forEach((k) => {
         if (k in editForm) payload[k] = (editForm as Record<string, unknown>)[k];
       });
+      if (isLate(editForm.fatherName)) {
+        payload.fatherOccupation = null;
+        payload.fatherContact = null;
+      }
+      if (isLate(editForm.motherName)) {
+        payload.motherOccupation = null;
+        payload.motherContact = null;
+      }
       payload.gothram = editForm.gothram === 'Other' ? (editForm.gothramOther ?? '') : (editForm.gothram ?? '');
       payload.uncleGothram = editForm.uncleGothram === 'Other' ? (editForm.uncleGothramOther ?? '') : (editForm.uncleGothram ?? '');
 
@@ -430,10 +463,8 @@ export default function UserProfilePage() {
 
   return (
     <div className="profile-page-root">
-    <div className="w-full min-h-screen" style={{ 
-      backgroundColor: 'var(--bg)',
-      padding: '20px 10px',
-      paddingTop: 'calc(20px + 10px)'
+    <div className="w-full min-h-screen px-3 sm:px-4 lg:px-6 py-4 sm:py-6 overflow-x-hidden" style={{ 
+      backgroundColor: 'var(--bg)'
     }}>
       <div style={{ width: '100%', margin: '0 auto'}}>
        
@@ -441,7 +472,7 @@ export default function UserProfilePage() {
             <div className="rounded-2xl shadow-lg overflow-hidden border-2" style={{ borderColor: '#E7C9D1', backgroundColor: '#FBF0F2' }}>
           <div className="flex flex-col md:flex-row">
             {/* Left Side - Profile Photo Carousel (Full Height) */}
-            <div className="w-full md:w-1/3 flex-shrink-0 relative pt-5 pl-2 pr-2" style={{ minHeight: '600px', backgroundColor: '#FBF0F2' }}>
+            <div className="w-full md:w-1/3 flex-shrink-0 relative pt-4 sm:pt-5 pl-2 pr-2" style={{ minHeight: 'clamp(280px, 50vh, 600px)', backgroundColor: '#FBF0F2' }}>
               {/* Prev/Next at top-right */}
               {photoCount > 1 && (
                 <div className="absolute top-3 right-3 z-10 flex gap-1">
@@ -469,7 +500,7 @@ export default function UserProfilePage() {
                   src={getPhotoUrl() || ''}
                   alt={`${user.name} – photo ${photoIndex + 1}`}
                   className="w-full h-full object-contain object-top"
-                  style={{ minHeight: '600px', maxWidth: '100%', maxHeight: '100%' }}
+                  style={{ minHeight: 'clamp(280px, 45vh, 600px)', maxWidth: '100%', maxHeight: '100%' }}
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
                     img.style.display = 'none';
@@ -477,7 +508,7 @@ export default function UserProfilePage() {
                     if (parent && !parent.querySelector('.photo-placeholder')) {
                       const placeholder = document.createElement('div');
                       placeholder.className = 'photo-placeholder w-full h-full flex items-center justify-center text-6xl font-bold';
-                      placeholder.style.minHeight = '600px';
+                      placeholder.style.minHeight = 'clamp(280px, 45vh, 600px)';
                       placeholder.style.backgroundColor = 'var(--secondary)';
                       placeholder.style.color = 'var(--muted)';
                       placeholder.textContent = user.name ? user.name[0].toUpperCase() : '?';
@@ -502,9 +533,9 @@ export default function UserProfilePage() {
             </div>
 
             {/* Right Side - Content */}
-            <div className="flex-1 p-2 flex flex-col" style={{ backgroundColor: '#FBF0F2' }}>
+            <div className="flex-1 p-3 sm:p-4 lg:p-8 flex flex-col" style={{ backgroundColor: '#FBF0F2' }}>
               {/* Header: Profile ID left, Edit/Actions right */}
-              <div className="mb-4 flex flex-row items-center justify-between gap-4 flex-wrap">
+              <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                 <div>
                   <p className="text-xl font-bold mb-1" style={{ color: '#15803d' }}>Profile ID: {user.id}</p>
                   <p className="text-base" style={{ color: '#3A3A3A' }}>
@@ -615,8 +646,8 @@ export default function UserProfilePage() {
                       if (canSeePrivate && (editing || hasVal(user.motherContact))) rows.push({ label: 'Mother Contact', show: true, input: 'motherContact', type: 'text' });
                       if (rows.length === 0 && !editing) return <p className="py-4 px-4 text-sm" style={{ color: '#3A3A3A' }}>No personal information added yet.</p>;
                       return rows.map((row, i) => (
-                        <div key={row.label} className="flex items-center py-1.5 px-0">
-                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}</span>
+                        <div key={row.label} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0 py-1.5 px-0">
+                          <span className="font-semibold shrink-0 text-xs sm:text-sm" style={{ minWidth: 'clamp(120px, 25vw, 200px)', color: '#3A3A3A' }}>{row.label}</span>
                           {editing && row.input ? (
                             row.input === 'gender' ? (
                               <select value={editForm.gender ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, gender: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}>
@@ -647,6 +678,18 @@ export default function UserProfilePage() {
                               <div className="flex-1 flex gap-2"><select value={editForm.uncleGothram ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, uncleGothram: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}><option value="">Select</option>{gothramOptions.map((o) => <option key={o} value={o}>{o}</option>)}<option value="Other">Other</option></select>{editForm.uncleGothram === 'Other' && <input type="text" placeholder="Enter Uncle Gothram" value={editForm.uncleGothramOther ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, uncleGothramOther: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />}</div>
                             ) : row.input === 'siblingsInfo' ? (
                               <textarea value={editForm.siblingsInfo != null ? (typeof editForm.siblingsInfo === 'string' ? editForm.siblingsInfo : JSON.stringify(editForm.siblingsInfo, null, 2)) : ''} onChange={(e) => { const v = e.target.value.trim(); if (!v) { setEditForm((f) => ({ ...f, siblingsInfo: null })); return; } try { setEditForm((f) => ({ ...f, siblingsInfo: JSON.parse(v) })); } catch {} }} className="flex-1 px-3 py-2 border-2 rounded-lg text-sm min-h-[60px]" style={{ borderColor: 'var(--border)' }} placeholder='{"brothers": 0, "sisters": 1}' />
+                            ) : row.input === 'fatherName' ? (
+                              <input type="text" value={editForm.fatherName ?? ''} onChange={(e) => { const v = e.target.value || null; setEditForm((f) => ({ ...f, fatherName: v, ...(isLate(v) ? { fatherOccupation: null, fatherContact: null } : {}) })); }} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'fatherOccupation' ? (
+                              <input type="text" value={editForm.fatherOccupation ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, fatherOccupation: e.target.value || null }))} disabled={isLate(editForm.fatherName)} className="flex-1 px-3 py-2 border-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'fatherContact' ? (
+                              <input type="tel" value={editForm.fatherContact ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, fatherContact: e.target.value || null }))} disabled={isLate(editForm.fatherName)} className="flex-1 px-3 py-2 border-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'motherName' ? (
+                              <input type="text" value={editForm.motherName ?? ''} onChange={(e) => { const v = e.target.value || null; setEditForm((f) => ({ ...f, motherName: v, ...(isLate(v) ? { motherOccupation: null, motherContact: null } : {}) })); }} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'motherOccupation' ? (
+                              <input type="text" value={editForm.motherOccupation ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, motherOccupation: e.target.value || null }))} disabled={isLate(editForm.motherName)} className="flex-1 px-3 py-2 border-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--border)' }} />
+                            ) : row.input === 'motherContact' ? (
+                              <input type="tel" value={editForm.motherContact ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, motherContact: e.target.value || null }))} disabled={isLate(editForm.motherName)} className="flex-1 px-3 py-2 border-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed" style={{ borderColor: 'var(--border)' }} />
                             ) : (
                               <input type={(row.type as 'text'|'email'|'tel') || 'text'} value={String((editForm as Record<string, unknown>)[row.input!] ?? '')} onChange={(e) => setEditForm((f) => ({ ...f, [row.input!]: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
                             )
@@ -677,8 +720,8 @@ export default function UserProfilePage() {
                       ].filter(r => editing || hasVal(r.val));
                       if (eduRows.length === 0 && !editing) return <p className="py-4 px-4 text-sm" style={{ color: '#3A3A3A' }}>No educational information added yet.</p>;
                       return eduRows.map((row, i) => (
-                        <div key={row.key} className="flex items-center py-1.5 px-0">
-                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}</span>
+                        <div key={row.key} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0 py-1.5 px-0">
+                          <span className="font-semibold shrink-0 text-xs sm:text-sm" style={{ minWidth: 'clamp(120px, 25vw, 200px)', color: '#3A3A3A' }}>{row.label}</span>
                           {editing ? (
                             row.isSelect ? (
                               <select value={editForm.educationCategory ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, educationCategory: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}>

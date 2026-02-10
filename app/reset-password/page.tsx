@@ -72,8 +72,8 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="w-full" style={{ background: 'var(--bg)', padding: '20px 0', minHeight: 'calc(100vh - 82px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="w-full max-w-md rounded-3xl shadow-2xl p-8 border text-center" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
+      <div className="w-full px-3 sm:px-4 py-6 sm:py-8" style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 84px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="w-full max-w-md rounded-2xl sm:rounded-3xl shadow-2xl p-5 sm:p-8 border text-center mx-auto" style={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)' }}>
           <p className="text-lg font-semibold" style={{ color: 'var(--text)' }}>Password has been reset successfully.</p>
           <p className="mt-2" style={{ color: 'var(--muted)' }}>Redirecting you to sign in...</p>
           <Link href="/login" className="inline-block mt-4 font-semibold" style={{ color: 'var(--primary)' }}>Sign in now</Link>
@@ -83,17 +83,15 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div className="w-full" style={{
+    <div className="w-full px-3 sm:px-4 py-6 sm:py-8" style={{
       background: 'var(--bg)',
-      padding: '20px 0',
-      paddingTop: 'calc(10px + 1px)',
-      minHeight: 'calc(100vh - 82px)',
+      minHeight: 'calc(100vh - 84px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: 'column',
     }}>
-      <div className="w-full max-w-md rounded-3xl shadow-2xl p-8 border" style={{
+      <div className="w-full max-w-md rounded-2xl sm:rounded-3xl shadow-2xl p-5 sm:p-8 border mx-auto" style={{
         backgroundColor: 'var(--card)',
         borderColor: 'var(--border)',
         boxShadow: 'var(--shadow)',
@@ -168,7 +166,7 @@ function ResetPasswordForm() {
 export default function ResetPasswordPage() {
   return (
     <Suspense fallback={
-      <div className="w-full" style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 82px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="w-full" style={{ background: 'var(--bg)', minHeight: 'calc(100vh - 84px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <p style={{ color: 'var(--muted)' }}>Loading...</p>
       </div>
     }>

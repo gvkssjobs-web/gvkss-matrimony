@@ -61,6 +61,20 @@ export async function PATCH(
         );
       }
 
+      if ('dob' in body && body.dob) {
+        const birthDate = new Date(body.dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const m = today.getMonth() - birthDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+        if (age <= 21) {
+          return NextResponse.json(
+            { error: 'Age must be greater than 21' },
+            { status: 400 }
+          );
+        }
+      }
+
       // Fields that users can update (exclude status - admin only)
       const allowedFields: Record<string, string> = {
         email: 'email',

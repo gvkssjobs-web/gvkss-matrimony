@@ -43,6 +43,7 @@
 
 html {
   color-scheme: light;
+  overflow-x: clip;
 }
 
 body {
@@ -52,6 +53,8 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Navbar styling - solid background, no transparency */
@@ -189,6 +192,18 @@ nav input::placeholder {
 /* Smooth Scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+/* Mobile: prevent zoom on input focus (iOS) */
+@media (max-width: 640px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* Custom Scrollbar */
