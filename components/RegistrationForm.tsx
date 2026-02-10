@@ -394,18 +394,16 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
   };
 
   return (
-    <div className="w-full" style={{ 
+    <div className="w-full px-3 sm:px-4 py-6 sm:py-8" style={{ 
       background: 'var(--bg)',
-      padding: '20px 0',
-      paddingTop: 'calc(20px + 10px)',
-      minHeight: 'calc(100vh - 82px)',
+      minHeight: 'calc(100vh - 84px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       flexDirection: 'column'
     }}>
       
-      <div className="w-full max-w-lg rounded-3xl shadow-2xl p-8 border" style={{ 
+      <div className="w-full max-w-lg rounded-2xl sm:rounded-3xl shadow-2xl p-4 sm:p-6 lg:p-8 border mx-3 sm:mx-4 overflow-x-hidden" style={{ 
         backgroundColor: 'var(--card)', 
         borderColor: 'var(--border)', 
         boxShadow: 'var(--shadow)' 
@@ -1064,7 +1062,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             }}>
               Photos <span style={{ color: '#dc2626' }}>*</span> <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '12px' }}>(2–4 required)</span>
             </label>
-            <div className="grid grid-cols-2 gap-3 mb-2">
+            <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 mb-2">
               {formData.photos.map((slot, index) => (
                 <div key={index} className="relative rounded-xl border-2 overflow-hidden" style={{ borderColor: 'var(--border)', aspectRatio: '1', backgroundColor: 'var(--secondary)' }}>
                   {slot.preview ? (

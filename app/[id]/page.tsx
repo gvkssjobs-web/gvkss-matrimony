@@ -463,10 +463,8 @@ export default function UserProfilePage() {
 
   return (
     <div className="profile-page-root">
-    <div className="w-full min-h-screen" style={{ 
-      backgroundColor: 'var(--bg)',
-      padding: '20px 10px',
-      paddingTop: 'calc(20px + 10px)'
+    <div className="w-full min-h-screen px-3 sm:px-4 lg:px-6 py-4 sm:py-6 overflow-x-hidden" style={{ 
+      backgroundColor: 'var(--bg)'
     }}>
       <div style={{ width: '100%', margin: '0 auto'}}>
        
@@ -474,7 +472,7 @@ export default function UserProfilePage() {
             <div className="rounded-2xl shadow-lg overflow-hidden border-2" style={{ borderColor: '#E7C9D1', backgroundColor: '#FBF0F2' }}>
           <div className="flex flex-col md:flex-row">
             {/* Left Side - Profile Photo Carousel (Full Height) */}
-            <div className="w-full md:w-1/3 flex-shrink-0 relative pt-5 pl-2 pr-2" style={{ minHeight: '600px', backgroundColor: '#FBF0F2' }}>
+            <div className="w-full md:w-1/3 flex-shrink-0 relative pt-4 sm:pt-5 pl-2 pr-2" style={{ minHeight: 'clamp(280px, 50vh, 600px)', backgroundColor: '#FBF0F2' }}>
               {/* Prev/Next at top-right */}
               {photoCount > 1 && (
                 <div className="absolute top-3 right-3 z-10 flex gap-1">
@@ -502,7 +500,7 @@ export default function UserProfilePage() {
                   src={getPhotoUrl() || ''}
                   alt={`${user.name} – photo ${photoIndex + 1}`}
                   className="w-full h-full object-contain object-top"
-                  style={{ minHeight: '600px', maxWidth: '100%', maxHeight: '100%' }}
+                  style={{ minHeight: 'clamp(280px, 45vh, 600px)', maxWidth: '100%', maxHeight: '100%' }}
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
                     img.style.display = 'none';
@@ -510,7 +508,7 @@ export default function UserProfilePage() {
                     if (parent && !parent.querySelector('.photo-placeholder')) {
                       const placeholder = document.createElement('div');
                       placeholder.className = 'photo-placeholder w-full h-full flex items-center justify-center text-6xl font-bold';
-                      placeholder.style.minHeight = '600px';
+                      placeholder.style.minHeight = 'clamp(280px, 45vh, 600px)';
                       placeholder.style.backgroundColor = 'var(--secondary)';
                       placeholder.style.color = 'var(--muted)';
                       placeholder.textContent = user.name ? user.name[0].toUpperCase() : '?';
@@ -535,9 +533,9 @@ export default function UserProfilePage() {
             </div>
 
             {/* Right Side - Content */}
-            <div className="flex-1 p-2 flex flex-col" style={{ backgroundColor: '#FBF0F2' }}>
+            <div className="flex-1 p-3 sm:p-4 lg:p-8 flex flex-col" style={{ backgroundColor: '#FBF0F2' }}>
               {/* Header: Profile ID left, Edit/Actions right */}
-              <div className="mb-4 flex flex-row items-center justify-between gap-4 flex-wrap">
+              <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
                 <div>
                   <p className="text-xl font-bold mb-1" style={{ color: '#15803d' }}>Profile ID: {user.id}</p>
                   <p className="text-base" style={{ color: '#3A3A3A' }}>
@@ -648,8 +646,8 @@ export default function UserProfilePage() {
                       if (canSeePrivate && (editing || hasVal(user.motherContact))) rows.push({ label: 'Mother Contact', show: true, input: 'motherContact', type: 'text' });
                       if (rows.length === 0 && !editing) return <p className="py-4 px-4 text-sm" style={{ color: '#3A3A3A' }}>No personal information added yet.</p>;
                       return rows.map((row, i) => (
-                        <div key={row.label} className="flex items-center py-1.5 px-0">
-                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}</span>
+                        <div key={row.label} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0 py-1.5 px-0">
+                          <span className="font-semibold shrink-0 text-xs sm:text-sm" style={{ minWidth: 'clamp(120px, 25vw, 200px)', color: '#3A3A3A' }}>{row.label}</span>
                           {editing && row.input ? (
                             row.input === 'gender' ? (
                               <select value={editForm.gender ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, gender: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}>
@@ -722,8 +720,8 @@ export default function UserProfilePage() {
                       ].filter(r => editing || hasVal(r.val));
                       if (eduRows.length === 0 && !editing) return <p className="py-4 px-4 text-sm" style={{ color: '#3A3A3A' }}>No educational information added yet.</p>;
                       return eduRows.map((row, i) => (
-                        <div key={row.key} className="flex items-center py-1.5 px-0">
-                          <span className="font-semibold shrink-0 text-sm" style={{ minWidth: '200px', color: '#3A3A3A' }}>{row.label}</span>
+                        <div key={row.key} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0 py-1.5 px-0">
+                          <span className="font-semibold shrink-0 text-xs sm:text-sm" style={{ minWidth: 'clamp(120px, 25vw, 200px)', color: '#3A3A3A' }}>{row.label}</span>
                           {editing ? (
                             row.isSelect ? (
                               <select value={editForm.educationCategory ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, educationCategory: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}>

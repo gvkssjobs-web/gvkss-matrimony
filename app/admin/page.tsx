@@ -140,10 +140,10 @@ export default function AdminPage() {
 
   return (
     <ProtectedRoute requiredRole="admin">
-      <div className="w-full max-w-6xl mx-auto mt-20">
-        <div className="p-8 rounded-3xl shadow-2xl border border-pink-100" style={{ backgroundColor: '#FFFFFF' }}>
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold">Admin Panel</h1>
+      <div className="w-full max-w-6xl mx-auto mt-3 sm:mt-3 px-3 sm:px-6 lg:px-8 pb-8">
+        <div className="p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-2xl border border-pink-100" style={{ backgroundColor: '#FFFFFF' }}>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold">Admin Panel</h1>
             <Link
               href="/admin/add_user"
               className="font-bold transition-colors"
@@ -186,10 +186,10 @@ export default function AdminPage() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-zinc-200 dark:border-zinc-700">
-                    <th className="text-left p-4">ID</th>
-                    <th className="text-left p-4">Name</th>
-                    <th className="text-left p-4">Status</th>
-                    <th className="text-left p-4">Actions</th>
+                    <th className="text-left p-2 sm:p-4 text-sm sm:text-base">ID</th>
+                    <th className="text-left p-2 sm:p-4 text-sm sm:text-base">Name</th>
+                    <th className="text-left p-2 sm:p-4 text-sm sm:text-base">Status</th>
+                    <th className="text-left p-2 sm:p-4 text-sm sm:text-base">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -243,12 +243,12 @@ export default function AdminPage() {
                       onClick={() => router.push(`/${u.id}`)}
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/${u.id}`); } }}
                     >
-                      <td className="p-4">{u.id}</td>
-                      <td className="p-4">{u.name || '-'}</td>
-                      <td className="p-4">
+                      <td className="p-2 sm:p-4 text-sm sm:text-base">{u.id}</td>
+                      <td className="p-2 sm:p-4 text-sm sm:text-base">{u.name || '-'}</td>
+                      <td className="p-2 sm:p-4">
                         {getStatusBadge(u.status)}
                       </td>
-                      <td className="p-4" onClick={(e) => e.stopPropagation()}>
+                      <td className="p-2 sm:p-4" onClick={(e) => e.stopPropagation()}>
                           <div className="relative inline-block">
                             <button
                               ref={actionsOpenForId === u.id ? actionsButtonRef : undefined}

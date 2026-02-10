@@ -133,70 +133,40 @@ export default function Home() {
   };
 
   return (
-    <div style={{ width: '100%', margin: '0 auto'}}>
-      {/* Quick Search with Background Image */}
-      <div style={{
-        background: '#FBF0F2',
-        borderRadius: '8px',
-        padding: '0',
-        overflow: 'hidden',
-        position: 'relative'
-      }}>
-        <div style={{ 
-          width: '100%', 
-          height: '565px',
-          position: 'relative',
-          borderRadius: '8px',
-          overflow: 'hidden'
-        }}>
-          {/* Static Background Image */}
+    <div className="w-full">
+      {/* Hero - full viewport width, breaks out of main padding */}
+      <div className="w-screen max-w-[100vw] relative left-1/2 -translate-x-1/2 mb-4 sm:mb-6">
+        <div className="relative w-full overflow-hidden pt-135" style={{ height: 'clamp(250px, 50vh, 565px)', background: '#FBF0F2' }}>
           <Image
             src="/Media.jpg"
             alt="Happy Couple"
             fill
-            style={{ objectFit: 'cover' }}
+            sizes="100vw"
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
             priority
+            className="object-cover"
           />
 
-          {/* Quick Search Overlay */}
-          <div style={{
-            position: 'absolute',
-            top: '60px',
-            right: '100px',
-            width: '400px',
-            maxWidth: 'calc(100% - 40px)',
-            zIndex: 5,
+          {/* Quick Search - always fully visible with safe padding */}
+          <div className="absolute inset-0 flex items-start justify-end p-4 sm:p-6 lg:p-8 pt-4 sm:pt-8 lg:pt-14 pointer-events-none">
+            <div className="pointer-events-auto w-[260px] sm:w-[300px] lg:w-[400px] max-w-[calc(100%-2rem)] z-10 bg-black/60 rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-xl text-white">
 
-            background: 'rgba(0, 0, 0, 0.6)',
-            borderRadius: '25px',
-            padding: '30px',
-
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.3)',
-            border: 'none',
-            color: '#fff' // base text color
-          }}>
-
-            <h2 style={{
-              fontSize: '24px',
-              fontWeight: 'bold',
-              marginBottom: '20px',
-              color: '#fff'
-            }}>
+            <h2 className="text-base sm:text-xl lg:text-2xl font-bold mb-2 sm:mb-5">
               Quick Search
             </h2>
 
             {/* Looking For */}
-            <div style={{ marginBottom: '20px' }}>
+            <div className="mb-2 sm:mb-5">
               <label style={{
                 display: 'block',
-                marginBottom: '10px',
+                marginBottom: '6px',
                 fontWeight: '600',
                 color: 'rgba(255,255,255,0.85)'
               }}>
                 Looking For
               </label>
 
-              <div style={{ display: 'flex', gap: '20px' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                   <input
                     type="radio"
@@ -204,9 +174,10 @@ export default function Home() {
                     value="bride"
                     checked={searchType === 'bride'}
                     onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
-                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
+                    className="shrink-0"
+                    style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#E94B6A' }}
                   />
-                  <span style={{ fontSize: '16px', color: '#fff' }}>Bride</span>
+                  <span style={{ fontSize: '14px', color: '#fff' }}>Bride</span>
                 </label>
 
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
@@ -216,33 +187,36 @@ export default function Home() {
                     value="groom"
                     checked={searchType === 'groom'}
                     onChange={(e) => setSearchType(e.target.value as 'bride' | 'groom')}
-                    style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#E94B6A' }}
+                    className="shrink-0"
+                    style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#E94B6A' }}
                   />
-                  <span style={{ fontSize: '16px', color: '#fff' }}>Groom</span>
+                  <span style={{ fontSize: '14px', color: '#fff' }}>Groom</span>
                 </label>
               </div>
             </div>
 
             {/* Age */}
-            <div style={{ marginBottom: '20px' }}>
+            <div className="mb-2 sm:mb-5">
               <label style={{
                 display: 'block',
-                marginBottom: '10px',
+                marginBottom: '6px',
                 fontWeight: '600',
                 color: 'rgba(255,255,255,0.85)'
               }}>
                 Age
               </label>
 
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <select
                   value={minAge}
                   onChange={(e) => setMinAge(Number(e.target.value))}
                   style={{
-                    padding: '8px 12px',
+                    padding: '6px 8px',
                     borderRadius: '4px',
                     fontSize: '14px',
-                    minWidth: '80px',
+                    minWidth: '60px',
+                    flex: '1 1 60px',
+                    maxWidth: '80px',
                     background: 'rgba(255,255,255,0.1)',
                     color: '#fff',
                     border: '1px solid rgba(255,255,255,0.2)'
@@ -261,10 +235,12 @@ export default function Home() {
                   value={maxAge}
                   onChange={(e) => setMaxAge(Number(e.target.value))}
                   style={{
-                    padding: '8px 12px',
+                    padding: '6px 8px',
                     borderRadius: '4px',
                     fontSize: '14px',
-                    minWidth: '80px',
+                    minWidth: '60px',
+                    flex: '1 1 60px',
+                    maxWidth: '80px',
                     background: 'rgba(255,255,255,0.1)',
                     color: '#fff',
                     border: '1px solid rgba(255,255,255,0.2)'
@@ -280,25 +256,27 @@ export default function Home() {
             </div>
 
             {/* Height */}
-            <div style={{ marginBottom: '20px' }}>
+            <div className="mb-2 sm:mb-5">
               <label style={{
                 display: 'block',
-                marginBottom: '10px',
+                marginBottom: '6px',
                 fontWeight: '600',
                 color: 'rgba(255,255,255,0.85)'
               }}>
                 Height
               </label>
 
-              <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <select
                   value={minHeight}
                   onChange={(e) => setMinHeight(e.target.value)}
                   style={{
-                    padding: '8px 12px',
+                    padding: '6px 8px',
                     borderRadius: '4px',
                     fontSize: '14px',
-                    minWidth: '120px',
+                    minWidth: '72px',
+                    flex: '1 1 72px',
+                    maxWidth: '100px',
                     background: 'rgba(255,255,255,0.1)',
                     color: '#fff',
                     border: '1px solid rgba(255,255,255,0.2)'
@@ -318,10 +296,12 @@ export default function Home() {
                   value={maxHeight}
                   onChange={(e) => setMaxHeight(e.target.value)}
                   style={{
-                    padding: '8px 12px',
+                    padding: '6px 8px',
                     borderRadius: '4px',
                     fontSize: '14px',
-                    minWidth: '120px',
+                    minWidth: '72px',
+                    flex: '1 1 72px',
+                    maxWidth: '100px',
                     background: 'rgba(255,255,255,0.1)',
                     color: '#fff',
                     border: '1px solid rgba(255,255,255,0.2)'
@@ -339,8 +319,9 @@ export default function Home() {
 
             <button
               onClick={handleSearch}
+              className="text-sm sm:text-base"
               style={{
-                padding: '12px 30px',
+                padding: '10px 20px',
                 background: '#E94B6A',
                 color: '#fff',
                 border: 'none',
@@ -357,19 +338,15 @@ export default function Home() {
             </button>
 
           </div>
-
+        </div>
         </div>
       </div>
 
-      {/* Unified Section: Profile ID Search, Brides, and Grooms */}
-      <div style={{
-        background: '#FBF0F2',
-        borderRadius: '8px',
-        padding: '30px',
-        marginBottom: '30px'
-      }}>
+      {/* Content - constrained width */}
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-4">
+      <div className="w-full bg-[#FBF0F2] rounded-lg p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
         {/* Profile ID Search */}
-        <div style={{ marginBottom: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div className="mb-8 sm:mb-10 flex flex-col items-center">
           <h2 style={{ 
             fontSize: '24px', 
             fontWeight: 'bold', 
@@ -381,7 +358,7 @@ export default function Home() {
           }}>
             Profile ID Search
           </h2>
-          <div style={{ display: 'flex', gap: '5px', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-2 items-stretch sm:items-center justify-center w-full max-w-md mx-auto">
             <input
               type="text"
               value={profileId}
@@ -392,27 +369,12 @@ export default function Home() {
                 }
               }}
               placeholder="Enter Profile ID"
-              style={{
-                padding: '10px 15px',
-                borderRadius: '10px',
-                fontSize: '16px',
-                flex: 1,
-                maxWidth: '300px',
-                border: '3px solid #333'
-              }}
+              className="flex-1 w-full sm:max-w-[200px] px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-base border-2 sm:border-[3px] border-[#333]"
             />
             <button
               onClick={handleProfileIdSearch}
-              style={{
-                padding: '10px 25px',
-                background: 'linear-gradient(135deg, #7A0F2E, #A41644)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '10px',
-                fontSize: '16px',
-                fontWeight: '600',
-                cursor: 'pointer'
-              }}
+              className="px-6 py-2.5 sm:py-3 rounded-lg text-base font-semibold text-white cursor-pointer shrink-0"
+              style={{ background: 'linear-gradient(135deg, #7A0F2E, #A41644)' }}
             >
               Search
             </button>
@@ -626,6 +588,7 @@ export default function Home() {
             </div>
           )}
         </div>
+      </div>
       </div>
 
       <style jsx>{`

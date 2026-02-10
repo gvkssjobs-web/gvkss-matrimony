@@ -12,10 +12,10 @@ export default function Footer() {
         borderTopColor: '#C9A36A',
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 items-start">
-          {/* Contact Us */}
-          <div className="flex flex-col items-center md:items-start pl-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-12 items-start">
+          {/* Contact Us - on mobile: bottom, on desktop: left */}
+          <div className="flex flex-col items-center md:items-start pl-0 md:pl-4 lg:pl-20 order-3 md:order-1">
             <h3 className="text-base font-bold mb-3" style={{ color: '#F3C2CF', letterSpacing: '0.5px' }}>Contact Us</h3>
             <div className="space-y-2">
               {/* Name with Person Icon */}
@@ -149,8 +149,8 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Logo - between Contact Us and Quick Links */}
-          <div className="flex justify-center">
+          {/* Logo - on mobile: top, on desktop: center */}
+          <div className="flex justify-center order-1 md:order-2">
             <Image
               src="/footer.png"
               alt="Deepthi Matrimony - Only for Arya Vysya - Established in 2010"
@@ -161,8 +161,8 @@ export default function Footer() {
             />
           </div>
 
-          {/* Quick Links */}
-          <div className="flex flex-col items-center md:items-start pl-20">
+          {/* Quick Links - on mobile: middle, on desktop: right */}
+          <div className="flex flex-col items-center md:items-start pl-0 md:pl-4 lg:pl-20 order-2 md:order-3">
             <h4 className="text-sm font-semibold mb-2" style={{ color: '#F3C2CF' }}>Quick Links</h4>
             <ul className="space-y-1 flex flex-col items-center md:items-start">
               <li>
