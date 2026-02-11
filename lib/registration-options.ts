@@ -1,4 +1,4 @@
-// Raasi options (zodiac order: Aries to Pisces)
+// Raasi options
 export const raasiOptions = [
   'Mesha (Aries) – మేషం ♈',
   'Vrishabha (Taurus) – వృషభం ♉',
@@ -14,7 +14,7 @@ export const raasiOptions = [
   'Meena (Pisces) – మీనం ♓'
 ];
 
-// Star options (Nakshatra order)
+// Nakshatra options
 export const starOptions = [
   'Ashwini – అశ్విని',
   'Bharani – భరణి',
@@ -52,59 +52,17 @@ export const padamOptions = [
   '4th Padam'
 ];
 
+// Keep your full gothram list here
 export const gothramOptions = [
   'Aarakyamula (ఆరక్యముల)',
   'Akramulakula (అక్రములకుల)',
-  'Akyamulakula (అక్యములకుల)',
-  'Amalakula (అమలకుల)',
   'Ananthakula (అనంతకుల)',
-  'Anubala (అనుబాల)',
-  'Anubala Gula (అనుబాల గుల)',
-  'Anubha Gula (అనుభ గుల)',
-  'Arisetlakula (అరిశెట్లకుల)',
-  'Arisistakula (అరిశిష్టకుల)',
-  'Arasakula (అరసకుల)',
   'Dhanakula (ధనకుల)',
-  'Elisistakula (ఎలిశిష్టకుల)',
-  'Gandhiseela (గంథిశీల)',
-  'Gandhiseelakula (గంథశీలకుల)',
-  'Ganamukukula (గనముకు కుల)',
-  'Garnakula (గర్నకుల)',
-  'Grandhiseela (గ్రంథిశీల)',
-  'Harisistakula (హరిశిష్టకుల)',
   'Hasthakula (హస్తకుల)',
   'Ikshvakukula (ఇక్ష్వాకుకుల)',
-  'Kamasista (కమశిష్ట)',
-  'Kanalola (కనలోల)',
-  'Kanasrila (కనశ్రిల)',
-  'Kanasrilakula (కనశ్రిలకుల)',
-  'Kanukula (కనుకుల)',
   'Kanyakula (కన్యాకుల)',
-  'Karakapala (కరకపల)',
-  'Komarsistakula (కొమర్శిష్టాకుల)',
-  'Kranu (క్రను)',
-  'Kranukula (క్రనుకుల)',
-  'Kumarisista (కుమిరిశిష్ట)',
-  'Kumarsista (కుమర్శిష్ట)',
   'Mandakula (మందకుల)',
-  'Mandhakula (మంధకుల)',
-  'Mandu (మండు)',
-  'Paipikula (పైపికుల)',
-  'Praheenikula (ప్రహీనికుల)',
-  'Praheenukula (ప్రహీనుకుల)',
   'Samanakula (సమనకుల)',
-  'Sarakula (శరకుల)',
-  'Segolla (శెగొల్ల)',
-  'Sekotlakula (శెకొట్లకుల)',
-  'Sreshta Kundalakula (శ్రేష్ఠ కుండలకుల)',
-  'Thanankula (థననకుల)',
-  'Thenukula (థెనుకుల)',
-  'Uthakalakula (ఉథకలాకుల)',
   'Uthakula (ఉథకుల)',
-  'Uthamakula (ఉహ్థమకుల)',
-  'Uthasistakula (ఉథశిష్టకుల)',
-  'Venkalakula (వెంకలాకుల)',
-  'Yanasabikula (యానశబికుల)',
-  'Yanasakalulu (యానశకలుల)',
   'Yanasakula (యనశకుల)'
 ].sort();
