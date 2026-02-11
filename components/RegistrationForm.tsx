@@ -101,11 +101,12 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         if (!formData.dob) errors.push('Date of Birth is required');
         else {
           const age = getAge(formData.dob);
-          if (age !== null && age <= 21) errors.push('Age must be greater than 21');
+          if (age !== null && age < 21) errors.push('Age must be at least 21 years');
         }
         if (!formData.birthTime) errors.push('Birth Time is required');
         if (!formData.birthPlace?.trim()) errors.push('Birth Place is required');
         if (!formData.height?.trim()) errors.push('Height is required');
+        else if (!/^\d*\.?\d*$/.test(formData.height.trim())) errors.push('Height must contain only numbers and decimal point (e.g. 5.8)');
         if (!formData.complexion) errors.push('Complexion is required');
         break;
       case 3: // Family (Father, Mother, Siblings)
@@ -139,7 +140,9 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
         if (photoCount < 2) errors.push('At least 2 photos are required');
         if (photoCount > 4) errors.push('Maximum 4 photos allowed');
         if (!formData.phone?.trim()) errors.push('Phone Number (1) is required');
+        else if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) errors.push('Phone number must be exactly 10 digits');
         if (phoneError) errors.push(phoneError);
+        if (formData.phone2?.trim() && !/^\d{10}$/.test(formData.phone2.replace(/\D/g, ''))) errors.push('Phone number 2 must be exactly 10 digits if provided');
         if (phone2Error) errors.push(phone2Error);
         if (!formData.address?.trim()) errors.push('Address is required');
         break;
@@ -572,7 +575,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
           {/* Step 2: Birth & Physical */}
           {currentStep === 2 && (
             <>
-          {/* DOB */}
+          {/* DOB - only valid dates, min 100 years back, max so age is at least 21 */}
           <div>
             <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>
               Date of Birth <span style={{ color: '#dc2626' }}>*</span>
@@ -580,6 +583,8 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             <input
               type="date"
               value={formData.dob}
+              min={`${new Date().getFullYear() - 100}-01-01`}
+              max={new Date(new Date().setFullYear(new Date().getFullYear() - 21)).toISOString().split('T')[0]}
               onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
               required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
@@ -622,14 +627,23 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             />
           </div>
 
-          {/* Height */}
+          {/* Height - only numbers and decimal point */}
           <div>
             <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>Height <span style={{ color: '#dc2626' }}>*</span></label>
             <input
               type="text"
-              placeholder="Height (e.g., 5ft 8in)"
+              inputMode="decimal"
+              placeholder="e.g. 5.8 or 168 (numbers and point only)"
               value={formData.height}
-              onChange={(e) => setFormData({ ...formData, height: e.target.value })}
+              onChange={(e) => {
+                const v = e.target.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1');
+                setFormData({ ...formData, height: v });
+                if (stepErrors[2]) {
+                  const newErrors = { ...stepErrors };
+                  delete newErrors[2];
+                  setStepErrors(newErrors);
+                }
+              }}
               required
               className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
               style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
@@ -661,9 +675,7 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
 
           {/* Step 3: Family (Father, Mother, Siblings) */}
           {currentStep === 3 && (
-            <>
-          <p style={{ marginBottom: '12px', color: 'var(--muted)', fontSize: '13px' }}>Father & Mother details are required. Type &quot;Late&quot; if deceased — occupation and contact will be disabled. Otherwise occupation and contact are required. Then add siblings below.</p>
-          {/* Father & Mother */}
+            <>{/* Father & Mother */}
           <div className="mb-4 p-3 rounded-xl border-2" style={{ borderColor: 'var(--border)', backgroundColor: 'var(--card)' }}>
             <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text)', marginBottom: '10px' }}>Father <span style={{ color: '#dc2626' }}>*</span></h3>
             <div className="space-y-2 mb-3">
@@ -690,9 +702,11 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               />
               <input
                 type="tel"
-                placeholder={isLate(formData.fatherName) ? "Father's Contact (disabled)" : "Father's Contact *"}
+                inputMode="numeric"
+                placeholder={isLate(formData.fatherName) ? "Father's Contact (disabled)" : "10-digit number *"}
                 value={formData.fatherContact}
-                onChange={(e) => setFormData({ ...formData, fatherContact: e.target.value })}
+                maxLength={10}
+                onChange={(e) => setFormData({ ...formData, fatherContact: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                 disabled={isLate(formData.fatherName)}
                 className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
@@ -723,9 +737,11 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               />
               <input
                 type="tel"
-                placeholder={isLate(formData.motherName) ? "Mother's Contact (disabled)" : "Mother's Contact *"}
+                inputMode="numeric"
+                placeholder={isLate(formData.motherName) ? "Mother's Contact (disabled)" : "10-digit number *"}
                 value={formData.motherContact}
-                onChange={(e) => setFormData({ ...formData, motherContact: e.target.value })}
+                maxLength={10}
+                onChange={(e) => setFormData({ ...formData, motherContact: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                 disabled={isLate(formData.motherName)}
                 className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
@@ -1118,9 +1134,15 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               </select>
               <input
                 type="tel"
-                placeholder="Enter Your Phone Number"
+                inputMode="numeric"
+                placeholder="10-digit number"
                 value={formData.phone}
-                onChange={(e) => { setFormData({ ...formData, phone: e.target.value }); setPhoneError(''); }}
+                maxLength={10}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  setFormData({ ...formData, phone: v });
+                  setPhoneError('');
+                }}
                 onBlur={() => checkPhoneAvailability(formData.phone)}
                 required
                 className="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
@@ -1148,9 +1170,15 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               </select>
               <input
                 type="tel"
-                placeholder="Optional second number"
+                inputMode="numeric"
+                placeholder="10-digit number (optional)"
                 value={formData.phone2}
-                onChange={(e) => { setFormData({ ...formData, phone2: e.target.value }); setPhone2Error(''); }}
+                maxLength={10}
+                onChange={(e) => {
+                  const v = e.target.value.replace(/\D/g, '').slice(0, 10);
+                  setFormData({ ...formData, phone2: v });
+                  setPhone2Error('');
+                }}
                 onBlur={() => checkPhone2Availability(formData.phone2)}
                 className="flex-1 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
                 style={{ borderColor: phone2Error ? '#dc2626' : 'var(--border)', color: 'var(--text)' }}
