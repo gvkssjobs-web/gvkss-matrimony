@@ -523,8 +523,9 @@ export default function Home() {
                         <div className="absolute top-2 right-2 z-10 flex gap-1" style={{ top: 8, right: 8 }} onClick={(e) => e.stopPropagation()}>
                           <button
                             type="button"
-                            onClick={() => setPhotoIndex(photoIndex <= 0 ? photoCount - 1 : photoIndex - 1)}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg text-white"
+                            onClick={() => photoIndex > 0 && setPhotoIndex(photoIndex - 1)}
+                            disabled={photoIndex <= 0}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg text-white disabled:opacity-40 disabled:cursor-default"
                             style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
                             aria-label="Previous photo"
                           >
@@ -532,8 +533,9 @@ export default function Home() {
                           </button>
                           <button
                             type="button"
-                            onClick={() => setPhotoIndex(photoIndex >= photoCount - 1 ? 0 : photoIndex + 1)}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg text-white"
+                            onClick={() => photoIndex < photoCount - 1 && setPhotoIndex(photoIndex + 1)}
+                            disabled={photoIndex >= photoCount - 1}
+                            className="w-8 h-8 flex items-center justify-center rounded-lg text-white disabled:opacity-40 disabled:cursor-default"
                             style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
                             aria-label="Next photo"
                           >
