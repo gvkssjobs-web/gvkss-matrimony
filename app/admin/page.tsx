@@ -141,7 +141,7 @@ export default function AdminPage() {
   return (
     <ProtectedRoute requiredRole="admin">
       <div className="w-full max-w-6xl mx-auto mt-3 sm:mt-3 px-3 sm:px-6 lg:px-8 pb-8">
-        <div className="p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl shadow-2xl border border-pink-100" style={{ backgroundColor: '#FFFFFF' }}>
+        <div className="p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-                                                              3xl shadow-2xl border border-pink-100" style={{ backgroundColor: '#FFFFFF' }}>
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
             <h1 className="text-2xl sm:text-3xl font-bold">Admin Panel</h1>
             <Link
