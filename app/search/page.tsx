@@ -225,16 +225,18 @@ function SearchResultsContent() {
                           <div style={{ position: 'absolute', top: 8, right: 8, zIndex: 10, display: 'flex', gap: 4 }} onClick={(e) => e.stopPropagation()}>
                             <button
                               type="button"
-                              onClick={() => setPhotoIndex(photoIndex <= 0 ? photoCount - 1 : photoIndex - 1)}
-                              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer' }}
+                              onClick={() => photoIndex > 0 && setPhotoIndex(photoIndex - 1)}
+                              disabled={photoIndex <= 0}
+                              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: photoIndex <= 0 ? 'default' : 'pointer', opacity: photoIndex <= 0 ? 0.4 : 1 }}
                               aria-label="Previous photo"
                             >
                               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                             </button>
                             <button
                               type="button"
-                              onClick={() => setPhotoIndex(photoIndex >= photoCount - 1 ? 0 : photoIndex + 1)}
-                              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: 'pointer' }}
+                              onClick={() => photoIndex < photoCount - 1 && setPhotoIndex(photoIndex + 1)}
+                              disabled={photoIndex >= photoCount - 1}
+                              style={{ width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', cursor: photoIndex >= photoCount - 1 ? 'default' : 'pointer', opacity: photoIndex >= photoCount - 1 ? 0.4 : 1 }}
                               aria-label="Next photo"
                             >
                               <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>

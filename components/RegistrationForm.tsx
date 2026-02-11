@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { raasiOptions, starOptions, padamOptions, gothramOptions } from '@/lib/registration-options';
+import { time24ToParts, time12To24 } from '@/lib/format-time';
 
 export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_add' }) {
   const router = useRouter();
@@ -594,21 +595,66 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
             />
           </div>
 
-          {/* Birth Time */}
+          {/* Birth Time - 12hr format */}
           <div>
             <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text)', fontWeight: 600, fontSize: '14px' }}>
-              Birth Time <span style={{ color: '#dc2626' }}>*</span>
+              Birth Time <span style={{ color: '#dc2626' }}>*</span> <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '12px' }}>(12-hour)</span>
             </label>
-            <input
-              type="time"
-              value={formData.birthTime}
-              onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
-              required
-              className="w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
-              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            />
+            <div className="flex gap-2 flex-wrap">
+              <select
+                value={formData.birthTime ? time24ToParts(formData.birthTime).hour : ''}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  const { minute, ampm } = formData.birthTime ? time24ToParts(formData.birthTime) : { minute: 0, ampm: 'AM' as const };
+                  const hour = v === '' ? 12 : parseInt(v, 10);
+                  setFormData({ ...formData, birthTime: v === '' ? '' : time12To24(hour, minute, ampm) });
+                }}
+                required
+                className="flex-1 min-w-[4rem] px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+              >
+                <option value="">Hour</option>
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((h) => (
+                  <option key={h} value={h}>{h}</option>
+                ))}
+              </select>
+              <select
+                value={formData.birthTime ? time24ToParts(formData.birthTime).minute : ''}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  const { hour, ampm } = formData.birthTime ? time24ToParts(formData.birthTime) : { hour: 12, ampm: 'AM' as const };
+                  const minute = v === '' ? 0 : parseInt(v, 10);
+                  setFormData({ ...formData, birthTime: v === '' ? '' : time12To24(hour, minute, ampm) });
+                }}
+                required
+                className="flex-1 min-w-[4rem] px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+              >
+                <option value="">Min</option>
+                {Array.from({ length: 60 }, (_, i) => (
+                  <option key={i} value={i}>{String(i).padStart(2, '0')}</option>
+                ))}
+              </select>
+              <select
+                value={formData.birthTime ? time24ToParts(formData.birthTime).ampm : 'AM'}
+                onChange={(e) => {
+                  const ampm = e.target.value as 'AM' | 'PM';
+                  const { hour, minute } = formData.birthTime ? time24ToParts(formData.birthTime) : { hour: 12, minute: 0 };
+                  setFormData({ ...formData, birthTime: time12To24(hour, minute, ampm) });
+                }}
+                className="w-20 px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 bg-white transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+              >
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
           </div>
 
           {/* Birth Place */}
@@ -1248,14 +1294,15 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 p-1 rounded focus:outline-none"
+                className="absolute right-3 p-1 rounded focus:outline-none flex items-center justify-center"
                 style={{ color: 'var(--muted)' }}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'View password'}
+                aria-label={showPassword ? 'Hide password' : 'View password'}
               >
                 {showPassword ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878a4.5 4.5 0 106.262 6.262M4.031 11.117A9.953 9.953 0 003 12c0 4.478 2.943 8.268 7 9.543 2.767 1.128 5.878 1.128 8.61 0a9.953 9.953 0 003.117-1.117m5.858-.908L4.031 4.031m13.938 13.938L4.031 4.031" /></svg>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878a4.5 4.5 0 106.262 6.262M4.031 11.117A9.953 9.953 0 003 12c0 4.478 2.943 8.268 7 9.543 2.767 1.128 5.878 1.128 8.61 0a9.953 9.953 0 003.117-1.117m5.858-.908L4.031 4.031m13.938 13.938L4.031 4.031" /></svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                 )}
               </button>
             </div>
@@ -1288,14 +1335,15 @@ export default function RegistrationForm({ mode }: { mode: 'register' | 'admin_a
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 p-1 rounded focus:outline-none"
+                className="absolute right-3 p-1 rounded focus:outline-none flex items-center justify-center"
                 style={{ color: 'var(--muted)' }}
-                aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                title={showConfirmPassword ? 'Hide password' : 'View password'}
+                aria-label={showConfirmPassword ? 'Hide password' : 'View password'}
               >
                 {showConfirmPassword ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878a4.5 4.5 0 106.262 6.262M4.031 11.117A9.953 9.953 0 003 12c0 4.478 2.943 8.268 7 9.543 2.767 1.128 5.878 1.128 8.61 0a9.953 9.953 0 003.117-1.117m5.858-.908L4.031 4.031m13.938 13.938L4.031 4.031" /></svg>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878a4.5 4.5 0 106.262 6.262M4.031 11.117A9.953 9.953 0 003 12c0 4.478 2.943 8.268 7 9.543 2.767 1.128 5.878 1.128 8.61 0a9.953 9.953 0 003.117-1.117m5.858-.908L4.031 4.031m13.938 13.938L4.031 4.031" /></svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                 )}
               </button>
             </div>

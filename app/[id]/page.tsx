@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getCurrentUser, isAdmin, User } from '@/lib/auth';
 import { raasiOptions, starOptions, padamOptions, gothramOptions } from '@/lib/registration-options';
+import { time24To12 } from '@/lib/format-time';
 
 interface UserProfile {
   id: number;
@@ -410,27 +411,6 @@ export default function UserProfilePage() {
     }
   };
 
-  // Format 24-hour time (e.g. "14:30" or "14:30:00") to 12-hour format (e.g. "2:30 PM")
-  const formatBirthTime = (timeStr: string | null) => {
-    if (!timeStr) return '';
-
-    // Keep only the time part if there is a date prefix
-    const onlyTime = timeStr.trim().split(' ')[0];
-
-    const parts = onlyTime.split(':');
-    if (parts.length < 2) return timeStr; // fallback to original if unexpected format
-
-    let hours = parseInt(parts[0], 10);
-    const minutes = parts[1];
-    if (Number.isNaN(hours)) return timeStr;
-
-    const suffix = hours >= 12 ? 'PM' : 'AM';
-    hours = hours % 12;
-    if (hours === 0) hours = 12;
-
-    return `${hours}:${minutes} ${suffix}`;
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen" style={{ backgroundColor: 'var(--bg)' }}>
@@ -478,16 +458,18 @@ export default function UserProfilePage() {
                 <div className="absolute top-3 right-3 z-10 flex gap-1">
                   <button
                     type="button"
-                    onClick={() => setPhotoIndex((i) => (i <= 0 ? photoCount - 1 : i - 1))}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-zinc-800/90 text-white hover:bg-zinc-700 shadow-md"
+                    onClick={() => setPhotoIndex((i) => (i > 0 ? i - 1 : i))}
+                    disabled={photoIndex <= 0}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-zinc-800/90 text-white hover:bg-zinc-700 shadow-md disabled:opacity-40 disabled:cursor-default disabled:hover:bg-zinc-800/90"
                     aria-label="Previous photo"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPhotoIndex((i) => (i >= photoCount - 1 ? 0 : i + 1))}
-                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-zinc-800/90 text-white hover:bg-zinc-700 shadow-md"
+                    onClick={() => setPhotoIndex((i) => (i < photoCount - 1 ? i + 1 : i))}
+                    disabled={photoIndex >= photoCount - 1}
+                    className="w-10 h-10 flex items-center justify-center rounded-lg bg-zinc-800/90 text-white hover:bg-zinc-700 shadow-md disabled:opacity-40 disabled:cursor-default disabled:hover:bg-zinc-800/90"
                     aria-label="Next photo"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -624,7 +606,7 @@ export default function UserProfilePage() {
                       if (editing || hasVal(user.gender)) rows.push({ label: 'Gender', show: true, input: 'gender', render: editing ? undefined : (user.gender === 'bride' ? 'Bride' : user.gender === 'groom' ? 'Groom' : user.gender || '') });
                       if (editing || hasVal(user.marriageStatus)) rows.push({ label: 'Marital Status', show: true, input: 'marriageStatus', type: 'text' });
                       if (editing || hasVal(user.dob)) rows.push({ label: 'Date of Birth', show: true, input: 'dob', render: editing ? undefined : (user.dob ? new Date(user.dob).toLocaleDateString() : '') });
-                      if (editing || hasVal(user.birthTime)) rows.push({ label: 'Birth Time', show: true, input: 'birthTime', render: editing ? undefined : (user.birthTime ? formatBirthTime(user.birthTime) : '') });
+                      if (editing || hasVal(user.birthTime)) rows.push({ label: 'Birth Time', show: true, input: 'birthTime', render: editing ? undefined : (user.birthTime ? time24To12(user.birthTime) : '') });
                       if (editing || hasVal(user.birthPlace)) rows.push({ label: 'Birth Place', show: true, input: 'birthPlace', type: 'text' });
                       if (editing || hasVal(user.height)) rows.push({ label: 'Height', show: true, input: 'height', type: 'text' });
                       if (editing || hasVal(user.complexion)) rows.push({ label: 'Complexion', show: true, input: 'complexion', render: editing ? undefined : (user.complexion ? String(user.complexion) : '') });
@@ -665,7 +647,7 @@ export default function UserProfilePage() {
                             ) : row.input === 'dob' ? (
                               <input type="date" value={editForm.dob ? String(editForm.dob).slice(0, 10) : ''} onChange={(e) => setEditForm((f) => ({ ...f, dob: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
                             ) : row.input === 'birthTime' ? (
-                              <input type="text" placeholder="e.g. 14:30" value={editForm.birthTime ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, birthTime: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} />
+                              <input type="text" placeholder="e.g. 2:30 PM or 14:30" value={editForm.birthTime ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, birthTime: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg" style={{ borderColor: 'var(--border)' }} title="Store as 24h (14:30) or display as 12h (2:30 PM)" />
                             ) : row.input === 'star' ? (
                               <select value={editForm.star ?? ''} onChange={(e) => setEditForm((f) => ({ ...f, star: e.target.value || null }))} className="flex-1 px-3 py-2 border-2 rounded-lg bg-white" style={{ borderColor: 'var(--border)' }}><option value="">Select</option>{starOptions.map((o) => <option key={o} value={o}>{o}</option>)}</select>
                             ) : row.input === 'raasi' ? (
